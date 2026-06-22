@@ -506,6 +506,49 @@
 
 - **ndc_core.networks.domestic_water.profiles.DomesticWaterProfile.flow_attribute_name(self)** -> `str`
 
+## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\section_sizing.py
+
+- **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizing.sized(self)** -> `bool`
+- **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizing.has_warnings(self)** -> `bool`
+  - calls: any
+- **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizing.has_errors(self)** -> `bool`
+  - calls: any
+- **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine.cold_water(cls, appliance_catalog, pipe_catalog)** -> `DomesticWaterSectionSizingEngine`
+  - calls: cls
+- **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine.hot_water(cls, appliance_catalog, pipe_catalog)** -> `DomesticWaterSectionSizingEngine`
+  - calls: cls
+- **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine.size_section_from_counts(self, section, appliance_counts, max_velocity_m_s)** -> `Result[DomesticWaterSectionSizing]`
+  - calls: DomesticWaterDemandBuilder, DomesticWaterDemandBuilder(appliance_catalog=self.appliance_catalog, profile=self.profile).compute_from_counts, DomesticWaterSectionSizing, EngineMessage.warning, Result.failure, Result.partial, Result.success, _apply_sizing_to_section, _minimum_appliance_internal_diameter_mm, _normalize_counts, max, messages.append, messages.extend, self._select_or_force_diameter, tuple ...
+- **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine._select_or_force_diameter(self, section, demand, raw_counts, effective_counts, min_required_diameter_mm, max_velocity_m_s, messages)** -> `DomesticWaterSectionSizing`
+  - calls: _clean_optional_code, _positive_optional_float, self._size_automatically, self._size_with_forced_internal_diameter, self._size_with_forced_pipe
+- **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine._size_automatically(self, section, demand, raw_counts, effective_counts, min_required_diameter_mm, max_velocity_m_s, messages)** -> `DomesticWaterSectionSizing`
+  - calls: DomesticWaterSectionSizing, EngineMessage.error, list, messages.append, section.fluid_code.lower, select_pipe_size_by_velocity, self.pipe_catalog.list_sizes_for_material, self.pipe_catalog.sizes_by_code.values, tuple
+- **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine._size_with_forced_pipe(self, section, demand, forced_pipe_code, min_required_diameter_mm, max_velocity_m_s, messages)** -> `DomesticWaterSectionSizing`
+  - calls: DomesticWaterSectionSizing, EngineMessage.error, EngineMessage.warning, messages.append, select_pipe_size_by_velocity, self.pipe_catalog.get_size, self.pipe_catalog.sizes_by_code.values, tuple, velocity_from_l_s_and_mm
+- **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine._size_with_forced_internal_diameter(self, section, demand, forced_diameter_mm, min_required_diameter_mm, max_velocity_m_s, messages)** -> `DomesticWaterSectionSizing`
+  - calls: DomesticWaterSectionSizing, EngineMessage.warning, messages.append, select_pipe_size_by_velocity, self.pipe_catalog.sizes_by_code.values, tuple, velocity_from_l_s_and_mm
+- **ndc_core.networks.domestic_water.section_sizing.size_cold_water_section_from_counts(section, appliance_counts, appliance_catalog, pipe_catalog, max_velocity_m_s)** -> `Result[DomesticWaterSectionSizing]`
+  - calls: DomesticWaterSectionSizingEngine.cold_water, DomesticWaterSectionSizingEngine.cold_water(appliance_catalog=appliance_catalog, pipe_catalog=pipe_catalog).size_section_from_counts
+  - doc: Convenience function for EFS section sizing.
+- **ndc_core.networks.domestic_water.section_sizing.size_hot_water_section_from_counts(section, appliance_counts, appliance_catalog, pipe_catalog, max_velocity_m_s)** -> `Result[DomesticWaterSectionSizing]`
+  - calls: DomesticWaterSectionSizingEngine.hot_water, DomesticWaterSectionSizingEngine.hot_water(appliance_catalog=appliance_catalog, pipe_catalog=pipe_catalog).size_section_from_counts
+  - doc: Convenience function for ECS forward section sizing.
+- **ndc_core.networks.domestic_water.section_sizing.velocity_limit_for_context(usage_context)** -> `float`
+  - calls: isinstance, str, value.strip, value.strip().lower
+  - doc: Return default velocity limit for domestic water.
+- **ndc_core.networks.domestic_water.section_sizing._apply_sizing_to_section(section, sizing, raw_counts, effective_counts)** -> `None`
+  - calls: section.downstream_appliance_counts.clear, section.downstream_appliance_counts.update, section.effective_appliance_counts.clear, section.effective_appliance_counts.update
+- **ndc_core.networks.domestic_water.section_sizing._minimum_appliance_internal_diameter_mm(appliance_catalog, appliance_counts, profile)** -> `float`
+  - calls: _flow_for_profile, appliance_catalog.get, appliance_counts.items, float
+- **ndc_core.networks.domestic_water.section_sizing._flow_for_profile(appliance, profile)** -> `float`
+  - calls: float, getattr, max
+- **ndc_core.networks.domestic_water.section_sizing._normalize_counts(appliance_counts)** -> `dict[str, int]`
+  - calls: appliance_counts.items, int, normalized.get, str, str(raw_code or '').strip
+- **ndc_core.networks.domestic_water.section_sizing._clean_optional_code(value)** -> `str | None`
+  - calls: str, str(value or '').strip
+- **ndc_core.networks.domestic_water.section_sizing._positive_optional_float(value)** -> `float | None`
+  - calls: float
+
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\simultaneity.py
 
 - **ndc_core.networks.domestic_water.simultaneity.collective_dtu_simultaneity_factor(appliance_count, threshold)** -> `float`
@@ -817,6 +860,31 @@
   - calls: DomesticWaterDemandBuilder.cold_water, DomesticWaterDemandBuilder.cold_water(_catalog()).compute_from_counts, _catalog
 - **tests.networks.domestic_water.test_demand.test_invalid_counts_are_ignored()** -> `None`
   - calls: _catalog, compute_cold_water_demand
+
+## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_section_sizing.py
+
+- **tests.networks.domestic_water.test_section_sizing._appliance_catalog()** -> `ApplianceCatalog`
+  - calls: Appliance, ApplianceCatalog
+- **tests.networks.domestic_water.test_section_sizing._pipe_catalog()** -> `PipeCatalog`
+  - calls: PipeCatalog, PipeMaterial, PipeSize
+- **tests.networks.domestic_water.test_section_sizing._section(**kwargs)** -> `Section`
+  - calls: Section, values.update
+- **tests.networks.domestic_water.test_section_sizing.test_velocity_limit_for_context()** -> `None`
+  - calls: velocity_limit_for_context
+- **tests.networks.domestic_water.test_section_sizing.test_size_cold_water_section_automatic()** -> `None`
+  - calls: _appliance_catalog, _pipe_catalog, _section, size_cold_water_section_from_counts
+- **tests.networks.domestic_water.test_section_sizing.test_size_section_respects_machine_exclusivity()** -> `None`
+  - calls: _appliance_catalog, _pipe_catalog, _section, size_cold_water_section_from_counts
+- **tests.networks.domestic_water.test_section_sizing.test_size_cold_water_section_with_forced_pipe()** -> `None`
+  - calls: _appliance_catalog, _pipe_catalog, _section, size_cold_water_section_from_counts
+- **tests.networks.domestic_water.test_section_sizing.test_size_cold_water_section_with_forced_internal_diameter()** -> `None`
+  - calls: _appliance_catalog, _pipe_catalog, _section, size_cold_water_section_from_counts
+- **tests.networks.domestic_water.test_section_sizing.test_forced_diameter_below_minimum_creates_warning()** -> `None`
+  - calls: _appliance_catalog, _pipe_catalog, _section, any, size_cold_water_section_from_counts
+- **tests.networks.domestic_water.test_section_sizing.test_unknown_forced_pipe_returns_failure()** -> `None`
+  - calls: _appliance_catalog, _pipe_catalog, _section, any, size_cold_water_section_from_counts
+- **tests.networks.domestic_water.test_section_sizing.test_zero_hot_water_demand_returns_partial_without_exception()** -> `None`
+  - calls: _appliance_catalog, _pipe_catalog, _section, any, size_hot_water_section_from_counts
 
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_simultaneity.py
 

@@ -8,6 +8,14 @@ from ndc_core.networks.domestic_water.profiles import (
     HOT_WATER_PROFILE,
     DomesticWaterProfile,
 )
+from ndc_core.networks.domestic_water.section_sizing import (
+    DomesticWaterSectionSizing,
+    DomesticWaterSectionSizingEngine,
+    SectionSizingMode,
+    size_cold_water_section_from_counts,
+    size_hot_water_section_from_counts,
+    velocity_limit_for_context,
+)
 from ndc_core.networks.domestic_water.simultaneity import (
     clamp_simultaneity_factor,
     collective_dtu_simultaneity_factor,
@@ -26,10 +34,16 @@ __all__ = [
     "DomesticWaterDemandBuilder",
     "DomesticWaterMethod",
     "DomesticWaterProfile",
+    "DomesticWaterSectionSizing",
+    "DomesticWaterSectionSizingEngine",
     "DomesticWaterSide",
     "HOT_WATER_PROFILE",
+    "SectionSizingMode",
     "clamp_simultaneity_factor",
     "collective_dtu_simultaneity_factor",
     "compute_cold_water_demand",
     "compute_hot_water_demand",
+    "size_cold_water_section_from_counts",
+    "size_hot_water_section_from_counts",
+    "velocity_limit_for_context",
 ]
