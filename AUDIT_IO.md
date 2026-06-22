@@ -505,6 +505,54 @@
 - **ndc_core.networks.domestic_water.demand._flow_for_profile(appliance, profile)** -> `float`
   - calls: float, getattr, max
 
+## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\network_engine.py
+
+- **ndc_core.networks.domestic_water.network_engine.DomesticWaterSectionComputeResult.sizing_ok(self)** -> `bool`
+- **ndc_core.networks.domestic_water.network_engine.DomesticWaterSectionComputeResult.pressure_loss_ok(self)** -> `bool`
+- **ndc_core.networks.domestic_water.network_engine.DomesticWaterSectionComputeResult.has_pressure_loss(self)** -> `bool`
+- **ndc_core.networks.domestic_water.network_engine.DomesticWaterSectionComputeResult.has_warnings(self)** -> `bool`
+  - calls: any
+- **ndc_core.networks.domestic_water.network_engine.DomesticWaterSectionComputeResult.has_errors(self)** -> `bool`
+  - calls: any
+- **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkComputeResult.section_count(self)** -> `int`
+  - calls: len
+- **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkComputeResult.sized_section_count(self)** -> `int`
+  - calls: self.section_results.values, sum
+- **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkComputeResult.pressure_loss_section_count(self)** -> `int`
+  - calls: self.section_results.values, sum
+- **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkComputeResult.has_pressure_propagation(self)** -> `bool`
+- **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkComputeResult.has_pressure_summary(self)** -> `bool`
+- **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkComputeResult.has_warnings(self)** -> `bool`
+  - calls: any
+- **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkComputeResult.has_errors(self)** -> `bool`
+  - calls: any
+- **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine.cold_water(cls, nodes, sections, appliance_catalog, pipe_catalog, fluid_catalog, singular_loss_catalog)** -> `DomesticWaterNetworkEngine`
+  - calls: cls
+- **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine.hot_water(cls, nodes, sections, appliance_catalog, pipe_catalog, fluid_catalog, singular_loss_catalog)** -> `DomesticWaterNetworkEngine`
+  - calls: cls
+- **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine.compute_sections(self, max_velocity_m_s, water_temperature_c)** -> `Result[DomesticWaterNetworkComputeResult]`
+  - calls: DomesticWaterNetworkComputeResult, Result.failure, Result.partial, Result.success, _section_matches_side, messages.extend, self._compute_one_section, self.sections.items, str, tuple
+  - doc: Compute sizing and pressure losses for all sections matching the engine side.
+- **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine.compute_all(self, source_node_id, source_pressure_bar, min_required_pressure_bar, max_velocity_m_s, water_temperature_c)** -> `Result[DomesticWaterNetworkComputeResult]`
+  - calls: DomesticWaterNetworkComputeResult, DomesticWaterPressureNetworkEngine, Result.failure, Result.partial, Result.success, messages.extend, pressure_bar_to_pa, pressure_engine.propagate_pressures, pressure_engine.summarize_worst_terminal_pressure, self.compute_sections, tuple
+  - doc: Compute sections, then optionally propagate pressure and summarize terminals.
+- **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine._compute_one_section(self, section_id, section, max_velocity_m_s, water_temperature_c)** -> `DomesticWaterSectionComputeResult`
+  - calls: DomesticWaterSectionComputeResult, EngineMessage.warning, _read_section_downstream_appliance_counts, getattr, messages.append, messages.extend, self._compute_section_pressure_loss, self._size_section, tuple
+- **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine._size_section(self, section, appliance_counts, max_velocity_m_s)** -> `Result[DomesticWaterSectionSizing]`
+  - calls: size_cold_water_section_from_counts, size_hot_water_section_from_counts
+- **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine._compute_section_pressure_loss(self, section, water_temperature_c)** -> `Result[DomesticWaterPressureLossResult]`
+  - calls: compute_cold_water_section_pressure_loss, compute_hot_water_section_pressure_loss
+- **ndc_core.networks.domestic_water.network_engine.compute_cold_water_network(nodes, sections, appliance_catalog, pipe_catalog, fluid_catalog, singular_loss_catalog, source_node_id, source_pressure_bar, min_required_pressure_bar, max_velocity_m_s, water_temperature_c)** -> `Result[DomesticWaterNetworkComputeResult]`
+  - calls: DomesticWaterNetworkEngine.cold_water, DomesticWaterNetworkEngine.cold_water(nodes=nodes, sections=sections, appliance_catalog=appliance_catalog, pipe_catalog=pipe_catalog, fluid_catalog=fluid_catalog, singular_loss_catalog=singular_loss_catalog).compute_all
+  - doc: Convenience function for full EFS network computation.
+- **ndc_core.networks.domestic_water.network_engine.compute_hot_water_network(nodes, sections, appliance_catalog, pipe_catalog, fluid_catalog, singular_loss_catalog, source_node_id, source_pressure_bar, min_required_pressure_bar, max_velocity_m_s, water_temperature_c)** -> `Result[DomesticWaterNetworkComputeResult]`
+  - calls: DomesticWaterNetworkEngine.hot_water, DomesticWaterNetworkEngine.hot_water(nodes=nodes, sections=sections, appliance_catalog=appliance_catalog, pipe_catalog=pipe_catalog, fluid_catalog=fluid_catalog, singular_loss_catalog=singular_loss_catalog).compute_all
+  - doc: Convenience function for full ECS forward network computation.
+- **ndc_core.networks.domestic_water.network_engine._read_section_downstream_appliance_counts(section)** -> `dict[str, int]`
+  - calls: getattr, int, normalized.get, raw_counts.items, str, str(raw_code or '').strip
+- **ndc_core.networks.domestic_water.network_engine._section_matches_side(section, side)** -> `bool`
+  - calls: getattr, str, str(getattr(section, 'fluid_code', '') or '').strip, str(getattr(section, 'fluid_code', '') or '').strip().lower
+
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\pressure_loss.py
 
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossResult.reynolds(self)** -> `float | None`
@@ -947,6 +995,27 @@
   - calls: DomesticWaterDemandBuilder.cold_water, DomesticWaterDemandBuilder.cold_water(_catalog()).compute_from_counts, _catalog
 - **tests.networks.domestic_water.test_demand.test_invalid_counts_are_ignored()** -> `None`
   - calls: _catalog, compute_cold_water_demand
+
+## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_network_engine.py
+
+- **tests.networks.domestic_water.test_network_engine._appliance_catalog()** -> `ApplianceCatalog`
+  - calls: Appliance, ApplianceCatalog
+- **tests.networks.domestic_water.test_network_engine._pipe_catalog()** -> `PipeCatalog`
+  - calls: PipeCatalog, PipeMaterial, PipeSize
+- **tests.networks.domestic_water.test_network_engine._fluid_catalog()** -> `FluidCatalog`
+  - calls: Fluid, FluidCatalog
+- **tests.networks.domestic_water.test_network_engine._section(section_id, downstream_node_id, counts, elevation_change_m)** -> `Section`
+  - calls: Section, section.downstream_appliance_counts.update
+- **tests.networks.domestic_water.test_network_engine.test_compute_sections_sizes_and_computes_pressure_losses()** -> `None`
+  - calls: DomesticWaterNetworkEngine.cold_water, _Node, _appliance_catalog, _fluid_catalog, _pipe_catalog, _section, engine.compute_sections
+- **tests.networks.domestic_water.test_network_engine.test_compute_all_sizes_losses_and_propagates_pressure()** -> `None`
+  - calls: _Node, _appliance_catalog, _fluid_catalog, _pipe_catalog, _section, compute_cold_water_network
+- **tests.networks.domestic_water.test_network_engine.test_compute_all_without_source_only_computes_sections()** -> `None`
+  - calls: _Node, _appliance_catalog, _fluid_catalog, _pipe_catalog, _section, compute_cold_water_network
+- **tests.networks.domestic_water.test_network_engine.test_section_without_appliance_counts_returns_partial_without_exception()** -> `None`
+  - calls: _Node, _appliance_catalog, _fluid_catalog, _pipe_catalog, _section, any, compute_cold_water_network
+- **tests.networks.domestic_water.test_network_engine.test_hot_water_engine_ignores_cold_water_sections()** -> `None`
+  - calls: DomesticWaterNetworkEngine.hot_water, _Node, _appliance_catalog, _fluid_catalog, _pipe_catalog, _section, engine.compute_sections
 
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_pressure_loss.py
 

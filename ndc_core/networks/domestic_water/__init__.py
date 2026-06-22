@@ -3,6 +3,14 @@ from ndc_core.networks.domestic_water.demand import (
     compute_cold_water_demand,
     compute_hot_water_demand,
 )
+from ndc_core.networks.domestic_water.network_engine import (
+    DomesticWaterNetworkComputeResult,
+    DomesticWaterNetworkEngine,
+    DomesticWaterNetworkStep,
+    DomesticWaterSectionComputeResult,
+    compute_cold_water_network,
+    compute_hot_water_network,
+)
 from ndc_core.networks.domestic_water.pressure_loss import (
     DomesticWaterPressureLossEngine,
     DomesticWaterPressureLossMode,
@@ -52,6 +60,9 @@ __all__ = [
     "DomesticWaterDemand",
     "DomesticWaterDemandBuilder",
     "DomesticWaterMethod",
+    "DomesticWaterNetworkComputeResult",
+    "DomesticWaterNetworkEngine",
+    "DomesticWaterNetworkStep",
     "DomesticWaterPressureLossEngine",
     "DomesticWaterPressureLossMode",
     "DomesticWaterPressureLossResult",
@@ -59,6 +70,7 @@ __all__ = [
     "DomesticWaterPressurePropagationResult",
     "DomesticWaterPressureSummary",
     "DomesticWaterProfile",
+    "DomesticWaterSectionComputeResult",
     "DomesticWaterSectionSizing",
     "DomesticWaterSectionSizingEngine",
     "DomesticWaterSide",
@@ -70,8 +82,10 @@ __all__ = [
     "clamp_simultaneity_factor",
     "collective_dtu_simultaneity_factor",
     "compute_cold_water_demand",
+    "compute_cold_water_network",
     "compute_cold_water_section_pressure_loss",
     "compute_hot_water_demand",
+    "compute_hot_water_network",
     "compute_hot_water_section_pressure_loss",
     "propagate_cold_water_pressures",
     "propagate_hot_water_pressures",
