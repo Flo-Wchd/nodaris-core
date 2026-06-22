@@ -1,0 +1,555 @@
+from __future__ import annotations
+
+from collections import deque
+from collections.abc import Mapping
+from dataclasses import dataclass, field
+from enum import StrEnum
+from math import isfinite
+from typing import Any
+
+from ndc_core.common.messages import EngineMessage
+from ndc_core.common.result import Result
+from ndc_core.hydraulics.conversions import pressure_bar_to_pa, pressure_pa_to_bar
+from ndc_core.networks.domestic_water.types import DomesticWaterSide
+
+
+class PressurePropagationStatus(StrEnum):
+    """Pressure propagation status."""
+
+    SUCCESS = "success"
+    SOURCE_NOT_FOUND = "source_not_found"
+    NO_TERMINAL_REACHED = "no_terminal_reached"
+
+
+@dataclass(frozen=True, slots=True)
+class NodePressureState:
+    """Computed pressure state for one node."""
+
+    node_id: str
+    pressure_pa: float
+    pressure_bar: float
+    is_terminal: bool = False
+    min_required_pressure_bar: float | None = None
+    delta_to_min_bar: float | None = None
+    is_below_min: bool | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class DomesticWaterPressurePropagationResult:
+    """Network pressure propagation result."""
+
+    source_node_id: str
+    source_pressure_pa: float
+    source_pressure_bar: float
+    side: DomesticWaterSide
+    node_pressures: dict[str, NodePressureState]
+    messages: tuple[EngineMessage, ...] = field(default_factory=tuple)
+    status: PressurePropagationStatus = PressurePropagationStatus.SUCCESS
+
+    @property
+    def reached_node_ids(self) -> tuple[str, ...]:
+        return tuple(self.node_pressures)
+
+    @property
+    def has_warnings(self) -> bool:
+        return any(message.is_warning for message in self.messages)
+
+    @property
+    def has_errors(self) -> bool:
+        return any(message.is_error for message in self.messages)
+
+
+@dataclass(frozen=True, slots=True)
+class TerminalPressureStatus:
+    """Pressure status for one terminal node."""
+
+    node_id: str
+    pressure_pa: float
+    pressure_bar: float
+    min_required_pressure_bar: float
+    delta_to_min_bar: float
+    is_below_min: bool
+
+
+@dataclass(frozen=True, slots=True)
+class DomesticWaterPressureSummary:
+    """Worst terminal pressure summary."""
+
+    source_node_id: str
+    source_pressure_bar: float
+    min_required_pressure_bar: float
+    side: DomesticWaterSide
+    worst_terminal: TerminalPressureStatus | None
+    terminal_statuses: dict[str, TerminalPressureStatus]
+    propagation: DomesticWaterPressurePropagationResult
+    messages: tuple[EngineMessage, ...] = field(default_factory=tuple)
+
+    @property
+    def has_worst_terminal(self) -> bool:
+        return self.worst_terminal is not None
+
+    @property
+    def has_warnings(self) -> bool:
+        return any(message.is_warning for message in self.messages)
+
+    @property
+    def has_errors(self) -> bool:
+        return any(message.is_error for message in self.messages)
+
+
+@dataclass(frozen=True, slots=True)
+class DomesticWaterPressureNetworkEngine:
+    """
+    Common EFS/ECS pressure propagation engine.
+
+    This engine does not compute section pressure losses. It only consumes:
+
+        Section.total_pressure_loss_pa
+
+    Convention:
+
+        p_down = p_up - total_pressure_loss_pa
+
+    If total_pressure_loss_pa is negative, downstream pressure increases.
+    """
+
+    nodes: Mapping[str, Any]
+    sections: Mapping[str, Any]
+    side: DomesticWaterSide = DomesticWaterSide.COLD_WATER
+
+    def propagate_pressures(
+        self,
+        *,
+        source_node_id: str,
+        source_pressure_pa: float,
+    ) -> Result[DomesticWaterPressurePropagationResult]:
+        messages: list[EngineMessage] = []
+
+        source_id = str(source_node_id or "").strip()
+        if not source_id:
+            messages.append(
+                EngineMessage.error(
+                    code="DOMESTIC_WATER_PRESSURE_SOURCE_EMPTY",
+                    text="Source node id is empty; pressure propagation cannot start.",
+                    context={},
+                )
+            )
+            return Result.failure(messages=messages)
+
+        if source_id not in self.nodes:
+            messages.append(
+                EngineMessage.error(
+                    code="DOMESTIC_WATER_PRESSURE_SOURCE_NOT_FOUND",
+                    text="Source node was not found; pressure propagation cannot start.",
+                    context={"source_node_id": source_id},
+                )
+            )
+            result = DomesticWaterPressurePropagationResult(
+                source_node_id=source_id,
+                source_pressure_pa=0.0,
+                source_pressure_bar=0.0,
+                side=self.side,
+                node_pressures={},
+                messages=tuple(messages),
+                status=PressurePropagationStatus.SOURCE_NOT_FOUND,
+            )
+            return Result.failure(value=result, messages=messages)
+
+        source_pressure = _safe_pressure_pa(source_pressure_pa)
+
+        pressures_pa: dict[str, float] = {source_id: source_pressure}
+        queue: deque[str] = deque([source_id])
+        warned_missing_losses: set[str] = set()
+
+        while queue:
+            current_node_id = queue.popleft()
+            current_pressure_pa = pressures_pa.get(current_node_id, 0.0)
+
+            node = self.nodes.get(current_node_id)
+            downstream_section_ids = _read_downstream_section_ids(node)
+
+            for section_id in downstream_section_ids:
+                section = self.sections.get(section_id)
+                if section is None:
+                    messages.append(
+                        EngineMessage.warning(
+                            code="DOMESTIC_WATER_PRESSURE_SECTION_NOT_FOUND",
+                            text="Section referenced by node was not found.",
+                            context={
+                                "node_id": current_node_id,
+                                "section_id": section_id,
+                            },
+                        )
+                    )
+                    continue
+
+                if not _section_matches_side(section, self.side):
+                    continue
+
+                downstream_node_id = _clean_optional_code(
+                    getattr(section, "downstream_node_id", None)
+                )
+                if downstream_node_id is None:
+                    messages.append(
+                        EngineMessage.warning(
+                            code="DOMESTIC_WATER_PRESSURE_DOWNSTREAM_NODE_MISSING",
+                            text="Section has no downstream node; pressure propagation skipped.",
+                            context={"section_id": section_id},
+                        )
+                    )
+                    continue
+
+                delta_p_pa = _read_section_pressure_loss_pa(
+                    section_id=section_id,
+                    section=section,
+                    messages=messages,
+                    warned_missing_losses=warned_missing_losses,
+                )
+
+                downstream_pressure_pa = max(0.0, current_pressure_pa - delta_p_pa)
+
+                _apply_section_pressures(
+                    section=section,
+                    pressure_start_pa=current_pressure_pa,
+                    pressure_end_pa=downstream_pressure_pa,
+                )
+
+                previous_pressure = pressures_pa.get(downstream_node_id)
+
+                if (
+                    previous_pressure is None
+                    or downstream_pressure_pa < previous_pressure
+                ):
+                    pressures_pa[downstream_node_id] = downstream_pressure_pa
+                    queue.append(downstream_node_id)
+
+        node_states = {
+            node_id: NodePressureState(
+                node_id=node_id,
+                pressure_pa=pressure_pa,
+                pressure_bar=pressure_pa_to_bar(pressure_pa),
+                is_terminal=_is_terminal_node(self.nodes.get(node_id), self.sections, self.side),
+            )
+            for node_id, pressure_pa in pressures_pa.items()
+        }
+
+        _apply_node_pressures(self.nodes, node_states)
+
+        result = DomesticWaterPressurePropagationResult(
+            source_node_id=source_id,
+            source_pressure_pa=source_pressure,
+            source_pressure_bar=pressure_pa_to_bar(source_pressure),
+            side=self.side,
+            node_pressures=node_states,
+            messages=tuple(messages),
+            status=PressurePropagationStatus.SUCCESS,
+        )
+
+        return Result.success(value=result, messages=messages)
+
+    def summarize_worst_terminal_pressure(
+        self,
+        *,
+        source_node_id: str,
+        source_pressure_bar: float,
+        min_required_pressure_bar: float = 1.0,
+    ) -> Result[DomesticWaterPressureSummary]:
+        messages: list[EngineMessage] = []
+
+        source_pressure_bar_f = _safe_non_negative_float(source_pressure_bar)
+        min_required_bar_f = _safe_non_negative_float(
+            min_required_pressure_bar,
+            default=1.0,
+        )
+
+        propagation_result = self.propagate_pressures(
+            source_node_id=source_node_id,
+            source_pressure_pa=pressure_bar_to_pa(source_pressure_bar_f),
+        )
+
+        messages.extend(propagation_result.messages)
+
+        if propagation_result.value is None:
+            summary = DomesticWaterPressureSummary(
+                source_node_id=str(source_node_id or "").strip(),
+                source_pressure_bar=source_pressure_bar_f,
+                min_required_pressure_bar=min_required_bar_f,
+                side=self.side,
+                worst_terminal=None,
+                terminal_statuses={},
+                propagation=DomesticWaterPressurePropagationResult(
+                    source_node_id=str(source_node_id or "").strip(),
+                    source_pressure_pa=0.0,
+                    source_pressure_bar=0.0,
+                    side=self.side,
+                    node_pressures={},
+                    messages=tuple(messages),
+                    status=PressurePropagationStatus.SOURCE_NOT_FOUND,
+                ),
+                messages=tuple(messages),
+            )
+            return Result.failure(value=summary, messages=messages)
+
+        terminal_statuses: dict[str, TerminalPressureStatus] = {}
+
+        for node_id, state in propagation_result.value.node_pressures.items():
+            if not state.is_terminal:
+                continue
+
+            delta_to_min = state.pressure_bar - min_required_bar_f
+
+            terminal_statuses[node_id] = TerminalPressureStatus(
+                node_id=node_id,
+                pressure_pa=state.pressure_pa,
+                pressure_bar=state.pressure_bar,
+                min_required_pressure_bar=min_required_bar_f,
+                delta_to_min_bar=delta_to_min,
+                is_below_min=delta_to_min < 0.0,
+            )
+
+        if not terminal_statuses:
+            messages.append(
+                EngineMessage.warning(
+                    code="DOMESTIC_WATER_PRESSURE_NO_TERMINAL_REACHED",
+                    text="No terminal node was reached during pressure propagation.",
+                    context={"source_node_id": str(source_node_id or "").strip()},
+                )
+            )
+            summary = DomesticWaterPressureSummary(
+                source_node_id=propagation_result.value.source_node_id,
+                source_pressure_bar=source_pressure_bar_f,
+                min_required_pressure_bar=min_required_bar_f,
+                side=self.side,
+                worst_terminal=None,
+                terminal_statuses={},
+                propagation=propagation_result.value,
+                messages=tuple(messages),
+            )
+            return Result.partial(value=summary, messages=messages)
+
+        worst_terminal = min(
+            terminal_statuses.values(),
+            key=lambda terminal: terminal.delta_to_min_bar,
+        )
+
+        summary = DomesticWaterPressureSummary(
+            source_node_id=propagation_result.value.source_node_id,
+            source_pressure_bar=source_pressure_bar_f,
+            min_required_pressure_bar=min_required_bar_f,
+            side=self.side,
+            worst_terminal=worst_terminal,
+            terminal_statuses=terminal_statuses,
+            propagation=propagation_result.value,
+            messages=tuple(messages),
+        )
+
+        return Result.success(value=summary, messages=messages)
+
+
+def propagate_cold_water_pressures(
+    *,
+    nodes: Mapping[str, Any],
+    sections: Mapping[str, Any],
+    source_node_id: str,
+    source_pressure_pa: float,
+) -> Result[DomesticWaterPressurePropagationResult]:
+    """Convenience function for EFS pressure propagation."""
+
+    return DomesticWaterPressureNetworkEngine(
+        nodes=nodes,
+        sections=sections,
+        side=DomesticWaterSide.COLD_WATER,
+    ).propagate_pressures(
+        source_node_id=source_node_id,
+        source_pressure_pa=source_pressure_pa,
+    )
+
+
+def propagate_hot_water_pressures(
+    *,
+    nodes: Mapping[str, Any],
+    sections: Mapping[str, Any],
+    source_node_id: str,
+    source_pressure_pa: float,
+) -> Result[DomesticWaterPressurePropagationResult]:
+    """Convenience function for ECS forward pressure propagation."""
+
+    return DomesticWaterPressureNetworkEngine(
+        nodes=nodes,
+        sections=sections,
+        side=DomesticWaterSide.HOT_WATER,
+    ).propagate_pressures(
+        source_node_id=source_node_id,
+        source_pressure_pa=source_pressure_pa,
+    )
+
+
+def summarize_cold_water_worst_terminal_pressure(
+    *,
+    nodes: Mapping[str, Any],
+    sections: Mapping[str, Any],
+    source_node_id: str,
+    source_pressure_bar: float,
+    min_required_pressure_bar: float = 1.0,
+) -> Result[DomesticWaterPressureSummary]:
+    """Convenience function for EFS worst terminal summary."""
+
+    return DomesticWaterPressureNetworkEngine(
+        nodes=nodes,
+        sections=sections,
+        side=DomesticWaterSide.COLD_WATER,
+    ).summarize_worst_terminal_pressure(
+        source_node_id=source_node_id,
+        source_pressure_bar=source_pressure_bar,
+        min_required_pressure_bar=min_required_pressure_bar,
+    )
+
+
+def summarize_hot_water_worst_terminal_pressure(
+    *,
+    nodes: Mapping[str, Any],
+    sections: Mapping[str, Any],
+    source_node_id: str,
+    source_pressure_bar: float,
+    min_required_pressure_bar: float = 1.0,
+) -> Result[DomesticWaterPressureSummary]:
+    """Convenience function for ECS forward worst terminal summary."""
+
+    return DomesticWaterPressureNetworkEngine(
+        nodes=nodes,
+        sections=sections,
+        side=DomesticWaterSide.HOT_WATER,
+    ).summarize_worst_terminal_pressure(
+        source_node_id=source_node_id,
+        source_pressure_bar=source_pressure_bar,
+        min_required_pressure_bar=min_required_pressure_bar,
+    )
+
+
+def _read_downstream_section_ids(node: Any) -> tuple[str, ...]:
+    raw_ids = getattr(node, "downstream_section_ids", None) or []
+    return tuple(str(section_id) for section_id in raw_ids if str(section_id).strip())
+
+
+def _section_matches_side(section: Any, side: DomesticWaterSide) -> bool:
+    fluid_code = str(getattr(section, "fluid_code", "") or "").strip().lower()
+
+    if side is DomesticWaterSide.HOT_WATER:
+        return fluid_code in {"ecs", "hot_water", "hot water", "domestic_hot_water"}
+
+    return fluid_code in {"efs", "cold_water", "cold water", "domestic_cold_water"}
+
+
+def _read_section_pressure_loss_pa(
+    *,
+    section_id: str,
+    section: Any,
+    messages: list[EngineMessage],
+    warned_missing_losses: set[str],
+) -> float:
+    value = getattr(section, "total_pressure_loss_pa", None)
+
+    if value is None:
+        if section_id not in warned_missing_losses:
+            messages.append(
+                EngineMessage.warning(
+                    code="DOMESTIC_WATER_PRESSURE_LOSS_MISSING",
+                    text="Section pressure loss is missing; propagation uses Δp = 0.",
+                    context={"section_id": section_id},
+                )
+            )
+            warned_missing_losses.add(section_id)
+
+        return 0.0
+
+    try:
+        pressure_loss = float(value)
+    except (TypeError, ValueError):
+        messages.append(
+            EngineMessage.warning(
+                code="DOMESTIC_WATER_PRESSURE_LOSS_INVALID",
+                text="Section pressure loss is invalid; propagation uses Δp = 0.",
+                context={"section_id": section_id, "value": value},
+            )
+        )
+        return 0.0
+
+    if not isfinite(pressure_loss):
+        messages.append(
+            EngineMessage.warning(
+                code="DOMESTIC_WATER_PRESSURE_LOSS_NOT_FINITE",
+                text="Section pressure loss is not finite; propagation uses Δp = 0.",
+                context={"section_id": section_id, "value": value},
+            )
+        )
+        return 0.0
+
+    return pressure_loss
+
+
+def _is_terminal_node(
+    node: Any,
+    sections: Mapping[str, Any],
+    side: DomesticWaterSide,
+) -> bool:
+    downstream_section_ids = _read_downstream_section_ids(node)
+
+    if not downstream_section_ids:
+        return True
+
+    for section_id in downstream_section_ids:
+        section = sections.get(section_id)
+        if section is not None and _section_matches_side(section, side):
+            return False
+
+    return True
+
+
+def _apply_section_pressures(
+    *,
+    section: Any,
+    pressure_start_pa: float,
+    pressure_end_pa: float,
+) -> None:
+    try:
+        section.pressure_start_pa = pressure_start_pa
+        section.pressure_end_pa = pressure_end_pa
+    except (AttributeError, TypeError):
+        return
+
+
+def _apply_node_pressures(
+    nodes: Mapping[str, Any],
+    node_states: Mapping[str, NodePressureState],
+) -> None:
+    for node_id, state in node_states.items():
+        node = nodes.get(node_id)
+        if node is None:
+            continue
+
+        try:
+            node.pressure_pa = state.pressure_pa
+        except (AttributeError, TypeError):
+            continue
+
+
+def _clean_optional_code(value: Any) -> str | None:
+    text = str(value or "").strip()
+    return text or None
+
+
+def _safe_pressure_pa(value: Any) -> float:
+    pressure = _safe_non_negative_float(value)
+    return pressure if isfinite(pressure) else 0.0
+
+
+def _safe_non_negative_float(value: Any, default: float = 0.0) -> float:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return default
+
+    if not isfinite(number):
+        return default
+
+    return max(0.0, number)

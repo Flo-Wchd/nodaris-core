@@ -542,6 +542,53 @@
 - **ndc_core.networks.domestic_water.pressure_loss._clean_optional_code(value)** -> `str | None`
   - calls: str, str(value or '').strip
 
+## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\pressure_network.py
+
+- **ndc_core.networks.domestic_water.pressure_network.DomesticWaterPressurePropagationResult.reached_node_ids(self)** -> `tuple[str, ...]`
+  - calls: tuple
+- **ndc_core.networks.domestic_water.pressure_network.DomesticWaterPressurePropagationResult.has_warnings(self)** -> `bool`
+  - calls: any
+- **ndc_core.networks.domestic_water.pressure_network.DomesticWaterPressurePropagationResult.has_errors(self)** -> `bool`
+  - calls: any
+- **ndc_core.networks.domestic_water.pressure_network.DomesticWaterPressureSummary.has_worst_terminal(self)** -> `bool`
+- **ndc_core.networks.domestic_water.pressure_network.DomesticWaterPressureSummary.has_warnings(self)** -> `bool`
+  - calls: any
+- **ndc_core.networks.domestic_water.pressure_network.DomesticWaterPressureSummary.has_errors(self)** -> `bool`
+  - calls: any
+- **ndc_core.networks.domestic_water.pressure_network.DomesticWaterPressureNetworkEngine.propagate_pressures(self, source_node_id, source_pressure_pa)** -> `Result[DomesticWaterPressurePropagationResult]`
+  - calls: DomesticWaterPressurePropagationResult, EngineMessage.error, EngineMessage.warning, NodePressureState, Result.failure, Result.success, _apply_node_pressures, _apply_section_pressures, _clean_optional_code, _is_terminal_node, _read_downstream_section_ids, _read_section_pressure_loss_pa, _safe_pressure_pa, _section_matches_side, deque ...
+- **ndc_core.networks.domestic_water.pressure_network.DomesticWaterPressureNetworkEngine.summarize_worst_terminal_pressure(self, source_node_id, source_pressure_bar, min_required_pressure_bar)** -> `Result[DomesticWaterPressureSummary]`
+  - calls: DomesticWaterPressurePropagationResult, DomesticWaterPressureSummary, EngineMessage.warning, Result.failure, Result.partial, Result.success, TerminalPressureStatus, _safe_non_negative_float, messages.append, messages.extend, min, pressure_bar_to_pa, propagation_result.value.node_pressures.items, self.propagate_pressures, str ...
+- **ndc_core.networks.domestic_water.pressure_network.propagate_cold_water_pressures(nodes, sections, source_node_id, source_pressure_pa)** -> `Result[DomesticWaterPressurePropagationResult]`
+  - calls: DomesticWaterPressureNetworkEngine, DomesticWaterPressureNetworkEngine(nodes=nodes, sections=sections, side=DomesticWaterSide.COLD_WATER).propagate_pressures
+  - doc: Convenience function for EFS pressure propagation.
+- **ndc_core.networks.domestic_water.pressure_network.propagate_hot_water_pressures(nodes, sections, source_node_id, source_pressure_pa)** -> `Result[DomesticWaterPressurePropagationResult]`
+  - calls: DomesticWaterPressureNetworkEngine, DomesticWaterPressureNetworkEngine(nodes=nodes, sections=sections, side=DomesticWaterSide.HOT_WATER).propagate_pressures
+  - doc: Convenience function for ECS forward pressure propagation.
+- **ndc_core.networks.domestic_water.pressure_network.summarize_cold_water_worst_terminal_pressure(nodes, sections, source_node_id, source_pressure_bar, min_required_pressure_bar)** -> `Result[DomesticWaterPressureSummary]`
+  - calls: DomesticWaterPressureNetworkEngine, DomesticWaterPressureNetworkEngine(nodes=nodes, sections=sections, side=DomesticWaterSide.COLD_WATER).summarize_worst_terminal_pressure
+  - doc: Convenience function for EFS worst terminal summary.
+- **ndc_core.networks.domestic_water.pressure_network.summarize_hot_water_worst_terminal_pressure(nodes, sections, source_node_id, source_pressure_bar, min_required_pressure_bar)** -> `Result[DomesticWaterPressureSummary]`
+  - calls: DomesticWaterPressureNetworkEngine, DomesticWaterPressureNetworkEngine(nodes=nodes, sections=sections, side=DomesticWaterSide.HOT_WATER).summarize_worst_terminal_pressure
+  - doc: Convenience function for ECS forward worst terminal summary.
+- **ndc_core.networks.domestic_water.pressure_network._read_downstream_section_ids(node)** -> `tuple[str, ...]`
+  - calls: getattr, str, str(section_id).strip, tuple
+- **ndc_core.networks.domestic_water.pressure_network._section_matches_side(section, side)** -> `bool`
+  - calls: getattr, str, str(getattr(section, 'fluid_code', '') or '').strip, str(getattr(section, 'fluid_code', '') or '').strip().lower
+- **ndc_core.networks.domestic_water.pressure_network._read_section_pressure_loss_pa(section_id, section, messages, warned_missing_losses)** -> `float`
+  - calls: EngineMessage.warning, float, getattr, isfinite, messages.append, warned_missing_losses.add
+- **ndc_core.networks.domestic_water.pressure_network._is_terminal_node(node, sections, side)** -> `bool`
+  - calls: _read_downstream_section_ids, _section_matches_side, sections.get
+- **ndc_core.networks.domestic_water.pressure_network._apply_section_pressures(section, pressure_start_pa, pressure_end_pa)** -> `None`
+- **ndc_core.networks.domestic_water.pressure_network._apply_node_pressures(nodes, node_states)** -> `None`
+  - calls: node_states.items, nodes.get
+- **ndc_core.networks.domestic_water.pressure_network._clean_optional_code(value)** -> `str | None`
+  - calls: str, str(value or '').strip
+- **ndc_core.networks.domestic_water.pressure_network._safe_pressure_pa(value)** -> `float`
+  - calls: _safe_non_negative_float, isfinite
+- **ndc_core.networks.domestic_water.pressure_network._safe_non_negative_float(value, default)** -> `float`
+  - calls: float, isfinite, max
+
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\profiles.py
 
 - **ndc_core.networks.domestic_water.profiles.DomesticWaterProfile.flow_attribute_name(self)** -> `str`
@@ -929,6 +976,23 @@
   - calls: _fluid_catalog, _pipe_catalog, _section, compute_cold_water_section_pressure_loss
 - **tests.networks.domestic_water.test_pressure_loss.test_unknown_singular_loss_creates_warning_without_failure()** -> `None`
   - calls: _CatalogLoss, _fluid_catalog, _pipe_catalog, _section, _singular_loss_catalog, any, compute_cold_water_section_pressure_loss, section.singular_losses.append
+
+## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_pressure_network.py
+
+- **tests.networks.domestic_water.test_pressure_network.test_propagate_pressures_on_simple_network()** -> `None`
+  - calls: _Node, _Section, propagate_cold_water_pressures
+- **tests.networks.domestic_water.test_pressure_network.test_branching_keeps_most_unfavorable_pressure_on_merge()** -> `None`
+  - calls: DomesticWaterPressureNetworkEngine, _Node, _Section, engine.propagate_pressures
+- **tests.networks.domestic_water.test_pressure_network.test_negative_pressure_loss_increases_downstream_pressure()** -> `None`
+  - calls: _Node, _Section, propagate_cold_water_pressures
+- **tests.networks.domestic_water.test_pressure_network.test_missing_pressure_loss_warns_and_uses_zero_delta_p()** -> `None`
+  - calls: _Node, _Section, any, propagate_cold_water_pressures
+- **tests.networks.domestic_water.test_pressure_network.test_unknown_source_returns_failure()** -> `None`
+  - calls: any, propagate_cold_water_pressures
+- **tests.networks.domestic_water.test_pressure_network.test_worst_terminal_summary()** -> `None`
+  - calls: _Node, _Section, round, set, summarize_cold_water_worst_terminal_pressure
+- **tests.networks.domestic_water.test_pressure_network.test_hot_water_sections_are_ignored_by_cold_water_engine()** -> `None`
+  - calls: _Node, _Section, propagate_cold_water_pressures, set
 
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_section_sizing.py
 
