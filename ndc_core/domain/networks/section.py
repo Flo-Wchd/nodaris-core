@@ -34,9 +34,14 @@ class Section:
     flow_l_s: float | None = None
     velocity_m_s: float | None = None
 
+    reynolds: float | None = None
+    friction_factor: float | None = None
     linear_pressure_loss_pa: float | None = None
     singular_pressure_loss_pa: float | None = None
     elevation_pressure_loss_pa: float | None = None
+    _total_pressure_loss_pa: float | None = None
+    singular_zeta_total: float | None = None
+
     pressure_start_pa: float | None = None
     pressure_end_pa: float | None = None
 
@@ -55,10 +60,16 @@ class Section:
         self.length_m = max(0.0, self.length_m)
 
         if self.forced_internal_diameter_mm is not None:
-            self.forced_internal_diameter_mm = max(0.0, self.forced_internal_diameter_mm)
+            self.forced_internal_diameter_mm = max(
+                0.0,
+                self.forced_internal_diameter_mm,
+            )
 
         if self.selected_internal_diameter_mm is not None:
-            self.selected_internal_diameter_mm = max(0.0, self.selected_internal_diameter_mm)
+            self.selected_internal_diameter_mm = max(
+                0.0,
+                self.selected_internal_diameter_mm,
+            )
 
     @property
     def diameter_mode(self) -> DiameterMode:
@@ -83,6 +94,17 @@ class Section:
 
     @property
     def total_pressure_loss_pa(self) -> float | None:
+        """
+        Total pressure loss stored or computed from available components.
+
+        Semantics:
+        - None means not calculated yet.
+        - 0.0 means calculated and equal to zero.
+        """
+
+        if self._total_pressure_loss_pa is not None:
+            return self._total_pressure_loss_pa
+
         values = (
             self.linear_pressure_loss_pa,
             self.singular_pressure_loss_pa,
@@ -93,6 +115,14 @@ class Section:
             return None
 
         return sum(value or 0.0 for value in values)
+
+    @total_pressure_loss_pa.setter
+    def total_pressure_loss_pa(self, value: float | None) -> None:
+        if value is None:
+            self._total_pressure_loss_pa = None
+            return
+
+        self._total_pressure_loss_pa = float(value)
 
     def set_downstream_appliance_count(self, appliance_code: str, count: int) -> None:
         code = appliance_code.strip()
@@ -133,9 +163,14 @@ class Section:
         self.flow_l_s = None
         self.velocity_m_s = None
 
+        self.reynolds = None
+        self.friction_factor = None
         self.linear_pressure_loss_pa = None
         self.singular_pressure_loss_pa = None
         self.elevation_pressure_loss_pa = None
+        self.total_pressure_loss_pa = None
+        self.singular_zeta_total = None
+
         self.pressure_start_pa = None
         self.pressure_end_pa = None
 
@@ -160,7 +195,15 @@ class Section:
             "used_internal_diameter_mm": self.used_internal_diameter_mm,
             "flow_l_s": self.flow_l_s,
             "velocity_m_s": self.velocity_m_s,
+            "reynolds": self.reynolds,
+            "friction_factor": self.friction_factor,
+            "linear_pressure_loss_pa": self.linear_pressure_loss_pa,
+            "singular_pressure_loss_pa": self.singular_pressure_loss_pa,
+            "elevation_pressure_loss_pa": self.elevation_pressure_loss_pa,
             "total_pressure_loss_pa": self.total_pressure_loss_pa,
+            "singular_zeta_total": self.singular_zeta_total,
+            "pressure_start_pa": self.pressure_start_pa,
+            "pressure_end_pa": self.pressure_end_pa,
             "downstream_appliance_counts": dict(self.downstream_appliance_counts),
             "effective_appliance_counts": dict(self.effective_appliance_counts),
             "singular_losses_count": len(self.singular_losses),

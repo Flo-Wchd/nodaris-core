@@ -337,6 +337,9 @@
 - **ndc_core.domain.networks.section.Section.used_internal_diameter_mm(self)** -> `float | None`
 - **ndc_core.domain.networks.section.Section.total_pressure_loss_pa(self)** -> `float | None`
   - calls: all, sum
+  - doc: Total pressure loss stored or computed from available components.
+- **ndc_core.domain.networks.section.Section.total_pressure_loss_pa(self, value)** -> `None`
+  - calls: float
 - **ndc_core.domain.networks.section.Section.set_downstream_appliance_count(self, appliance_code, count)** -> `None`
   - calls: appliance_code.strip, int, max, self.downstream_appliance_counts.pop
 - **ndc_core.domain.networks.section.Section.set_effective_appliance_count(self, appliance_code, count)** -> `None`
@@ -501,6 +504,43 @@
   - doc: Apply LL + LV counted as one effective machine.
 - **ndc_core.networks.domestic_water.demand._flow_for_profile(appliance, profile)** -> `float`
   - calls: float, getattr, max
+
+## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\pressure_loss.py
+
+- **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossResult.reynolds(self)** -> `float | None`
+- **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossResult.linear_pressure_loss_pa(self)** -> `float`
+- **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossResult.singular_pressure_loss_pa(self)** -> `float`
+- **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossResult.elevation_pressure_change_pa(self)** -> `float`
+- **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossResult.total_pressure_change_pa(self)** -> `float`
+- **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossResult.has_warnings(self)** -> `bool`
+  - calls: any
+- **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossResult.has_errors(self)** -> `bool`
+  - calls: any
+- **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine.compute_section_pressure_loss(self, section, water_temperature_c, singular_zeta_values)** -> `Result[DomesticWaterPressureLossResult]`
+  - calls: DomesticWaterPressureLossResult, EngineMessage.error, EngineMessage.info, Result.failure, Result.success, _apply_pressure_loss_to_section, _safe_float, _safe_positive_float, diameter_mm_to_m, max, messages.append, self._collect_section_zeta_values, self._relative_roughness_for_section, self._resolve_fluid, total_pressure_loss ...
+- **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine._resolve_fluid(self, water_temperature_c, messages)** -> `Fluid | None`
+  - calls: EngineMessage.error, messages.append, self.fluid_catalog.get, self.fluid_catalog.get_water_at_temperature
+- **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine._relative_roughness_for_section(self, section, internal_diameter_m)** -> `float`
+  - calls: _clean_optional_code, getattr, relative_roughness, self.pipe_catalog.get_size, self.pipe_catalog.materials_by_code.get
+- **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine._collect_section_zeta_values(self, section, flow_l_s, velocity_m_s, density_kg_m3, messages)** -> `tuple[float, ...]`
+  - calls: self._zeta_from_section_item, tuple, zeta_values.append
+- **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine._zeta_from_section_item(self, item, section, flow_l_s, velocity_m_s, density_kg_m3, messages)** -> `float`
+  - calls: EngineMessage.warning, _clean_optional_code, _safe_positive_float, getattr, messages.append, self._zeta_from_catalog_loss, self.singular_loss_catalog.get
+- **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine._zeta_from_catalog_loss(self, loss, quantity, section, flow_l_s, velocity_m_s, density_kg_m3, messages)** -> `float`
+  - calls: EngineMessage.warning, equivalent_zeta_from_kv, float, max, messages.append
+- **ndc_core.networks.domestic_water.pressure_loss.compute_cold_water_section_pressure_loss(section, fluid_catalog, pipe_catalog, singular_loss_catalog, water_temperature_c, singular_zeta_values)** -> `Result[DomesticWaterPressureLossResult]`
+  - calls: DomesticWaterPressureLossEngine, DomesticWaterPressureLossEngine(fluid_catalog=fluid_catalog, pipe_catalog=pipe_catalog, singular_loss_catalog=singular_loss_catalog, side=DomesticWaterSide.COLD_WATER).compute_section_pressure_loss
+  - doc: Convenience function for EFS section pressure loss.
+- **ndc_core.networks.domestic_water.pressure_loss.compute_hot_water_section_pressure_loss(section, fluid_catalog, pipe_catalog, singular_loss_catalog, water_temperature_c, singular_zeta_values)** -> `Result[DomesticWaterPressureLossResult]`
+  - calls: DomesticWaterPressureLossEngine, DomesticWaterPressureLossEngine(fluid_catalog=fluid_catalog, pipe_catalog=pipe_catalog, singular_loss_catalog=singular_loss_catalog, side=DomesticWaterSide.HOT_WATER).compute_section_pressure_loss
+  - doc: Convenience function for ECS forward section pressure loss.
+- **ndc_core.networks.domestic_water.pressure_loss._apply_pressure_loss_to_section(section, result)** -> `None`
+- **ndc_core.networks.domestic_water.pressure_loss._safe_float(value)** -> `float`
+  - calls: float
+- **ndc_core.networks.domestic_water.pressure_loss._safe_positive_float(value)** -> `float | None`
+  - calls: float
+- **ndc_core.networks.domestic_water.pressure_loss._clean_optional_code(value)** -> `str | None`
+  - calls: str, str(value or '').strip
 
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\profiles.py
 
@@ -860,6 +900,35 @@
   - calls: DomesticWaterDemandBuilder.cold_water, DomesticWaterDemandBuilder.cold_water(_catalog()).compute_from_counts, _catalog
 - **tests.networks.domestic_water.test_demand.test_invalid_counts_are_ignored()** -> `None`
   - calls: _catalog, compute_cold_water_demand
+
+## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_pressure_loss.py
+
+- **tests.networks.domestic_water.test_pressure_loss._DirectZeta.__init__(self, zeta, quantity)** -> `None`
+- **tests.networks.domestic_water.test_pressure_loss._CatalogLoss.__init__(self, loss_code, quantity)** -> `None`
+- **tests.networks.domestic_water.test_pressure_loss._fluid_catalog()** -> `FluidCatalog`
+  - calls: Fluid, FluidCatalog
+- **tests.networks.domestic_water.test_pressure_loss._pipe_catalog()** -> `PipeCatalog`
+  - calls: PipeCatalog, PipeMaterial, PipeSize
+- **tests.networks.domestic_water.test_pressure_loss._singular_loss_catalog()** -> `SingularLossCatalog`
+  - calls: SingularLoss, SingularLossCatalog
+- **tests.networks.domestic_water.test_pressure_loss._section(**kwargs)** -> `Section`
+  - calls: Section, values.update
+- **tests.networks.domestic_water.test_pressure_loss.test_compute_cold_water_section_pressure_loss_with_direct_zeta()** -> `None`
+  - calls: _DirectZeta, _fluid_catalog, _pipe_catalog, _section, compute_cold_water_section_pressure_loss, section.singular_losses.append
+- **tests.networks.domestic_water.test_pressure_loss.test_compute_pressure_loss_from_catalog_zeta()** -> `None`
+  - calls: _CatalogLoss, _fluid_catalog, _pipe_catalog, _section, _singular_loss_catalog, compute_cold_water_section_pressure_loss, isclose, section.singular_losses.append
+- **tests.networks.domestic_water.test_pressure_loss.test_compute_pressure_loss_from_catalog_kv()** -> `None`
+  - calls: _CatalogLoss, _fluid_catalog, _pipe_catalog, _section, _singular_loss_catalog, compute_cold_water_section_pressure_loss, section.singular_losses.append
+- **tests.networks.domestic_water.test_pressure_loss.test_missing_diameter_returns_failure_without_exception()** -> `None`
+  - calls: _fluid_catalog, _pipe_catalog, _section, any, compute_cold_water_section_pressure_loss
+- **tests.networks.domestic_water.test_pressure_loss.test_zero_flow_keeps_elevation_only()** -> `None`
+  - calls: _fluid_catalog, _pipe_catalog, _section, compute_cold_water_section_pressure_loss
+- **tests.networks.domestic_water.test_pressure_loss.test_hot_water_uses_hot_water_fluid_by_default()** -> `None`
+  - calls: _fluid_catalog, _pipe_catalog, _section, compute_hot_water_section_pressure_loss
+- **tests.networks.domestic_water.test_pressure_loss.test_temperature_override_uses_interpolated_water()** -> `None`
+  - calls: _fluid_catalog, _pipe_catalog, _section, compute_cold_water_section_pressure_loss
+- **tests.networks.domestic_water.test_pressure_loss.test_unknown_singular_loss_creates_warning_without_failure()** -> `None`
+  - calls: _CatalogLoss, _fluid_catalog, _pipe_catalog, _section, _singular_loss_catalog, any, compute_cold_water_section_pressure_loss, section.singular_losses.append
 
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_section_sizing.py
 
