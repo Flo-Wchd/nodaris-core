@@ -1,0 +1,239 @@
+# ============================================================================
+#   FICHIER   : appliances.yaml
+#   OBJET     : Catalogue des appareils sanitaires / points de puisage
+#   VERSION   : 1.0
+#   FORMAT    : Compatible avec moteur Python orienté objet
+# ============================================================================
+
+metadata:
+  source: "Catalogue interne BE - appareils sanitaire/points de puisage"
+  description: >
+    Catalogue des appareils raccordés aux réseaux EFS/ECS/EU/EV/EUV, utilisé
+    pour le dimensionnement des débits et diamètres (DTU 60.11)
+  version: 1.0
+  last_update: "2025-12-02"
+  author: "Florian Marchand"
+  notes: >
+    Les débits unitaires et coefficients sont des valeurs de calcul issues
+    des pratiques BE et/ou des normes. Les règles de simultanéité globales
+    restent définies dans un autre fichier de règles.
+
+units:
+  flow: "l/s"
+  diameter: "mm"
+
+fluids:
+  EFS:
+    label: "Eau froide sanitaire"
+  ECS:
+    label: "Eau chaude sanitaire"
+  EU:
+    label: "Eau usée"
+  EV:
+    label: "Eau vanne"
+  EUV:
+    label: "Eau usée + eau vanne"
+  EP:
+    label: "Eau pluviale"
+
+# ----------------------------------------------------------------------------
+#   APPAREILS
+#   Clé = acronyme utilisé dans le moteur
+# ----------------------------------------------------------------------------
+
+L:
+  name: "Lavabo"
+  acronym: "L"
+  has_cold_water: true
+  has_hot_water: true
+  cold_design_flow_lps: 0.2
+  hot_design_flow_lps: 0.2
+  cold_min_diameter_mm: 10
+  hot_min_diameter_mm: 10
+  individual_coefficient: 1.5
+  waste_flow_lps: 0.3
+  waste_min_diameter_mm: 25
+
+D:
+  name: "Douche"
+  acronym: "D"
+  has_cold_water: true
+  has_hot_water: true
+  cold_design_flow_lps: 0.2
+  hot_design_flow_lps: 0.2
+  cold_min_diameter_mm: 12
+  hot_min_diameter_mm: 12
+  individual_coefficient: 2
+  waste_flow_lps: 0.4
+  waste_min_diameter_mm: 33
+
+B:
+  name: "Baignoire"
+  acronym: "B"
+  has_cold_water: true
+  has_hot_water: true
+  cold_design_flow_lps: 0.33
+  hot_design_flow_lps: 0.33
+  cold_min_diameter_mm: 13
+  hot_min_diameter_mm: 13
+  individual_coefficient: 3
+  waste_flow_lps: 0.5
+  waste_min_diameter_mm: 33
+
+WC:
+  name: "WC avec réservoir"
+  acronym: "WC"
+  has_cold_water: true
+  has_hot_water: false
+  cold_design_flow_lps: 0.12
+  hot_design_flow_lps: null
+  cold_min_diameter_mm: 10
+  hot_min_diameter_mm: null
+  individual_coefficient: 0.5
+  waste_flow_lps: 2
+  waste_min_diameter_mm: 73
+
+BD:
+  name: "Bidet"
+  acronym: "BD"
+  has_cold_water: true
+  has_hot_water: true
+  cold_design_flow_lps: 0.2
+  hot_design_flow_lps: 0.2
+  cold_min_diameter_mm: 10
+  hot_min_diameter_mm: 10
+  individual_coefficient: 1
+  waste_flow_lps: 0.3
+  waste_min_diameter_mm: 25
+
+E:
+  name: "Evier"
+  acronym: "E"
+  has_cold_water: true
+  has_hot_water: true
+  cold_design_flow_lps: 0.2
+  hot_design_flow_lps: 0.2
+  cold_min_diameter_mm: 12
+  hot_min_diameter_mm: 12
+  individual_coefficient: 2.5
+  waste_flow_lps: 0.5
+  waste_min_diameter_mm: 33
+
+LV:
+  name: "Lave-vaisselle"
+  acronym: "LV"
+  has_cold_water: true
+  has_hot_water: false
+  cold_design_flow_lps: 0.1
+  hot_design_flow_lps: null
+  cold_min_diameter_mm: 10
+  hot_min_diameter_mm: null
+  individual_coefficient: 1
+  exclusive_group: "dwelling_machine"
+  waste_flow_lps: 0.5
+  waste_min_diameter_mm: 33
+
+LL:
+  name: "Lave-linge"
+  acronym: "LL"
+  has_cold_water: true
+  has_hot_water: false
+  cold_design_flow_lps: 0.2
+  hot_design_flow_lps: null
+  cold_min_diameter_mm: 10
+  hot_min_diameter_mm: null
+  individual_coefficient: 1
+  exclusive_group: "dwelling_machine"
+  waste_flow_lps: 0.5
+  waste_min_diameter_mm: 33
+
+SS:
+  name: "Siphon de sol"
+  acronym: "SS"
+  has_cold_water: false
+  has_hot_water: false
+  cold_design_flow_lps: null
+  hot_design_flow_lps: null
+  cold_min_diameter_mm: null
+  hot_min_diameter_mm: null
+  individual_coefficient: null
+  waste_flow_lps: 1.3
+  waste_min_diameter_mm: 83
+
+LM:
+  name: "Lave main"
+  acronym: "LM"
+  has_cold_water: true
+  has_hot_water: true
+  cold_design_flow_lps: 0.1
+  hot_design_flow_lps: 0.1
+  cold_min_diameter_mm: 10
+  hot_min_diameter_mm: 10
+  individual_coefficient: 0.5
+  waste_flow_lps: 0.3
+  waste_min_diameter_mm: 25
+
+U:
+  name: "Urinoir"
+  acronym: "U"
+  has_cold_water: true
+  has_hot_water: false
+  cold_design_flow_lps: 0.15
+  hot_design_flow_lps: null
+  cold_min_diameter_mm: 10
+  hot_min_diameter_mm: null
+  individual_coefficient: 1
+  waste_flow_lps: 0.3
+  waste_min_diameter_mm: 25
+
+DIT:
+  name: "Douche à l'italienne"
+  acronym: "DIT"
+  has_cold_water: true
+  has_hot_water: true
+  cold_design_flow_lps: 0.2
+  hot_design_flow_lps: 0.2
+  cold_min_diameter_mm: 10
+  hot_min_diameter_mm: 10
+  individual_coefficient: 2
+  waste_flow_lps: 0.5
+  waste_min_diameter_mm: 33
+
+RP:
+  name: "Robinet de puisage"
+  acronym: "RP"
+  has_cold_water: true
+  has_hot_water: false
+  cold_design_flow_lps: 0.33
+  hot_design_flow_lps: null
+  cold_min_diameter_mm: 12
+  hot_min_diameter_mm: null
+  individual_coefficient: 2.5
+  waste_flow_lps: null
+  waste_min_diameter_mm: null
+
+ATT:
+  name: "Attente"
+  acronym: "ATT"
+  has_cold_water: true
+  has_hot_water: true
+  cold_design_flow_lps: 0.33
+  hot_design_flow_lps: 0.33
+  cold_min_diameter_mm: 12
+  hot_min_diameter_mm: 12
+  individual_coefficient: 3
+  waste_flow_lps: 0.5
+  waste_min_diameter_mm: 33
+
+PE:
+  name: "Poste d'eau"
+  acronym: "PE"
+  has_cold_water: true
+  has_hot_water: true
+  cold_design_flow_lps: 0.33
+  hot_design_flow_lps: 0.33
+  cold_min_diameter_mm: 12
+  hot_min_diameter_mm: 12
+  individual_coefficient: 3
+  waste_flow_lps: 0.5
+  waste_min_diameter_mm: 33

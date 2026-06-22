@@ -1,0 +1,543 @@
+# ============================================================================
+#   FICHIER : pipes.yaml
+#   OBJET   : Définition professionnelle des tubes pour le moteur
+#   VERSION : 1.0
+#   FORMAT : Compatible avec moteur Python orienté objet
+# ============================================================================
+
+metadata:
+  source: "Catalogues interne BE - tuyauteries"
+  description: "Catalogue professionnel des tubes pour réseaux de fluide"
+  version: 1.0
+  last_update: "2025-12-02"
+  author: "Florian Marchand"
+  notes: >
+    Catalogue des tubes utilisables dans le moteur NDC.
+    Ce fichier ne contient que les caractéristiques physiques et commerciales
+    des conduites. Les limites normatives (vitesses, pentes, etc.) sont
+    définies dans un autre fichier de règles.
+
+units:
+  length: "mm"
+  diameter: "mm"
+  roughness: "mm"
+  pressure: "bar"
+  temperature: "°C"
+
+fluids:
+  EFS:
+    label: "Eau froide sanitaire"
+  ECS:
+    label: "Eau chaude sanitaire"
+  CH:
+    label: "Chauffage (eau)"
+  EU:
+    label: "Eaux usées"
+  EV:
+    label: "Eaux vannes"
+  EUV:
+    label: "Eaux usées + eaux vannes"
+  EP:
+    label: "Eaux pluviales"
+
+# ----------------------------------------------------------------------------
+#   FAMILLES DE TUBES
+# ----------------------------------------------------------------------------
+
+pipe_families:
+
+
+  # ╔=======================╗
+  #     PVC PRESSION PN 25
+  # ╚=======================╝
+
+
+  - id: "PVC_P_PN25"
+    label: "PVC-U pression (PN25)"
+    material: "pvc"
+    category: "pressure"
+    standards:
+      - "NF EN 1452-2 (indice de classement T54016)"
+
+    design_defaults:
+      roughness_mm: 0.0015
+      thermal_conductivity_w_mk: 0.16
+      max_pressure_bar: 25
+      min_temperature_c: null
+      max_temperature_c: 25
+      usages:
+        - "EFS"
+        - "EU"
+        - "EV"
+        - "EUV"
+        - "EP"
+
+    cad:
+      default_layer_suffix: "PVC_P"
+      default_color_index: 7
+      linetype: "CONTINUOUS"
+
+    variants:
+      - id: "PVC_P_PN25_16"
+        commercial_name: "PVC-U pression (PN25) ø16"
+        nominal_dn: 16
+        outer_diameter_mm: 16
+        inner_diameter_mm: 12.4
+        thickness_mm: 1.8
+        weight_kg_m: null
+
+      - id: "PVC_P_PN25_20"
+        commercial_name: "PVC-U pression (PN25) ø20"
+        nominal_dn: 20
+        outer_diameter_mm: 20
+        inner_diameter_mm: 15.4
+        thickness_mm: 2.3
+        weight_kg_m: null
+
+      - id: "PVC_P_PN25_25"
+        commercial_name: "PVC-U pression (PN25) ø25"
+        nominal_dn: 25
+        outer_diameter_mm: 25
+        inner_diameter_mm: 19.4
+        thickness_mm: 2.8
+        weight_kg_m: null
+
+
+  # ╔=======================╗
+  #     PVC PRESSION PN 16
+  # ╚=======================╝
+
+
+  - id: "PVC_P_PN16"
+    label: "PVC-U pression (PN16)"
+    material: "pvc"
+    category: "pressure"
+    standards:
+      - "NF EN 1452-2 (indice de classement T54016)"
+
+    design_defaults:
+      roughness_mm: 0.0015
+      thermal_conductivity_w_mk: 0.16
+      max_pressure_bar: 16
+      min_temperature_c: null
+      max_temperature_c: 25
+      usages:
+        - "EFS"
+        - "EU"
+        - "EV"
+        - "EUV"
+        - "EP"
+
+    cad:
+      default_layer_suffix: "PVC_P"
+      default_color_index: 7
+      linetype: "CONTINUOUS"
+
+    variants:
+        - id: "PVC_P_PN16_20"
+          commercial_name: "PVC-U pression (PN16) ø20"
+          nominal_dn: 20
+          outer_diameter_mm: 20
+          inner_diameter_mm: 17
+          thickness_mm: 1.5
+          weight_kg_m: null
+
+        - id: "PVC_P_PN16_25"
+          commercial_name: "PVC-U pression (PN16) ø25"
+          nominal_dn: 25
+          outer_diameter_mm: 25
+          inner_diameter_mm: 21.2
+          thickness_mm: 1.9
+          weight_kg_m: null
+
+        - id: "PVC_P_PN16_32"
+          commercial_name: "PVC-U pression (PN16) ø32"
+          nominal_dn: 32
+          outer_diameter_mm: 32
+          inner_diameter_mm: 27.2
+          thickness_mm: 2.4
+          weight_kg_m: null
+
+        - id: "PVC_P_PN16_40"
+          commercial_name: "PVC-U pression (PN16) ø40"
+          nominal_dn: 40
+          outer_diameter_mm: 40
+          inner_diameter_mm: 34
+          thickness_mm: 3.0
+          weight_kg_m: null
+
+        - id: "PVC_P_PN16_50"
+          commercial_name: "PVC-U pression (PN16) ø50"
+          nominal_dn: 50
+          outer_diameter_mm: 50
+          inner_diameter_mm: 42.6
+          thickness_mm: 3.7
+          weight_kg_m: null
+
+        - id: "PVC_P_PN16_63"
+          commercial_name: "PVC-U pression (PN16) ø63"
+          nominal_dn: 63
+          outer_diameter_mm: 63
+          inner_diameter_mm: 53.6
+          thickness_mm: 4.7
+          weight_kg_m: null
+
+        - id: "PVC_P_PN16_75"
+          commercial_name: "PVC-U pression (PN16) ø75"
+          nominal_dn: 75
+          outer_diameter_mm: 75
+          inner_diameter_mm: 63.8
+          thickness_mm: 5.6
+          weight_kg_m: null
+
+        - id: "PVC_P_PN16_90"
+          commercial_name: "PVC-U pression (PN16) ø90"
+          nominal_dn: 90
+          outer_diameter_mm: 90
+          inner_diameter_mm: 76.6
+          thickness_mm: 6.7
+          weight_kg_m: null
+
+        - id: "PVC_P_PN16_110"
+          commercial_name: "PVC-U pression (PN16) ø110"
+          nominal_dn: 110
+          outer_diameter_mm: 110
+          inner_diameter_mm: 93.8
+          thickness_mm: 8.1
+          weight_kg_m: null
+
+
+
+  # ╔=======================╗
+  #     PVC PRESSION PN 10
+  # ╚=======================╝
+
+
+  - id: "PVC_P_PN10"
+    label: "PVC-U pression (PN10)"
+    material: "pvc"
+    category: "pressure"
+    standards:
+      - "NF EN 1452-2 (indice de classement T54016)"
+
+    design_defaults:
+      roughness_mm: 0.0015
+      thermal_conductivity_w_mk: 0.16
+      max_pressure_bar: 10
+      min_temperature_c: null
+      max_temperature_c: 25
+      usages:
+        - "EFS"
+        - "EU"
+        - "EV"
+        - "EUV"
+        - "EP"
+
+    cad:
+      default_layer_suffix: "PVC_P"
+      default_color_index: 7
+      linetype: "CONTINUOUS"
+
+    variants:
+        - id: "PVC_P_PN10_90"
+          commercial_name: "PVC-U pression (PN10) ø90"
+          nominal_dn: 90
+          outer_diameter_mm: 90
+          inner_diameter_mm: 81.4
+          thickness_mm: 4.3
+          weight_kg_m: null
+
+        - id: "PVC_P_PN10_110"
+          commercial_name: "PVC-U pression (PN10) ø110"
+          nominal_dn: 110
+          outer_diameter_mm: 110
+          inner_diameter_mm: 99.4
+          thickness_mm: 5.3
+          weight_kg_m: null
+
+        - id: "PVC_P_PN10_125"
+          commercial_name: "PVC-U pression (PN10) ø125"
+          nominal_dn: 125
+          outer_diameter_mm: 125
+          inner_diameter_mm: 113
+          thickness_mm: 6
+          weight_kg_m: null
+
+        - id: "PVC_P_PN10_140"
+          commercial_name: "PVC-U pression (PN10) ø140"
+          nominal_dn: 140
+          outer_diameter_mm: 140
+          inner_diameter_mm: 127.8
+          thickness_mm: 6.1
+          weight_kg_m: null
+
+        - id: "PVC_P_PN10_160"
+          commercial_name: "PVC-U pression (PN10) ø160"
+          nominal_dn: 160
+          outer_diameter_mm: 160
+          inner_diameter_mm: 147.6
+          thickness_mm: 6.2
+          weight_kg_m: null
+
+        - id: "PVC_P_PN10_200"
+          commercial_name: "PVC-U pression (PN10) ø200"
+          nominal_dn: 200
+          outer_diameter_mm: 200
+          inner_diameter_mm: 184.6
+          thickness_mm: 7.7
+          weight_kg_m: null
+
+        - id: "PVC_P_PN10_250"
+          commercial_name: "PVC-U pression (PN10) ø250"
+          nominal_dn: 250
+          outer_diameter_mm: 250
+          inner_diameter_mm: 231.8
+          thickness_mm: 9.6
+          weight_kg_m: null
+
+        - id: "PVC_P_PN10_315"
+          commercial_name: "PVC-U pression (PN10) ø315"
+          nominal_dn: 315
+          outer_diameter_mm: 315
+          inner_diameter_mm: 290.8
+          thickness_mm: 12.1
+          weight_kg_m: null
+
+
+  # ╔=======================╗
+  #        MULTICOUCHE
+  # ╚=======================╝
+
+
+  - id: "ML"
+    label: "Multicouche"
+    material: "multilayer"
+    category: "pressure"
+    standards:
+      - "EN ISO 21003"
+
+    design_defaults:
+      roughness_mm: 0.007
+      thermal_conductivity_w_mk: 0.50
+      max_pressure_bar: 10
+      min_temperature_c: 5
+      max_temperature_c: 95
+      usages:
+        - "EFS"
+        - "ECS"
+        - "CH"
+
+    cad:
+      default_layer_suffix: "ML"
+      default_color_index: 7
+      linetype: "CONTINUOUS"
+
+    variants:
+      - id: "ML_16"
+        commercial_name: "Multicouche ø16x2"
+        nominal_dn: 16
+        outer_diameter_mm: 16
+        inner_diameter_mm: 12
+        thickness_mm: 2.0
+        weight_kg_m: 0.113
+        thermal_conductivity_w_mk: 0.44
+
+      - id: "ML_20"
+        commercial_name: "Multicouche ø20x2"
+        nominal_dn: 20
+        outer_diameter_mm: 20
+        inner_diameter_mm: 16
+        thickness_mm: 2.0
+        weight_kg_m: 0.156
+        thermal_conductivity_w_mk: 0.47
+
+      - id: "ML_26"
+        commercial_name: "Multicouche ø26x3"
+        nominal_dn: 26
+        outer_diameter_mm: 26
+        inner_diameter_mm: 20
+        thickness_mm: 3.0
+        weight_kg_m: 0.286
+        thermal_conductivity_w_mk: 0.47
+
+      - id: "ML_32"
+        commercial_name: "Multicouche ø32x3"
+        nominal_dn: 32
+        outer_diameter_mm: 32
+        inner_diameter_mm: 26
+        thickness_mm: 3.0
+        weight_kg_m: 0.390
+        thermal_conductivity_w_mk: 0.50
+
+      - id: "ML_40"
+        commercial_name: "Multicouche ø40x3,5"
+        nominal_dn: 40
+        outer_diameter_mm: 40
+        inner_diameter_mm: 33
+        thickness_mm: 3.5
+        weight_kg_m: 0.545
+        thermal_conductivity_w_mk: 0.49
+
+      - id: "ML_50"
+        commercial_name: "Multicouche ø50x4"
+        nominal_dn: 50
+        outer_diameter_mm: 50
+        inner_diameter_mm: 42
+        thickness_mm: 4.0
+        weight_kg_m: 0.833
+        thermal_conductivity_w_mk: 0.50
+
+      - id: "ML_63"
+        commercial_name: "Multicouche ø63x4,5"
+        nominal_dn: 63
+        outer_diameter_mm: 63
+        inner_diameter_mm: 54
+        thickness_mm: 4.5
+        weight_kg_m: 1.232
+        thermal_conductivity_w_mk: 0.51
+
+      - id: "ML_75"
+        commercial_name: "Multicouche ø75x5"
+        nominal_dn: 75
+        outer_diameter_mm: 75
+        inner_diameter_mm: 65
+        thickness_mm: 5
+        weight_kg_m: 1.603
+        thermal_conductivity_w_mk: 0.52
+
+      - id: "ML_90"
+        commercial_name: "Multicouche ø90x7"
+        nominal_dn: 90
+        outer_diameter_mm: 90
+        inner_diameter_mm: 76
+        thickness_mm: 7
+        weight_kg_m: 2.403
+        thermal_conductivity_w_mk: 0.47
+
+      - id: "ML_110"
+        commercial_name: "Multicouche ø110x10"
+        nominal_dn: 110
+        outer_diameter_mm: 110
+        inner_diameter_mm: 90
+        thickness_mm: 10
+        weight_kg_m: null
+
+
+  # ╔=======================╗
+  #            PER
+  # ╚=======================╝
+
+
+  - id: "PER"
+    label: "PER"
+    material: "pex"
+    category: "pressure"
+    standards:
+      - "NF EN ISO 15875"
+
+    design_defaults:
+      roughness_mm: 0.0015
+      thermal_conductivity_w_mk:
+      max_pressure_bar: 10
+      max_temperature_c: 70
+      min_temperature_c: 5
+      usages:
+          - "EFS"
+          - "ECS"
+
+    cad:
+      default_layer_suffix: "PER"
+      default_color_index: 7
+      linetype: "CONTINUOUS"
+
+    variants:
+      - id: "PER_12"
+        commercial_name: "PER ø12"
+        nominal_dn: 12
+        outer_diameter_mm: 12
+        inner_diameter_mm: 9.8
+        thickness_mm: 1.1
+        weight_kg_m: 0.0374
+
+      - id: "PER_16"
+        commercial_name: "PER ø16"
+        nominal_dn: 16
+        outer_diameter_mm: 16
+        inner_diameter_mm: 13
+        thickness_mm: 1.5
+        weight_kg_m: 0.0679
+
+      - id: "PER_20"
+        commercial_name: "PER ø20"
+        nominal_dn: 20
+        outer_diameter_mm: 20
+        inner_diameter_mm: 16.2
+        thickness_mm: 1.9
+        weight_kg_m: 0.1074
+
+      - id: "PER_25"
+        commercial_name: "PER ø25"
+        nominal_dn: 25
+        outer_diameter_mm: 25
+        inner_diameter_mm: 20.4
+        thickness_mm: 2.3
+        weight_kg_m: 0.1630
+
+
+  # ╔=======================╗
+  #          PER BAO
+  # ╚=======================╝
+
+
+  - id: "PER_BAO"
+    label: "PER BAO"
+    material: "pex"
+    category: "pressure"
+    standards:
+        - "NF EN ISO 15875"
+
+    design_defaults:
+      roughness_mm: 0.0015
+      thermal_conductivity_w_mk:
+      max_pressure_bar:
+      min_temperature_c:
+      max_temperature_c:
+      usages:
+          - "ECS"
+          - "CH"
+
+    cad:
+      default_layer_suffix: "PER_BAO"
+      default_color_index: 0
+      linetype: "CONTINUOUS"
+
+    variants:
+        - id: "PER_BAO_12"
+          commercial_name: "PER BAO ø12"
+          nominal_dn: 12
+          outer_diameter_mm: 12
+          inner_diameter_mm: 9.8
+          thickness_mm: 1.1
+          weight_kg_m: 0.0374
+
+        - id: "PER_BAO_16"
+          commercial_name: "PER BAO ø16"
+          nominal_dn: 16
+          outer_diameter_mm: 16
+          inner_diameter_mm: 13
+          thickness_mm: 1.5
+          weight_kg_m: 0.0679
+
+        - id: "PER_BAO_20"
+          commercial_name: "PER BAO ø20"
+          nominal_dn: 20
+          outer_diameter_mm: 20
+          inner_diameter_mm: 16.2
+          thickness_mm: 1.9
+          weight_kg_m: 0.1073
+
+
+
+  # ╔=======================╗
+  #         PEHD PN16
+  # ╚=======================╝

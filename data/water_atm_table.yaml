@@ -1,0 +1,197 @@
+# ============================================================================
+#   FICHIER   : water_atm_table.yaml
+#   OBJET     : Table des propriétés de l'eau
+#   VERSION   : 1.0
+#   FORMAT    : Compatible avec moteur Python orienté objet
+# ============================================================================
+
+metadata:
+  source: "Catalogue interne BE - Table des propriétés de l'eau"
+  description: >
+    Tableau des propriétés de l'eau en fonction de la température sous 1 atm
+  version: 1.0
+  last_update: "2025-12-03"
+  author: "Florian Marchand"
+  notes: ""
+
+units:
+  temperature: "°C"
+  density: "kg/m³"
+  dynamic_viscosity: "Pa.s"
+  kinematic_viscosity: "m²/s"
+  thermal_conductivity: "W/m.K"
+  specific_heat: "kJ/kg.K"
+  prandtl: "-"
+
+# ----------------------------------------------------------------------------
+#   PROPRIETES DE L'EAU A PRESSION ATM
+# ----------------------------------------------------------------------------
+
+water_atm:
+  - temperature_c: 0
+    density_kg_m3: 999.82
+    dynamic_viscosity_pa_s: 0.001792
+    kinematic_viscosity_m2_s: 1.788e-6
+    thermal_conductivity_w_m_k: 0.561
+    specific_heat_kj_kg_k: 4.217
+    prandtl: 13.35
+
+  - temperature_c: 5
+    density_kg_m3: 1000.0
+    dynamic_viscosity_pa_s: 0.001520
+    kinematic_viscosity_m2_s: 1.5182e-6
+    thermal_conductivity_w_m_k: 0.574
+    specific_heat_kj_kg_k: 4.202
+    prandtl: 11.04
+
+  - temperature_c: 10
+    density_kg_m3: 999.77
+    dynamic_viscosity_pa_s: 0.001308
+    kinematic_viscosity_m2_s: 1.3063e-6
+    thermal_conductivity_w_m_k: 0.580
+    specific_heat_kj_kg_k: 4.192
+    prandtl: 9.38
+
+  - temperature_c: 15
+    density_kg_m3: 999.19
+    dynamic_viscosity_pa_s: 0.001139
+    kinematic_viscosity_m2_s: 1.1385e-6
+    thermal_conductivity_w_m_k: 0.586
+    specific_heat_kj_kg_k: 4.186
+    prandtl: 8.12
+
+  - temperature_c: 20
+    density_kg_m3: 998.29
+    dynamic_viscosity_pa_s: 0.001003
+    kinematic_viscosity_m2_s: 1.0034e-6
+    thermal_conductivity_w_m_k: 0.593
+    specific_heat_kj_kg_k: 4.182
+    prandtl: 7.02
+
+  - temperature_c: 25
+    density_kg_m3: 997.13
+    dynamic_viscosity_pa_s: 0.000891
+    kinematic_viscosity_m2_s: 0.8927e-6
+    thermal_conductivity_w_m_k: 0.600
+    specific_heat_kj_kg_k: 4.180
+    prandtl: 6.13
+
+  - temperature_c: 30
+    density_kg_m3: 995.71
+    dynamic_viscosity_pa_s: 0.000798
+    kinematic_viscosity_m2_s: 0.8007e-6
+    thermal_conductivity_w_m_k: 0.607
+    specific_heat_kj_kg_k: 4.178
+    prandtl: 5.40
+
+  - temperature_c: 35
+    density_kg_m3: 994.08
+    dynamic_viscosity_pa_s: 0.000720
+    kinematic_viscosity_m2_s: 0.7234e-6
+    thermal_conductivity_w_m_k: 0.613
+    specific_heat_kj_kg_k: 4.178
+    prandtl: 4.82
+
+  - temperature_c: 40
+    density_kg_m3: 992.25
+    dynamic_viscosity_pa_s: 0.000653
+    kinematic_viscosity_m2_s: 0.6578e-6
+    thermal_conductivity_w_m_k: 0.619
+    specific_heat_kj_kg_k: 4.179
+    prandtl: 4.33
+
+  - temperature_c: 45
+    density_kg_m3: 990.22
+    dynamic_viscosity_pa_s: 0.000596
+    kinematic_viscosity_m2_s: 0.6017e-6
+    thermal_conductivity_w_m_k: 0.624
+    specific_heat_kj_kg_k: 4.180
+    prandtl: 3.91
+
+  - temperature_c: 50
+    density_kg_m3: 988.02
+    dynamic_viscosity_pa_s: 0.000547
+    kinematic_viscosity_m2_s: 0.5531e-6
+    thermal_conductivity_w_m_k: 0.628
+    specific_heat_kj_kg_k: 4.181
+    prandtl: 3.57
+
+  - temperature_c: 55
+    density_kg_m3: 985.65
+    dynamic_viscosity_pa_s: 0.000504
+    kinematic_viscosity_m2_s: 0.5109e-6
+    thermal_conductivity_w_m_k: 0.632
+    specific_heat_kj_kg_k: 4.183
+    prandtl: 3.27
+
+  - temperature_c: 60
+    density_kg_m3: 983.13
+    dynamic_viscosity_pa_s: 0.000467
+    kinematic_viscosity_m2_s: 0.4740e-6
+    thermal_conductivity_w_m_k: 0.637
+    specific_heat_kj_kg_k: 4.185
+    prandtl: 3.01
+
+  - temperature_c: 65
+    density_kg_m3: 980.45
+    dynamic_viscosity_pa_s: 0.000434
+    kinematic_viscosity_m2_s: 0.4415e-6
+    thermal_conductivity_w_m_k: 0.641
+    specific_heat_kj_kg_k: 4.187
+    prandtl: 2.80
+
+  - temperature_c: 70
+    density_kg_m3: 977.63
+    dynamic_viscosity_pa_s: 0.000404
+    kinematic_viscosity_m2_s: 0.4142e-6
+    thermal_conductivity_w_m_k: 0.645
+    specific_heat_kj_kg_k: 4.190
+    prandtl: 2.60
+
+  - temperature_c: 75
+    density_kg_m3: 974.68
+    dynamic_viscosity_pa_s: 0.000378
+    kinematic_viscosity_m2_s: 0.38716e-6
+    thermal_conductivity_w_m_k: 0.649
+    specific_heat_kj_kg_k: 4.193
+    prandtl: 2.43
+
+  - temperature_c: 80
+    density_kg_m3: 971.60
+    dynamic_viscosity_pa_s: 0.000355
+    kinematic_viscosity_m2_s: 0.3643e-6
+    thermal_conductivity_w_m_k: 0.653
+    specific_heat_kj_kg_k: 4.196
+    prandtl: 2.27
+
+  - temperature_c: 85
+    density_kg_m3: 968.39
+    dynamic_viscosity_pa_s: 0.000334
+    kinematic_viscosity_m2_s: 0.3453e-6
+    thermal_conductivity_w_m_k: 0.656
+    specific_heat_kj_kg_k: 4.200
+    prandtl: 2.12
+
+  - temperature_c: 90
+    density_kg_m3: 965.06
+    dynamic_viscosity_pa_s: 0.000315
+    kinematic_viscosity_m2_s: 0.3262e-6
+    thermal_conductivity_w_m_k: 0.659
+    specific_heat_kj_kg_k: 4.205
+    prandtl: 1.98
+
+  - temperature_c: 95
+    density_kg_m3: 961.62
+    dynamic_viscosity_pa_s: 0.000298
+    kinematic_viscosity_m2_s: 0.31055e-6
+    thermal_conductivity_w_m_k: 0.661
+    specific_heat_kj_kg_k: 4.210
+    prandtl: 1.86
+
+  - temperature_c: 100
+    density_kg_m3: 958.05
+    dynamic_viscosity_pa_s: 0.000282
+    kinematic_viscosity_m2_s: 0.29476e-6
+    thermal_conductivity_w_m_k: 0.679
+    specific_heat_kj_kg_k: 4.216
+    prandtl: 1.75

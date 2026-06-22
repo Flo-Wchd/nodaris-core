@@ -343,9 +343,13 @@ PythonProject_v4
 │   ├── catalogs/
 │   │   ├── __init__.py
 │   │   ├── test_appliance_catalog.py
+│   │   ├── test_catalog_paths.py
+│   │   ├── test_fluid_catalog.py
 │   │   ├── test_pipe_catalog.py
+│   │   ├── test_real_catalog_file.py
 │   │   ├── test_singular_loss_catalog.py
-│   │   └── test_standards_catalog.py
+│   │   ├── test_standards_catalog.py
+│   │   └── test_yaml_loader.py
 │   ├── common/
 │   │   ├── __init__.py
 │   │   ├── test_messages.py
@@ -359,6 +363,7 @@ PythonProject_v4
 │   │   │   └── test_section.py
 │   │   ├── __init__.py
 │   │   ├── test_appliances.py
+│   │   ├── test_fluids.py
 │   │   ├── test_pipes.py
 │   │   └── test_singular_losses.py
 │   ├── exporters/
