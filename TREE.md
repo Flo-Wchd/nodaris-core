@@ -379,10 +379,12 @@ PythonProject_v4
 │   │   └── network_builders.py
 │   ├── hydraulics/
 │   │   ├── __init__.py
+│   │   ├── test_conversions.py
 │   │   ├── test_elevation_pressure_loss.py
 │   │   ├── test_friction.py
 │   │   ├── test_linear_pressure_loss.py
 │   │   ├── test_pipe_sizing.py
+│   │   ├── test_pressure_losses.py
 │   │   ├── test_reynolds.py
 │   │   ├── test_singular_pressure_loss.py
 │   │   ├── test_total_pressure_loss.py

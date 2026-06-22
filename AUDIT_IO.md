@@ -367,6 +367,117 @@
 - **ndc_core.domain.singular_losses.SingularLoss.is_kv_based(self)** -> `bool`
 - **ndc_core.domain.singular_losses.SingularLoss.is_active(self)** -> `bool`
 
+## C:\dev\PythonProject_v4\ndc_core\hydraulics\conversions.py
+
+- **ndc_core.hydraulics.conversions.flow_l_s_to_m3_s(flow_l_s)** -> `float`
+  - calls: float
+  - doc: Convert a flow from L/s to m³/s.
+- **ndc_core.hydraulics.conversions.flow_m3_s_to_l_s(flow_m3_s)** -> `float`
+  - calls: float
+  - doc: Convert a flow from m³/s to L/s.
+- **ndc_core.hydraulics.conversions.diameter_mm_to_m(diameter_mm)** -> `float`
+  - calls: float
+  - doc: Convert a diameter from mm to m.
+- **ndc_core.hydraulics.conversions.diameter_m_to_mm(diameter_m)** -> `float`
+  - calls: float
+  - doc: Convert a diameter from m to mm.
+- **ndc_core.hydraulics.conversions.pressure_bar_to_pa(pressure_bar)** -> `float`
+  - calls: float
+  - doc: Convert pressure from bar to Pa.
+- **ndc_core.hydraulics.conversions.pressure_pa_to_bar(pressure_pa)** -> `float`
+  - calls: float
+  - doc: Convert pressure from Pa to bar.
+
+## C:\dev\PythonProject_v4\ndc_core\hydraulics\elevation_pressure_loss.py
+
+- **ndc_core.hydraulics.elevation_pressure_loss.elevation_pressure_change_pa(elevation_change_m, density_kg_m3, gravity_m_s2)** -> `float`
+  - calls: float
+  - doc: Return pressure change due to elevation.
+
+## C:\dev\PythonProject_v4\ndc_core\hydraulics\friction.py
+
+- **ndc_core.hydraulics.friction.relative_roughness(roughness_m, internal_diameter_m)** -> `float`
+  - calls: float
+  - doc: Return relative roughness epsilon / D.
+- **ndc_core.hydraulics.friction.laminar_friction_factor(reynolds)** -> `float`
+  - calls: float
+  - doc: Return Darcy friction factor in laminar regime.
+- **ndc_core.hydraulics.friction.swamee_jain_friction_factor(reynolds, relative_roughness_value)** -> `float`
+  - calls: float, log10, max
+  - doc: Return explicit Swamee-Jain Darcy friction factor approximation.
+- **ndc_core.hydraulics.friction.colebrook_white_friction_factor(reynolds, relative_roughness_value, max_iterations, tolerance)** -> `float`
+  - calls: abs, float, int, log10, max, range, sqrt, swamee_jain_friction_factor
+  - doc: Return Darcy friction factor using fixed-point Colebrook-White solving.
+- **ndc_core.hydraulics.friction.darcy_friction_factor(reynolds, relative_roughness_value)** -> `float`
+  - calls: colebrook_white_friction_factor, float, flow_regime, laminar_friction_factor
+  - doc: Return Darcy friction factor for laminar, transition or turbulent flow.
+
+## C:\dev\PythonProject_v4\ndc_core\hydraulics\linear_pressure_loss.py
+
+- **ndc_core.hydraulics.linear_pressure_loss.linear_pressure_loss_pa(friction_factor, length_m, internal_diameter_m, velocity_m_s, density_kg_m3)** -> `float`
+  - calls: float
+  - doc: Return Darcy-Weisbach linear pressure loss in Pa.
+
+## C:\dev\PythonProject_v4\ndc_core\hydraulics\pipe_sizing.py
+
+- **ndc_core.hydraulics.pipe_sizing.select_smallest_usable_pipe_size(pipe_sizes, minimum_internal_diameter_mm)** -> `PipeSize | None`
+  - calls: float, max, sorted
+  - doc: Return the smallest pipe size matching a minimum internal diameter.
+- **ndc_core.hydraulics.pipe_sizing.select_pipe_size_by_velocity(design_flow_l_s, pipe_sizes, max_velocity_m_s, min_internal_diameter_mm)** -> `PipeSizingResult`
+  - calls: PipeSizingResult, float, max, select_smallest_usable_pipe_size, theoretical_diameter_mm_for_velocity, velocity_from_l_s_and_mm
+  - doc: Select the smallest pipe size respecting theoretical diameter by velocity.
+
+## C:\dev\PythonProject_v4\ndc_core\hydraulics\reynolds.py
+
+- **ndc_core.hydraulics.reynolds.reynolds_number(velocity_m_s, internal_diameter_m, kinematic_viscosity_m2_s, density_kg_m3, dynamic_viscosity_pa_s)** -> `float`
+  - calls: float
+  - doc: Return Reynolds number for internal pipe flow.
+- **ndc_core.hydraulics.reynolds.flow_regime(reynolds, laminar_limit, turbulent_limit)** -> `FlowRegime`
+  - calls: float
+  - doc: Return qualitative flow regime.
+
+## C:\dev\PythonProject_v4\ndc_core\hydraulics\singular_pressure_loss.py
+
+- **ndc_core.hydraulics.singular_pressure_loss.sum_zeta(values)** -> `float`
+  - calls: float
+  - doc: Return positive zeta coefficients sum.
+- **ndc_core.hydraulics.singular_pressure_loss.singular_pressure_loss_pa(zeta_total, velocity_m_s, density_kg_m3)** -> `float`
+  - calls: float
+  - doc: Return singular pressure loss in Pa.
+- **ndc_core.hydraulics.singular_pressure_loss.equivalent_zeta_from_kv(flow_l_s, kv_m3_h, velocity_m_s, density_kg_m3)** -> `float`
+  - calls: float
+  - doc: Convert a Kv value to an equivalent zeta coefficient.
+
+## C:\dev\PythonProject_v4\ndc_core\hydraulics\total_pressure_loss.py
+
+- **ndc_core.hydraulics.total_pressure_loss.total_pressure_loss(velocity_m_s, internal_diameter_m, length_m, density_kg_m3, kinematic_viscosity_m2_s, relative_roughness_value, elevation_change_m, singular_zeta_values)** -> `PressureLossBreakdown`
+  - calls: PressureLossBreakdown, darcy_friction_factor, elevation_pressure_change_pa, flow_regime, linear_pressure_loss_pa, reynolds_number, singular_pressure_loss_pa, sum_zeta
+  - doc: Return complete pressure loss breakdown for one section.
+
+## C:\dev\PythonProject_v4\ndc_core\hydraulics\types.py
+
+- **ndc_core.hydraulics.types.PressureLossBreakdown.total_pressure_change_pa(self)** -> `float`
+- **ndc_core.hydraulics.types.PipeSizingResult.found(self)** -> `bool`
+- **ndc_core.hydraulics.types.PipeSizingResult.velocity_ok(self)** -> `bool | None`
+
+## C:\dev\PythonProject_v4\ndc_core\hydraulics\velocity.py
+
+- **ndc_core.hydraulics.velocity.circular_area_m2(diameter_m)** -> `float`
+  - calls: float
+  - doc: Return the internal area of a circular pipe.
+- **ndc_core.hydraulics.velocity.velocity_m_s(flow_m3_s, internal_diameter_m)** -> `float`
+  - calls: circular_area_m2, float
+  - doc: Return mean velocity from flow and internal diameter in SI units.
+- **ndc_core.hydraulics.velocity.velocity_from_l_s_and_mm(flow_l_s, internal_diameter_mm)** -> `float`
+  - calls: diameter_mm_to_m, flow_l_s_to_m3_s, velocity_m_s
+  - doc: Return mean velocity from flow in L/s and internal diameter in mm.
+- **ndc_core.hydraulics.velocity.theoretical_diameter_m_for_velocity(flow_m3_s, target_velocity_m_s)** -> `float`
+  - calls: float, sqrt
+  - doc: Return theoretical internal diameter for a target velocity.
+- **ndc_core.hydraulics.velocity.theoretical_diameter_mm_for_velocity(flow_l_s, target_velocity_m_s)** -> `float`
+  - calls: flow_l_s_to_m3_s, theoretical_diameter_m_for_velocity
+  - doc: Return theoretical internal diameter in mm from flow in L/s.
+
 ## C:\dev\PythonProject_v4\tests\catalogs\test_appliance_catalog.py
 
 - **tests.catalogs.test_appliance_catalog.test_appliance_catalog_from_mapping()** -> `None`
@@ -575,3 +686,70 @@
   - calls: SingularLoss
 - **tests.domain.test_singular_losses.test_singular_loss_method_helpers()** -> `None`
   - calls: SingularLoss
+
+## C:\dev\PythonProject_v4\tests\hydraulics\test_conversions.py
+
+- **tests.hydraulics.test_conversions.test_flow_conversions()** -> `None`
+  - calls: flow_l_s_to_m3_s, flow_m3_s_to_l_s
+- **tests.hydraulics.test_conversions.test_diameter_conversions()** -> `None`
+  - calls: diameter_m_to_mm, diameter_mm_to_m
+- **tests.hydraulics.test_conversions.test_pressure_conversions()** -> `None`
+  - calls: pressure_bar_to_pa, pressure_pa_to_bar
+
+## C:\dev\PythonProject_v4\tests\hydraulics\test_friction.py
+
+- **tests.hydraulics.test_friction.test_relative_roughness()** -> `None`
+  - calls: isclose, relative_roughness
+- **tests.hydraulics.test_friction.test_laminar_friction_factor()** -> `None`
+  - calls: laminar_friction_factor
+- **tests.hydraulics.test_friction.test_darcy_friction_factor_turbulent_returns_positive_value()** -> `None`
+  - calls: darcy_friction_factor, isclose
+
+## C:\dev\PythonProject_v4\tests\hydraulics\test_pipe_sizing.py
+
+- **tests.hydraulics.test_pipe_sizing.test_select_smallest_usable_pipe_size()** -> `None`
+  - calls: PipeSize, select_smallest_usable_pipe_size
+- **tests.hydraulics.test_pipe_sizing.test_select_pipe_size_by_velocity()** -> `None`
+  - calls: PipeSize, select_pipe_size_by_velocity
+- **tests.hydraulics.test_pipe_sizing.test_select_pipe_size_by_velocity_returns_largest_if_all_too_small()** -> `None`
+  - calls: PipeSize, select_pipe_size_by_velocity
+
+## C:\dev\PythonProject_v4\tests\hydraulics\test_pressure_losses.py
+
+- **tests.hydraulics.test_pressure_losses.test_linear_pressure_loss_pa()** -> `None`
+  - calls: linear_pressure_loss_pa
+- **tests.hydraulics.test_pressure_losses.test_sum_zeta_ignores_invalid_values()** -> `None`
+  - calls: sum_zeta
+- **tests.hydraulics.test_pressure_losses.test_singular_pressure_loss_pa()** -> `None`
+  - calls: singular_pressure_loss_pa
+- **tests.hydraulics.test_pressure_losses.test_equivalent_zeta_from_kv()** -> `None`
+  - calls: equivalent_zeta_from_kv
+- **tests.hydraulics.test_pressure_losses.test_elevation_pressure_change_positive_when_downstream_is_higher()** -> `None`
+  - calls: elevation_pressure_change_pa, isclose
+- **tests.hydraulics.test_pressure_losses.test_elevation_pressure_change_negative_when_downstream_is_lower()** -> `None`
+  - calls: elevation_pressure_change_pa, isclose
+
+## C:\dev\PythonProject_v4\tests\hydraulics\test_reynolds.py
+
+- **tests.hydraulics.test_reynolds.test_reynolds_number_with_kinematic_viscosity()** -> `None`
+  - calls: reynolds_number
+- **tests.hydraulics.test_reynolds.test_reynolds_number_with_dynamic_viscosity()** -> `None`
+  - calls: reynolds_number
+- **tests.hydraulics.test_reynolds.test_flow_regime()** -> `None`
+  - calls: flow_regime
+
+## C:\dev\PythonProject_v4\tests\hydraulics\test_total_pressure_loss.py
+
+- **tests.hydraulics.test_total_pressure_loss.test_total_pressure_loss_breakdown()** -> `None`
+  - calls: total_pressure_loss
+- **tests.hydraulics.test_total_pressure_loss.test_total_pressure_loss_keeps_elevation_when_no_flow()** -> `None`
+  - calls: total_pressure_loss
+
+## C:\dev\PythonProject_v4\tests\hydraulics\test_velocity.py
+
+- **tests.hydraulics.test_velocity.test_circular_area_m2()** -> `None`
+  - calls: circular_area_m2, isclose
+- **tests.hydraulics.test_velocity.test_velocity_from_l_s_and_mm()** -> `None`
+  - calls: isclose, velocity_from_l_s_and_mm
+- **tests.hydraulics.test_velocity.test_theoretical_diameter_mm_for_velocity()** -> `None`
+  - calls: theoretical_diameter_mm_for_velocity
