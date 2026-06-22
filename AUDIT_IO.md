@@ -478,6 +478,51 @@
   - calls: flow_l_s_to_m3_s, theoretical_diameter_m_for_velocity
   - doc: Return theoretical internal diameter in mm from flow in L/s.
 
+## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\demand.py
+
+- **ndc_core.networks.domestic_water.demand.DomesticWaterDemandBuilder.cold_water(cls, appliance_catalog)** -> `DomesticWaterDemandBuilder`
+  - calls: cls
+- **ndc_core.networks.domestic_water.demand.DomesticWaterDemandBuilder.hot_water(cls, appliance_catalog)** -> `DomesticWaterDemandBuilder`
+  - calls: cls
+- **ndc_core.networks.domestic_water.demand.DomesticWaterDemandBuilder.compute_from_counts(self, appliance_counts)** -> `Result[DomesticWaterDemand]`
+  - calls: ApplianceDemandItem, DomesticWaterDemand, EngineMessage.info, EngineMessage.warning, Result.success, _apply_machine_exclusivity, _flow_for_profile, _normalize_counts, declared_counts.get, declared_counts.values, effective_counts.values, items.append, messages.append, self._simultaneity_factor, self.appliance_catalog.get ...
+- **ndc_core.networks.domestic_water.demand.DomesticWaterDemandBuilder._simultaneity_factor(self, effective_appliance_count)** -> `float`
+  - calls: clamp_simultaneity_factor, collective_dtu_simultaneity_factor
+- **ndc_core.networks.domestic_water.demand.compute_cold_water_demand(appliance_catalog, appliance_counts)** -> `Result[DomesticWaterDemand]`
+  - calls: DomesticWaterDemandBuilder.cold_water, DomesticWaterDemandBuilder.cold_water(appliance_catalog).compute_from_counts
+  - doc: Convenience function for EFS demand.
+- **ndc_core.networks.domestic_water.demand.compute_hot_water_demand(appliance_catalog, appliance_counts)** -> `Result[DomesticWaterDemand]`
+  - calls: DomesticWaterDemandBuilder.hot_water, DomesticWaterDemandBuilder.hot_water(appliance_catalog).compute_from_counts
+  - doc: Convenience function for ECS forward demand.
+- **ndc_core.networks.domestic_water.demand._normalize_counts(appliance_counts)** -> `dict[str, int]`
+  - calls: appliance_counts.items, int, normalized.get, str, str(raw_code or '').strip
+- **ndc_core.networks.domestic_water.demand._apply_machine_exclusivity(counts, exclusive_codes)** -> `dict[str, int]`
+  - calls: code.strip, code.strip().upper, counts.items, dict, effective.pop, list, next, sum
+  - doc: Apply LL + LV counted as one effective machine.
+- **ndc_core.networks.domestic_water.demand._flow_for_profile(appliance, profile)** -> `float`
+  - calls: float, getattr, max
+
+## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\profiles.py
+
+- **ndc_core.networks.domestic_water.profiles.DomesticWaterProfile.flow_attribute_name(self)** -> `str`
+
+## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\simultaneity.py
+
+- **ndc_core.networks.domestic_water.simultaneity.collective_dtu_simultaneity_factor(appliance_count, threshold)** -> `float`
+  - calls: int, sqrt
+  - doc: Return DTU collective simultaneity factor.
+- **ndc_core.networks.domestic_water.simultaneity.clamp_simultaneity_factor(value)** -> `float`
+  - calls: float, min
+  - doc: Keep a simultaneity factor in a safe range.
+
+## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\types.py
+
+- **ndc_core.networks.domestic_water.types.DomesticWaterDemand.has_flow(self)** -> `bool`
+- **ndc_core.networks.domestic_water.types.DomesticWaterDemand.has_warnings(self)** -> `bool`
+  - calls: any
+- **ndc_core.networks.domestic_water.types.DomesticWaterDemand.has_errors(self)** -> `bool`
+  - calls: any
+
 ## C:\dev\PythonProject_v4\tests\catalogs\test_appliance_catalog.py
 
 - **tests.catalogs.test_appliance_catalog.test_appliance_catalog_from_mapping()** -> `None`
@@ -753,3 +798,33 @@
   - calls: isclose, velocity_from_l_s_and_mm
 - **tests.hydraulics.test_velocity.test_theoretical_diameter_mm_for_velocity()** -> `None`
   - calls: theoretical_diameter_mm_for_velocity
+
+## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_demand.py
+
+- **tests.networks.domestic_water.test_demand._catalog()** -> `ApplianceCatalog`
+  - calls: Appliance, ApplianceCatalog
+- **tests.networks.domestic_water.test_demand.test_compute_cold_water_demand_raw_below_threshold()** -> `None`
+  - calls: _catalog, compute_cold_water_demand
+- **tests.networks.domestic_water.test_demand.test_compute_cold_water_demand_with_collective_simultaneity()** -> `None`
+  - calls: _catalog, compute_cold_water_demand, isclose, sqrt
+- **tests.networks.domestic_water.test_demand.test_compute_hot_water_demand_ignores_cold_only_appliances()** -> `None`
+  - calls: _catalog, any, compute_hot_water_demand
+- **tests.networks.domestic_water.test_demand.test_unknown_appliance_creates_warning_without_failure()** -> `None`
+  - calls: _catalog, any, compute_cold_water_demand
+- **tests.networks.domestic_water.test_demand.test_machine_exclusivity_counts_ll_lv_as_one_effective_machine()** -> `None`
+  - calls: _catalog, any, compute_cold_water_demand, isclose, len
+- **tests.networks.domestic_water.test_demand.test_demand_builder_accepts_lowercase_catalog_lookup()** -> `None`
+  - calls: DomesticWaterDemandBuilder.cold_water, DomesticWaterDemandBuilder.cold_water(_catalog()).compute_from_counts, _catalog
+- **tests.networks.domestic_water.test_demand.test_invalid_counts_are_ignored()** -> `None`
+  - calls: _catalog, compute_cold_water_demand
+
+## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_simultaneity.py
+
+- **tests.networks.domestic_water.test_simultaneity.test_collective_dtu_simultaneity_is_one_below_threshold()** -> `None`
+  - calls: collective_dtu_simultaneity_factor
+- **tests.networks.domestic_water.test_simultaneity.test_collective_dtu_simultaneity_uses_formula_from_threshold()** -> `None`
+  - calls: collective_dtu_simultaneity_factor, isclose, sqrt
+- **tests.networks.domestic_water.test_simultaneity.test_collective_dtu_simultaneity_is_safe_for_invalid_values()** -> `None`
+  - calls: collective_dtu_simultaneity_factor
+- **tests.networks.domestic_water.test_simultaneity.test_clamp_simultaneity_factor()** -> `None`
+  - calls: clamp_simultaneity_factor
