@@ -1086,6 +1086,26 @@
 - **tests.hydraulics.test_velocity.test_theoretical_diameter_mm_for_velocity()** -> `None`
   - calls: theoretical_diameter_mm_for_velocity
 
+## C:\dev\PythonProject_v4\tests\integration\test_domestic_water_mixed_network.py
+
+- **tests.integration.test_domestic_water_mixed_network._appliance_catalog()** -> `ApplianceCatalog`
+  - calls: Appliance, ApplianceCatalog
+- **tests.integration.test_domestic_water_mixed_network._pipe_catalog()** -> `PipeCatalog`
+  - calls: PipeCatalog, PipeMaterial, PipeSize
+- **tests.integration.test_domestic_water_mixed_network._fluid_catalog()** -> `FluidCatalog`
+  - calls: Fluid, FluidCatalog
+- **tests.integration.test_domestic_water_mixed_network._mixed_network()** -> `Network`
+  - calls: Cell, Network, Node, Section, network.add_cell, network.add_node, network.add_section, network.attach_cell_to_node
+  - doc: Mixed domestic water network.
+- **tests.integration.test_domestic_water_mixed_network.test_cold_water_engine_from_mixed_network_only_computes_cold_sections()** -> `None`
+  - calls: ColdWaterNetworkEngine.from_network, _appliance_catalog, _fluid_catalog, _mixed_network, _pipe_catalog, engine.compute_all, network.get_section, set
+- **tests.integration.test_domestic_water_mixed_network.test_hot_water_engine_from_mixed_network_only_computes_hot_sections()** -> `None`
+  - calls: HotWaterNetworkEngine.from_network, _appliance_catalog, _fluid_catalog, _mixed_network, _pipe_catalog, engine.compute_all, network.get_section, set
+- **tests.integration.test_domestic_water_mixed_network.test_functional_entry_points_from_mixed_network_keep_side_isolation()** -> `None`
+  - calls: _appliance_catalog, _fluid_catalog, _mixed_network, _pipe_catalog, cold_network.get_section, compute_cold_water_network_from_network, compute_hot_water_network_from_network, hot_network.get_section, set
+- **tests.integration.test_domestic_water_mixed_network.test_running_cold_then_hot_on_same_mixed_network_computes_both_without_cross_sizing()** -> `None`
+  - calls: ColdWaterNetworkEngine.from_network, ColdWaterNetworkEngine.from_network(network=network, appliance_catalog=_appliance_catalog(), pipe_catalog=_pipe_catalog(), fluid_catalog=_fluid_catalog()).compute_all, HotWaterNetworkEngine.from_network, HotWaterNetworkEngine.from_network(network=network, appliance_catalog=_appliance_catalog(), pipe_catalog=_pipe_catalog(), fluid_catalog=_fluid_catalog()).compute_all, _appliance_catalog, _fluid_catalog, _mixed_network, _pipe_catalog, network.get_section, set
+
 ## C:\dev\PythonProject_v4\tests\networks\cold_water\test_engine.py
 
 - **tests.networks.cold_water.test_engine._appliance_catalog()** -> `ApplianceCatalog`
