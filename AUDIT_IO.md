@@ -627,11 +627,13 @@
 - **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine.hot_water_from_network(cls, network, appliance_catalog, pipe_catalog, fluid_catalog, singular_loss_catalog)** -> `DomesticWaterNetworkEngine`
   - calls: cls.from_network
 - **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine.compute_sections(self, max_velocity_m_s, water_temperature_c)** -> `Result[DomesticWaterNetworkComputeResult]`
-  - calls: DomesticWaterNetworkComputeResult, Result.failure, Result.partial, Result.success, _section_matches_side, messages.extend, propagate_domestic_water_appliances, self._bind_messages_to_entities, self._compute_one_section, self.sections.items, str, tuple
+  - calls: DomesticWaterNetworkComputeResult, Result.failure, Result.partial, Result.success, _section_matches_side, any, messages.extend, propagate_domestic_water_appliances, self._bind_messages_to_entities, self._compute_one_section, self._validate_topology, self.sections.items, str, tuple
   - doc: Compute sizing and pressure losses for all sections matching the engine side.
 - **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine.compute_all(self, source_node_id, source_pressure_bar, min_required_pressure_bar, max_velocity_m_s, water_temperature_c)** -> `Result[DomesticWaterNetworkComputeResult]`
   - calls: DomesticWaterNetworkComputeResult, DomesticWaterPressureNetworkEngine, Result.failure, Result.partial, Result.success, messages.extend, pressure_bar_to_pa, pressure_engine.propagate_pressures, pressure_engine.summarize_worst_terminal_pressure, self._bind_messages_to_entities, self.compute_sections, tuple
   - doc: Compute sections, then optionally propagate pressure and summarize terminals.
+- **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine._validate_topology(self)** -> `tuple[EngineMessage, ...]`
+  - calls: EngineMessage, context.setdefault, dict, messages.append, self.network.validate_topology, tuple
 - **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine._bind_messages_to_entities(self, result)** -> `None`
   - calls: bind_domestic_water_messages_to_entities
 - **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine._compute_one_section(self, section_id, section, max_velocity_m_s, water_temperature_c)** -> `DomesticWaterSectionComputeResult`
@@ -1349,6 +1351,10 @@
   - calls: Fluid, FluidCatalog
 - **tests.networks.test_network_domain_integration._network(fluid_code)** -> `Network`
   - calls: Network, Node, Section, network.add_node, network.add_section, section.downstream_appliance_counts.update
+- **tests.networks.test_network_domain_integration._network_with_unknown_downstream_node()** -> `Network`
+  - calls: Network, Node, Section, network.add_node, network.add_section, section.downstream_appliance_counts.update
+- **tests.networks.test_network_domain_integration._network_without_section()** -> `Network`
+  - calls: Network, Node, network.add_node
 - **tests.networks.test_network_domain_integration.test_domestic_water_engine_can_be_created_from_domain_network()** -> `None`
   - calls: DomesticWaterNetworkEngine.cold_water_from_network, _appliance_catalog, _fluid_catalog, _network, _pipe_catalog, engine.compute_all, network.get_node
 - **tests.networks.test_network_domain_integration.test_cold_water_facade_from_network_computes_domain_network()** -> `None`
@@ -1363,6 +1369,10 @@
   - calls: _appliance_catalog, _fluid_catalog, _network, _pipe_catalog, compute_cold_water_network_from_network, compute_hot_water_network_from_network
 - **tests.networks.test_network_domain_integration.test_facade_propagate_pressures_uses_existing_losses_without_resizing()** -> `None`
   - calls: ColdWaterNetworkEngine.from_network, _appliance_catalog, _fluid_catalog, _network, _pipe_catalog, engine.propagate_pressures, network.get_section
+- **tests.networks.test_network_domain_integration.test_compute_from_invalid_domain_network_returns_managed_failure()** -> `None`
+  - calls: _appliance_catalog, _fluid_catalog, _network_with_unknown_downstream_node, _pipe_catalog, any, compute_cold_water_network_from_network, network.get_section
+- **tests.networks.test_network_domain_integration.test_compute_from_domain_network_with_topology_warning_keeps_best_effort_result()** -> `None`
+  - calls: _appliance_catalog, _fluid_catalog, _network_without_section, _pipe_catalog, any, compute_cold_water_network_from_network
 
 ## C:\dev\PythonProject_v4\tests\networks\test_public_api.py
 

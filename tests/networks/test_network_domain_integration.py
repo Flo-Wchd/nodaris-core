@@ -153,6 +153,45 @@ def _network(fluid_code: str) -> Network:
     return network
 
 
+def _network_with_unknown_downstream_node() -> Network:
+    network = Network(id="N", name="Invalid network")
+
+    source = Node(
+        id="N0",
+        name="Source",
+        kind=NodeKind.SOURCE,
+    )
+    section = Section(
+        id="S1",
+        name="S1",
+        upstream_node_id="N0",
+        downstream_node_id="MISSING",
+        fluid_code="EFS",
+        usage_context=SectionUsageContext.RISER,
+        length_m=10.0,
+    )
+    section.downstream_appliance_counts.update({"L": 1})
+
+    network.add_node(source)
+    network.add_section(section)
+
+    return network
+
+
+def _network_without_section() -> Network:
+    network = Network(id="N", name="Empty section network")
+
+    source = Node(
+        id="N0",
+        name="Source",
+        kind=NodeKind.SOURCE,
+    )
+
+    network.add_node(source)
+
+    return network
+
+
 def test_domestic_water_engine_can_be_created_from_domain_network() -> None:
     network = _network("EFS")
 
@@ -318,3 +357,58 @@ def test_facade_propagate_pressures_uses_existing_losses_without_resizing() -> N
     assert result.value is not None
     assert result.value.node_pressures["N1"].pressure_pa == 275_000.0
     assert section.selected_internal_diameter_mm is None
+
+
+def test_compute_from_invalid_domain_network_returns_managed_failure() -> None:
+    network = _network_with_unknown_downstream_node()
+    section = network.get_section("S1")
+
+    result = compute_cold_water_network_from_network(
+        network=network,
+        appliance_catalog=_appliance_catalog(),
+        pipe_catalog=_pipe_catalog(),
+        fluid_catalog=_fluid_catalog(),
+        source_node_id="N0",
+        source_pressure_bar=3.0,
+    )
+
+    assert result.failed
+    assert result.value is not None
+    assert result.value.section_count == 0
+
+    assert section.selected_internal_diameter_mm is None
+    assert section.total_pressure_loss_pa is None
+
+    assert any(
+        message.code == "SECTION_UNKNOWN_DOWNSTREAM_NODE"
+        for message in result.messages
+    )
+    assert any(
+        message.code == "SECTION_UNKNOWN_DOWNSTREAM_NODE"
+        for message in network.engine_messages
+    )
+    assert any(
+        message.code == "SECTION_UNKNOWN_DOWNSTREAM_NODE"
+        for message in section.engine_messages
+    )
+
+
+def test_compute_from_domain_network_with_topology_warning_keeps_best_effort_result() -> None:
+    network = _network_without_section()
+
+    result = compute_cold_water_network_from_network(
+        network=network,
+        appliance_catalog=_appliance_catalog(),
+        pipe_catalog=_pipe_catalog(),
+        fluid_catalog=_fluid_catalog(),
+    )
+
+    assert result.ok
+    assert result.value is not None
+    assert result.value.section_count == 0
+
+    assert any(message.code == "NETWORK_NO_SECTION" for message in result.messages)
+    assert any(
+        message.code == "NETWORK_NO_SECTION"
+        for message in network.engine_messages
+    )

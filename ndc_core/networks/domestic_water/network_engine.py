@@ -41,6 +41,7 @@ from ndc_core.networks.domestic_water.types import DomesticWaterSide
 class DomesticWaterNetworkStep(StrEnum):
     """Network compute step names."""
 
+    TOPOLOGY_VALIDATION = "topology_validation"
     SIZING = "sizing"
     PRESSURE_LOSS = "pressure_loss"
     PRESSURE_PROPAGATION = "pressure_propagation"
@@ -127,6 +128,7 @@ class DomesticWaterNetworkEngine:
     Common EFS/ECS network orchestration engine.
 
     This class does not own hydraulic formulas. It coordinates:
+    - managed topology validation when a domain Network is available;
     - Cell/Node appliance propagation;
     - section demand/sizing;
     - section pressure losses;
@@ -269,6 +271,18 @@ class DomesticWaterNetworkEngine:
         messages: list[EngineMessage] = []
         section_results: dict[str, DomesticWaterSectionComputeResult] = {}
 
+        topology_messages = self._validate_topology()
+        messages.extend(topology_messages)
+
+        if any(message.is_error for message in topology_messages):
+            result = DomesticWaterNetworkComputeResult(
+                side=self.side,
+                section_results=section_results,
+                messages=tuple(messages),
+            )
+            self._bind_messages_to_entities(result)
+            return Result.failure(value=result, messages=messages)
+
         appliance_propagation_result = propagate_domestic_water_appliances(
             nodes=self.nodes,
             sections=self.sections,
@@ -335,6 +349,9 @@ class DomesticWaterNetworkEngine:
         if sections_result.value is None:
             return Result.failure(messages=messages)
 
+        if sections_result.failed:
+            return sections_result
+
         pressure_propagation: DomesticWaterPressurePropagationResult | None = None
         pressure_summary: DomesticWaterPressureSummary | None = None
 
@@ -378,6 +395,27 @@ class DomesticWaterNetworkEngine:
             return Result.partial(value=result, messages=messages)
 
         return Result.success(value=result, messages=messages)
+
+    def _validate_topology(self) -> tuple[EngineMessage, ...]:
+        if self.network is None:
+            return ()
+
+        messages: list[EngineMessage] = []
+
+        for message in self.network.validate_topology():
+            context = dict(message.context or {})
+            context.setdefault("step", DomesticWaterNetworkStep.TOPOLOGY_VALIDATION.value)
+
+            messages.append(
+                EngineMessage(
+                    severity=message.severity,
+                    code=message.code,
+                    text=message.text,
+                    context=context,
+                )
+            )
+
+        return tuple(messages)
 
     def _bind_messages_to_entities(
         self,

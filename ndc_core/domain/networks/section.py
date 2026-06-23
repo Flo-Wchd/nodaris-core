@@ -182,7 +182,7 @@ class Section:
         self.effective_appliance_counts.clear()
 
         self.engine_messages = ()
-        self.section_messages =()
+        self.section_messages = ()
 
     def as_debug_dict(self) -> dict[str, Any]:
         return {
