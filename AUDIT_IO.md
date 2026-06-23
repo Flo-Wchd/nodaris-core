@@ -574,6 +574,7 @@
 
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\entity_access.py
 
+- **ndc_core.networks.domestic_water.entity_access.SectionPressureLossRead.ok(self)** -> `bool`
 - **ndc_core.networks.domestic_water.entity_access.clean_entity_id(value)** -> `str`
   - calls: str, str(value or '').strip
   - doc: Return a normalized non-optional entity id string.
@@ -592,6 +593,9 @@
 - **ndc_core.networks.domestic_water.entity_access.read_section_downstream_appliance_counts(section)** -> `dict[str, int]`
   - calls: getattr, normalize_appliance_counts
   - doc: Read normalized downstream appliance counts from a Section-like object.
+- **ndc_core.networks.domestic_water.entity_access.read_section_pressure_loss_pa(section)** -> `SectionPressureLossRead`
+  - calls: SectionPressureLossRead, float, getattr, isfinite
+  - doc: Read a safe total pressure loss from a Section-like object.
 - **ndc_core.networks.domestic_water.entity_access.write_section_downstream_appliance_counts(section, counts)** -> `None`
   - calls: _write_mapping_attribute, normalize_appliance_counts
   - doc: Write normalized downstream appliance counts on a Section-like object.
@@ -751,7 +755,7 @@
 - **ndc_core.networks.domestic_water.pressure_network.DomesticWaterPressureSummary.has_errors(self)** -> `bool`
   - calls: any
 - **ndc_core.networks.domestic_water.pressure_network.DomesticWaterPressureNetworkEngine.propagate_pressures(self, source_node_id, source_pressure_pa)** -> `Result[DomesticWaterPressurePropagationResult]`
-  - calls: DomesticWaterPressurePropagationResult, EngineMessage.error, EngineMessage.warning, NodePressureState, Result.failure, Result.success, _is_terminal_node, _read_section_pressure_loss_pa, apply_node_pressures, apply_section_pressures, clean_optional_code, deque, getattr, max, messages.append ...
+  - calls: DomesticWaterPressurePropagationResult, EngineMessage.error, EngineMessage.warning, NodePressureState, Result.failure, Result.success, apply_node_pressures, apply_section_pressures, clean_optional_code, deque, getattr, max, messages.append, node_is_terminal_for_domestic_water_side, pressure_pa_to_bar ...
 - **ndc_core.networks.domestic_water.pressure_network.DomesticWaterPressureNetworkEngine.summarize_worst_terminal_pressure(self, source_node_id, source_pressure_bar, min_required_pressure_bar)** -> `Result[DomesticWaterPressureSummary]`
   - calls: DomesticWaterPressurePropagationResult, DomesticWaterPressureSummary, EngineMessage.warning, Result.failure, Result.partial, Result.success, TerminalPressureStatus, messages.append, messages.extend, min, pressure_bar_to_pa, propagation_result.value.node_pressures.items, safe_non_negative_float, self.propagate_pressures, str ...
 - **ndc_core.networks.domestic_water.pressure_network.propagate_cold_water_pressures(nodes, sections, source_node_id, source_pressure_pa)** -> `Result[DomesticWaterPressurePropagationResult]`
@@ -766,10 +770,6 @@
 - **ndc_core.networks.domestic_water.pressure_network.summarize_hot_water_worst_terminal_pressure(nodes, sections, source_node_id, source_pressure_bar, min_required_pressure_bar)** -> `Result[DomesticWaterPressureSummary]`
   - calls: DomesticWaterPressureNetworkEngine, DomesticWaterPressureNetworkEngine(nodes=nodes, sections=sections, side=DomesticWaterSide.HOT_WATER).summarize_worst_terminal_pressure
   - doc: Convenience function for ECS forward worst terminal summary.
-- **ndc_core.networks.domestic_water.pressure_network._read_section_pressure_loss_pa(section_id, section, messages, warned_missing_losses)** -> `float`
-  - calls: EngineMessage.warning, float, getattr, messages.append, warned_missing_losses.add
-- **ndc_core.networks.domestic_water.pressure_network._is_terminal_node(node, sections, side)** -> `bool`
-  - calls: read_downstream_section_ids, section_matches_domestic_water_side, sections.get
 
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\profiles.py
 
@@ -834,6 +834,9 @@
 - **ndc_core.networks.domestic_water.side_matching.section_matches_domestic_water_side(section, side)** -> `bool`
   - calls: domestic_water_fluid_codes_for_side, getattr, normalize_domestic_water_fluid_code
   - doc: Return whether a section belongs to the requested domestic water side.
+- **ndc_core.networks.domestic_water.side_matching.node_is_terminal_for_domestic_water_side(node, sections, side)** -> `bool`
+  - calls: read_downstream_section_ids, section_matches_domestic_water_side, sections.get
+  - doc: Return whether a node is terminal for the requested domestic water side.
 
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\simultaneity.py
 
@@ -1290,6 +1293,14 @@
 - **tests.networks.domestic_water.test_entity_access.NodeWithInvalidMethod.local_appliance_counts(self)** -> `None`
   - raises: TypeError('invalid')
   - calls: TypeError
+- **tests.networks.domestic_water.test_entity_access.test_read_section_pressure_loss_pa()** -> `None`
+  - calls: _Section, isinstance, read_section_pressure_loss_pa
+- **tests.networks.domestic_water.test_entity_access.test_read_section_pressure_loss_pa_missing()** -> `None`
+  - calls: _Section, read_section_pressure_loss_pa
+- **tests.networks.domestic_water.test_entity_access.test_read_section_pressure_loss_pa_invalid()** -> `None`
+  - calls: _Section, read_section_pressure_loss_pa
+- **tests.networks.domestic_water.test_entity_access.test_read_section_pressure_loss_pa_not_finite()** -> `None`
+  - calls: _Section, float, read_section_pressure_loss_pa
 
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_message_binding.py
 
@@ -1451,6 +1462,8 @@
   - calls: domestic_water_side_from_fluid_code
 - **tests.networks.domestic_water.test_side_matching.test_section_matches_domestic_water_side()** -> `None`
   - calls: _Section, section_matches_domestic_water_side
+- **tests.networks.domestic_water.test_side_matching.test_node_is_terminal_for_domestic_water_side()** -> `None`
+  - calls: _Node, _Section, node_is_terminal_for_domestic_water_side
 
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_simultaneity.py
 

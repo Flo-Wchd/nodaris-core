@@ -11,6 +11,7 @@ from ndc_core.common.result import Result
 from ndc_core.hydraulics.conversions import pressure_bar_to_pa, pressure_pa_to_bar
 from ndc_core.networks.domestic_water.types import DomesticWaterSide
 from ndc_core.networks.domestic_water.side_matching import (
+    node_is_terminal_for_domestic_water_side,
     section_matches_domestic_water_side,
 )
 from ndc_core.networks.domestic_water.entity_access import (
@@ -18,6 +19,7 @@ from ndc_core.networks.domestic_water.entity_access import (
     apply_section_pressures,
     clean_optional_code,
     read_downstream_section_ids,
+    read_section_pressure_loss_pa,
 )
 from ndc_core.networks.domestic_water.numeric import (
     safe_non_negative_float,
@@ -211,12 +213,44 @@ class DomesticWaterPressureNetworkEngine:
                     )
                     continue
 
-                delta_p_pa = _read_section_pressure_loss_pa(
-                    section_id=section_id,
-                    section=section,
-                    messages=messages,
-                    warned_missing_losses=warned_missing_losses,
-                )
+                pressure_loss_read = read_section_pressure_loss_pa(section)
+
+                if pressure_loss_read.missing:
+                    if section_id not in warned_missing_losses:
+                        messages.append(
+                            EngineMessage.warning(
+                                code="DOMESTIC_WATER_PRESSURE_LOSS_MISSING",
+                                text="Section pressure loss is missing; propagation uses Δp = 0.",
+                                context={"section_id": section_id},
+                            )
+                        )
+                        warned_missing_losses.add(section_id)
+
+                elif pressure_loss_read.invalid:
+                    messages.append(
+                        EngineMessage.warning(
+                            code="DOMESTIC_WATER_PRESSURE_LOSS_INVALID",
+                            text="Section pressure loss is invalid; propagation uses Δp = 0.",
+                            context={
+                                "section_id": section_id,
+                                "value": pressure_loss_read.raw_value,
+                            },
+                        )
+                    )
+
+                elif pressure_loss_read.not_finite:
+                    messages.append(
+                        EngineMessage.warning(
+                            code="DOMESTIC_WATER_PRESSURE_LOSS_NOT_FINITE",
+                            text="Section pressure loss is not finite; propagation uses Δp = 0.",
+                            context={
+                                "section_id": section_id,
+                                "value": pressure_loss_read.raw_value,
+                            },
+                        )
+                    )
+
+                delta_p_pa = pressure_loss_read.pressure_loss_pa
 
                 downstream_pressure_pa = max(0.0, current_pressure_pa - delta_p_pa)
 
@@ -240,7 +274,11 @@ class DomesticWaterPressureNetworkEngine:
                 node_id=node_id,
                 pressure_pa=pressure_pa,
                 pressure_bar=pressure_pa_to_bar(pressure_pa),
-                is_terminal=_is_terminal_node(self.nodes.get(node_id), self.sections, self.side),
+                is_terminal=node_is_terminal_for_domestic_water_side(
+                    node=self.nodes.get(node_id),
+                    sections=self.sections,
+                    side=self.side,
+                ),
             )
             for node_id, pressure_pa in pressures_pa.items()
         }
@@ -436,68 +474,3 @@ def summarize_hot_water_worst_terminal_pressure(
         source_pressure_bar=source_pressure_bar,
         min_required_pressure_bar=min_required_pressure_bar,
     )
-
-
-def _read_section_pressure_loss_pa(
-    *,
-    section_id: str,
-    section: Any,
-    messages: list[EngineMessage],
-    warned_missing_losses: set[str],
-) -> float:
-    value = getattr(section, "total_pressure_loss_pa", None)
-
-    if value is None:
-        if section_id not in warned_missing_losses:
-            messages.append(
-                EngineMessage.warning(
-                    code="DOMESTIC_WATER_PRESSURE_LOSS_MISSING",
-                    text="Section pressure loss is missing; propagation uses Δp = 0.",
-                    context={"section_id": section_id},
-                )
-            )
-            warned_missing_losses.add(section_id)
-
-        return 0.0
-
-    try:
-        pressure_loss = float(value)
-    except (TypeError, ValueError):
-        messages.append(
-            EngineMessage.warning(
-                code="DOMESTIC_WATER_PRESSURE_LOSS_INVALID",
-                text="Section pressure loss is invalid; propagation uses Δp = 0.",
-                context={"section_id": section_id, "value": value},
-            )
-        )
-        return 0.0
-
-    if pressure_loss != pressure_loss or pressure_loss in (float("inf"), float("-inf")):
-        messages.append(
-            EngineMessage.warning(
-                code="DOMESTIC_WATER_PRESSURE_LOSS_NOT_FINITE",
-                text="Section pressure loss is not finite; propagation uses Δp = 0.",
-                context={"section_id": section_id, "value": value},
-            )
-        )
-        return 0.0
-
-    return pressure_loss
-
-
-def _is_terminal_node(
-    node: Any,
-    sections: Mapping[str, Any],
-    side: DomesticWaterSide,
-) -> bool:
-    downstream_section_ids = read_downstream_section_ids(node)
-
-    if not downstream_section_ids:
-        return True
-
-    for section_id in downstream_section_ids:
-        section = sections.get(section_id)
-        if section is not None and section_matches_domestic_water_side(section, side):
-            return False
-
-    return True

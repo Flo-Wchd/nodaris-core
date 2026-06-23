@@ -9,6 +9,7 @@ from ndc_core.networks.domestic_water.side_matching import (
     hot_water_fluid_codes,
     normalize_domestic_water_fluid_code,
     section_matches_domestic_water_side,
+    node_is_terminal_for_domestic_water_side,
 )
 from ndc_core.networks.domestic_water.types import DomesticWaterSide
 
@@ -16,6 +17,11 @@ from ndc_core.networks.domestic_water.types import DomesticWaterSide
 @dataclass
 class _Section:
     fluid_code: str
+
+
+@dataclass
+class _Node:
+    downstream_section_ids: list[str]
 
 
 def test_normalize_domestic_water_fluid_code() -> None:
@@ -99,4 +105,42 @@ def test_section_matches_domestic_water_side() -> None:
     assert not section_matches_domestic_water_side(
         unknown_section,
         DomesticWaterSide.HOT_WATER,
+    )
+
+
+def test_node_is_terminal_for_domestic_water_side() -> None:
+    nodes = {
+        "A": _Node(downstream_section_ids=["S1", "S2"]),
+        "B": _Node(downstream_section_ids=["S2"]),
+        "C": _Node(downstream_section_ids=[]),
+    }
+    sections = {
+        "S1": _Section(fluid_code="EFS"),
+        "S2": _Section(fluid_code="ECS"),
+    }
+
+    assert not node_is_terminal_for_domestic_water_side(
+        node=nodes["A"],
+        sections=sections,
+        side=DomesticWaterSide.COLD_WATER,
+    )
+    assert not node_is_terminal_for_domestic_water_side(
+        node=nodes["A"],
+        sections=sections,
+        side=DomesticWaterSide.HOT_WATER,
+    )
+    assert node_is_terminal_for_domestic_water_side(
+        node=nodes["B"],
+        sections=sections,
+        side=DomesticWaterSide.COLD_WATER,
+    )
+    assert not node_is_terminal_for_domestic_water_side(
+        node=nodes["B"],
+        sections=sections,
+        side=DomesticWaterSide.HOT_WATER,
+    )
+    assert node_is_terminal_for_domestic_water_side(
+        node=nodes["C"],
+        sections=sections,
+        side=DomesticWaterSide.COLD_WATER,
     )

@@ -62,6 +62,9 @@ from ndc_core.networks.domestic_water import (
     read_cell_appliance_counts,
     read_node_local_appliance_counts,
     read_section_downstream_appliance_counts,
+    SectionPressureLossRead,
+    node_is_terminal_for_domestic_water_side,
+    read_section_pressure_loss_pa,
 )
 from ndc_core.networks.hot_water import (
     HotWaterNetworkEngine,
@@ -134,4 +137,7 @@ __all__ = [
     "read_cell_appliance_counts",
     "read_node_local_appliance_counts",
     "read_section_downstream_appliance_counts",
+    "SectionPressureLossRead",
+    "node_is_terminal_for_domestic_water_side",
+    "read_section_pressure_loss_pa",
 ]

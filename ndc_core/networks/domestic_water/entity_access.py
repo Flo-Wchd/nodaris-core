@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
+from math import isfinite
 from collections.abc import Mapping
 from typing import Any
 
@@ -7,6 +9,21 @@ from ndc_core.networks.domestic_water.appliance_counts import (
     merge_appliance_counts,
     normalize_appliance_counts,
 )
+
+
+@dataclass(frozen=True, slots=True)
+class SectionPressureLossRead:
+    """Safe pressure-loss read from a Section-like object."""
+
+    pressure_loss_pa: float
+    missing: bool = False
+    invalid: bool = False
+    not_finite: bool = False
+    raw_value: Any = None
+
+    @property
+    def ok(self) -> bool:
+        return not self.missing and not self.invalid and not self.not_finite
 
 
 def clean_entity_id(value: Any) -> str:
@@ -97,6 +114,40 @@ def read_section_downstream_appliance_counts(section: Any) -> dict[str, int]:
 
     return normalize_appliance_counts(
         getattr(section, "downstream_appliance_counts", None)
+    )
+
+
+def read_section_pressure_loss_pa(section: Any) -> SectionPressureLossRead:
+    """Read a safe total pressure loss from a Section-like object."""
+
+    value = getattr(section, "total_pressure_loss_pa", None)
+
+    if value is None:
+        return SectionPressureLossRead(
+            pressure_loss_pa=0.0,
+            missing=True,
+            raw_value=value,
+        )
+
+    try:
+        pressure_loss_pa = float(value)
+    except (TypeError, ValueError):
+        return SectionPressureLossRead(
+            pressure_loss_pa=0.0,
+            invalid=True,
+            raw_value=value,
+        )
+
+    if not isfinite(pressure_loss_pa):
+        return SectionPressureLossRead(
+            pressure_loss_pa=0.0,
+            not_finite=True,
+            raw_value=value,
+        )
+
+    return SectionPressureLossRead(
+        pressure_loss_pa=pressure_loss_pa,
+        raw_value=value,
     )
 
 

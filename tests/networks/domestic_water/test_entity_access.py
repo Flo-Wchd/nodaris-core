@@ -13,6 +13,8 @@ from ndc_core.networks.domestic_water.entity_access import (
     read_cell_appliance_counts,
     read_node_local_appliance_counts,
     read_section_downstream_appliance_counts,
+    SectionPressureLossRead,
+    read_section_pressure_loss_pa,
 )
 
 
@@ -25,9 +27,11 @@ class _Node:
     cells: list[object] = field(default_factory=list)
     pressure_pa: float | None = None
 
+
 @dataclass
 class _Section:
     downstream_appliance_counts: dict[str, int] = field(default_factory=dict)
+    total_pressure_loss_pa: object = None
     pressure_start_pa: float | None = None
     pressure_end_pa: float | None = None
 
@@ -187,3 +191,39 @@ def test_read_node_local_appliance_counts_handles_invalid_method() -> None:
             raise TypeError("invalid")
 
     assert read_node_local_appliance_counts(NodeWithInvalidMethod()) == {}
+
+
+def test_read_section_pressure_loss_pa() -> None:
+    section = _Section(total_pressure_loss_pa="125.5")
+
+    result = read_section_pressure_loss_pa(section)
+
+    assert isinstance(result, SectionPressureLossRead)
+    assert result.ok
+    assert result.pressure_loss_pa == 125.5
+    assert result.raw_value == "125.5"
+
+
+def test_read_section_pressure_loss_pa_missing() -> None:
+    result = read_section_pressure_loss_pa(_Section(total_pressure_loss_pa=None))
+
+    assert not result.ok
+    assert result.pressure_loss_pa == 0.0
+    assert result.missing
+
+
+def test_read_section_pressure_loss_pa_invalid() -> None:
+    result = read_section_pressure_loss_pa(_Section(total_pressure_loss_pa="bad"))
+
+    assert not result.ok
+    assert result.pressure_loss_pa == 0.0
+    assert result.invalid
+    assert result.raw_value == "bad"
+
+
+def test_read_section_pressure_loss_pa_not_finite() -> None:
+    result = read_section_pressure_loss_pa(_Section(total_pressure_loss_pa=float("inf")))
+
+    assert not result.ok
+    assert result.pressure_loss_pa == 0.0
+    assert result.not_finite

@@ -63,6 +63,9 @@ from ndc_core.networks import (
     read_cell_appliance_counts,
     read_node_local_appliance_counts,
     read_section_downstream_appliance_counts,
+    SectionPressureLossRead,
+    node_is_terminal_for_domestic_water_side,
+    read_section_pressure_loss_pa,
 )
 from ndc_core.networks.cold_water import (
     ColdWaterNetworkEngine as ColdWaterNetworkEngineFromPackage,
@@ -140,6 +143,7 @@ def test_networks_public_api_exports_domestic_water_side_matching_tools() -> Non
     assert callable(domestic_water_side_from_fluid_code)
     assert callable(normalize_domestic_water_fluid_code)
     assert callable(section_matches_domestic_water_side)
+    assert callable(node_is_terminal_for_domestic_water_side)
 
 
 def test_networks_public_api_exports_domestic_water_appliance_count_tools() -> None:
@@ -159,6 +163,8 @@ def test_networks_public_api_exports_domestic_water_entity_access_tools() -> Non
     assert callable(read_cell_appliance_counts)
     assert callable(read_node_local_appliance_counts)
     assert callable(read_section_downstream_appliance_counts)
+    assert SectionPressureLossRead is not None
+    assert callable(read_section_pressure_loss_pa)
 
 
 def test_networks_public_api_exports_domestic_water_numeric_tools() -> None:

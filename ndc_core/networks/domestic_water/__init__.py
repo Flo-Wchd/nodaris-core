@@ -74,6 +74,7 @@ from ndc_core.networks.domestic_water.side_matching import (
     hot_water_fluid_codes,
     normalize_domestic_water_fluid_code,
     section_matches_domestic_water_side,
+    node_is_terminal_for_domestic_water_side,
 )
 from ndc_core.networks.domestic_water.appliance_counts import (
     apply_machine_exclusivity,
@@ -91,6 +92,8 @@ from ndc_core.networks.domestic_water.entity_access import (
     read_cell_appliance_counts,
     read_node_local_appliance_counts,
     read_section_downstream_appliance_counts,
+    SectionPressureLossRead,
+    read_section_pressure_loss_pa,
 )
 from ndc_core.networks.domestic_water.numeric import (
     positive_optional_float,
@@ -186,4 +189,7 @@ __all__ = [
     "read_cell_appliance_counts",
     "read_node_local_appliance_counts",
     "read_section_downstream_appliance_counts",
+    "SectionPressureLossRead",
+    "node_is_terminal_for_domestic_water_side",
+    "read_section_pressure_loss_pa",
 ]
