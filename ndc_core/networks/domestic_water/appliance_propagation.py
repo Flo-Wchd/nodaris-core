@@ -11,12 +11,10 @@ from ndc_core.networks.domestic_water.types import DomesticWaterSide
 from ndc_core.networks.domestic_water.side_matching import (
     section_matches_domestic_water_side,
 )
-from ndc_core.networks.domestic_water.appliance_counts import (
-    merge_appliance_counts,
-    normalize_appliance_counts,
-)
+from ndc_core.networks.domestic_water.appliance_counts import merge_appliance_counts
 from ndc_core.networks.domestic_water.entity_access import (
     clean_entity_id,
+    read_node_local_appliance_counts,
     write_node_downstream_appliance_counts,
     write_section_downstream_appliance_counts,
 )
@@ -82,7 +80,7 @@ class DomesticWaterAppliancePropagationEngine:
         messages: list[EngineMessage] = []
 
         node_local_counts = {
-            str(node_id): _read_node_local_appliance_counts(node)
+            str(node_id): read_node_local_appliance_counts(node)
             for node_id, node in self.nodes.items()
         }
 
@@ -278,41 +276,3 @@ def propagate_hot_water_appliances(
         sections=sections,
         side=DomesticWaterSide.HOT_WATER,
     )
-
-
-def _read_node_local_appliance_counts(node: Any) -> dict[str, int]:
-    if node is None:
-        return {}
-
-    local_counts_method = getattr(node, "local_appliance_counts", None)
-    if callable(local_counts_method):
-        try:
-            return normalize_appliance_counts(local_counts_method())
-        except (TypeError, ValueError):
-            return {}
-
-    merged: dict[str, int] = {}
-
-    for attr_name in ("appliance_counts", "appliances"):
-        value = getattr(node, attr_name, None)
-        if isinstance(value, dict):
-            merged = merge_appliance_counts(merged, normalize_appliance_counts(value))
-
-    cells = getattr(node, "cells", None)
-    if isinstance(cells, (list, tuple)):
-        for cell in cells:
-            merged = merge_appliance_counts(merged, _read_cell_appliance_counts(cell))
-
-    return merged
-
-
-def _read_cell_appliance_counts(cell: Any) -> dict[str, int]:
-    if cell is None:
-        return {}
-
-    for attr_name in ("appliance_counts", "appliances"):
-        value = getattr(cell, attr_name, None)
-        if isinstance(value, dict):
-            return normalize_appliance_counts(value)
-
-    return {}

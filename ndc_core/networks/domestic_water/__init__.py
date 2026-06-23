@@ -88,6 +88,8 @@ from ndc_core.networks.domestic_water.entity_access import (
     read_downstream_section_ids,
     write_node_downstream_appliance_counts,
     write_section_downstream_appliance_counts,
+    read_cell_appliance_counts,
+    read_node_local_appliance_counts,
 )
 from ndc_core.networks.domestic_water.numeric import (
     positive_optional_float,
@@ -180,4 +182,6 @@ __all__ = [
     "apply_section_sizing_state",
     "appliance_flow_for_profile",
     "minimum_appliance_internal_diameter_mm",
+    "read_cell_appliance_counts",
+    "read_node_local_appliance_counts",
 ]

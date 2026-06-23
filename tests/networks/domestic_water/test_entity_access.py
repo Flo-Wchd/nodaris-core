@@ -10,6 +10,8 @@ from ndc_core.networks.domestic_water.entity_access import (
     read_downstream_section_ids,
     write_node_downstream_appliance_counts,
     write_section_downstream_appliance_counts,
+    read_cell_appliance_counts,
+    read_node_local_appliance_counts,
 )
 
 
@@ -17,14 +19,22 @@ from ndc_core.networks.domestic_water.entity_access import (
 class _Node:
     downstream_section_ids: list[object] = field(default_factory=list)
     downstream_appliance_counts: dict[str, int] = field(default_factory=dict)
+    appliance_counts: dict[str, int] = field(default_factory=dict)
+    appliances: dict[str, int] = field(default_factory=dict)
+    cells: list[object] = field(default_factory=list)
     pressure_pa: float | None = None
-
 
 @dataclass
 class _Section:
     downstream_appliance_counts: dict[str, int] = field(default_factory=dict)
     pressure_start_pa: float | None = None
     pressure_end_pa: float | None = None
+
+
+@dataclass
+class _Cell:
+    appliance_counts: dict[str, int] = field(default_factory=dict)
+    appliances: dict[str, int] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -108,3 +118,56 @@ def test_apply_node_pressures() -> None:
 
     assert nodes["N0"].pressure_pa == 300_000.0
     assert nodes["N1"].pressure_pa == 275_000.0
+
+
+def test_read_cell_appliance_counts() -> None:
+    cell = _Cell(
+        appliance_counts={
+            "L": 1,
+            "D": "2",
+            "BAD": 0,
+        },
+    )
+
+    assert read_cell_appliance_counts(cell) == {"L": 1, "D": 2}
+
+
+def test_read_node_local_appliance_counts_from_method() -> None:
+    class NodeWithMethod:
+        def local_appliance_counts(self) -> dict[str, object]:
+            return {
+                "L": 1,
+                "D": "2",
+                "BAD": 0,
+            }
+
+    assert read_node_local_appliance_counts(NodeWithMethod()) == {
+        "L": 1,
+        "D": 2,
+    }
+
+
+def test_read_node_local_appliance_counts_from_attributes_and_cells() -> None:
+    node = _Node(
+        appliance_counts={"L": 1},
+        appliances={"D": 1},
+        cells=[
+            _Cell(appliance_counts={"WC": 1}),
+            _Cell(appliances={"LL": 1}),
+        ],
+    )
+
+    assert read_node_local_appliance_counts(node) == {
+        "L": 1,
+        "D": 1,
+        "WC": 1,
+        "LL": 1,
+    }
+
+
+def test_read_node_local_appliance_counts_handles_invalid_method() -> None:
+    class NodeWithInvalidMethod:
+        def local_appliance_counts(self) -> None:
+            raise TypeError("invalid")
+
+    assert read_node_local_appliance_counts(NodeWithInvalidMethod()) == {}

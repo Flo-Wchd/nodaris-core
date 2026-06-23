@@ -531,7 +531,7 @@
 - **ndc_core.networks.domestic_water.appliance_propagation.DomesticWaterAppliancePropagationResult.propagated_section_count(self)** -> `int`
   - calls: len
 - **ndc_core.networks.domestic_water.appliance_propagation.DomesticWaterAppliancePropagationEngine.propagate(self)** -> `Result[DomesticWaterAppliancePropagationResult]`
-  - calls: DomesticWaterAppliancePropagationResult, EngineMessage.warning, Result.success, _read_node_local_appliance_counts, any, bool, children_by_node[upstream_node_id].append, clean_entity_id, defaultdict, getattr, messages.append, node_local_counts.values, section_matches_domestic_water_side, self.nodes.items, self.sections.items ...
+  - calls: DomesticWaterAppliancePropagationResult, EngineMessage.warning, Result.success, any, bool, children_by_node[upstream_node_id].append, clean_entity_id, defaultdict, getattr, messages.append, node_local_counts.values, read_node_local_appliance_counts, section_matches_domestic_water_side, self.nodes.items, self.sections.items ...
 - **ndc_core.networks.domestic_water.appliance_propagation.DomesticWaterAppliancePropagationEngine.compute_node_downstream_counts(node_id)** -> `dict[str, int]`
   - calls: EngineMessage.error, children_by_node.get, compute_node_downstream_counts, cycle_reported.add, dict, merge_appliance_counts, messages.append, node_local_counts.get, self.nodes.get, self.sections.get, visiting.add, visiting.remove, write_node_downstream_appliance_counts, write_section_downstream_appliance_counts
 - **ndc_core.networks.domestic_water.appliance_propagation.propagate_domestic_water_appliances(nodes, sections, side)** -> `Result[DomesticWaterAppliancePropagationResult]`
@@ -543,10 +543,6 @@
 - **ndc_core.networks.domestic_water.appliance_propagation.propagate_hot_water_appliances(nodes, sections)** -> `Result[DomesticWaterAppliancePropagationResult]`
   - calls: propagate_domestic_water_appliances
   - doc: Convenience function for ECS appliance propagation.
-- **ndc_core.networks.domestic_water.appliance_propagation._read_node_local_appliance_counts(node)** -> `dict[str, int]`
-  - calls: _read_cell_appliance_counts, callable, getattr, isinstance, local_counts_method, merge_appliance_counts, normalize_appliance_counts
-- **ndc_core.networks.domestic_water.appliance_propagation._read_cell_appliance_counts(cell)** -> `dict[str, int]`
-  - calls: getattr, isinstance, normalize_appliance_counts
 
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\appliance_rules.py
 
@@ -587,6 +583,12 @@
 - **ndc_core.networks.domestic_water.entity_access.read_downstream_section_ids(node)** -> `tuple[str, ...]`
   - calls: clean_entity_id, getattr, ids.append, tuple
   - doc: Read downstream section ids from a Node-like object.
+- **ndc_core.networks.domestic_water.entity_access.read_cell_appliance_counts(cell)** -> `dict[str, int]`
+  - calls: getattr, isinstance, merge_appliance_counts, normalize_appliance_counts
+  - doc: Read normalized appliance counts from a Cell-like object.
+- **ndc_core.networks.domestic_water.entity_access.read_node_local_appliance_counts(node)** -> `dict[str, int]`
+  - calls: callable, getattr, isinstance, local_counts_method, merge_appliance_counts, normalize_appliance_counts, read_cell_appliance_counts
+  - doc: Read normalized local appliance counts from a Node-like object.
 - **ndc_core.networks.domestic_water.entity_access.write_section_downstream_appliance_counts(section, counts)** -> `None`
   - calls: _write_mapping_attribute, normalize_appliance_counts
   - doc: Write normalized downstream appliance counts on a Section-like object.
@@ -1275,6 +1277,16 @@
   - calls: _Section, apply_section_pressures
 - **tests.networks.domestic_water.test_entity_access.test_apply_node_pressures()** -> `None`
   - calls: _Node, _NodeState, apply_node_pressures
+- **tests.networks.domestic_water.test_entity_access.test_read_cell_appliance_counts()** -> `None`
+  - calls: _Cell, read_cell_appliance_counts
+- **tests.networks.domestic_water.test_entity_access.test_read_node_local_appliance_counts_from_method()** -> `None`
+- **tests.networks.domestic_water.test_entity_access.NodeWithMethod.local_appliance_counts(self)** -> `dict[str, object]`
+- **tests.networks.domestic_water.test_entity_access.test_read_node_local_appliance_counts_from_attributes_and_cells()** -> `None`
+  - calls: _Cell, _Node, read_node_local_appliance_counts
+- **tests.networks.domestic_water.test_entity_access.test_read_node_local_appliance_counts_handles_invalid_method()** -> `None`
+- **tests.networks.domestic_water.test_entity_access.NodeWithInvalidMethod.local_appliance_counts(self)** -> `None`
+  - raises: TypeError('invalid')
+  - calls: TypeError
 
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_message_binding.py
 

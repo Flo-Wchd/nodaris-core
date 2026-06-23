@@ -59,6 +59,8 @@ from ndc_core.networks.domestic_water import (
     apply_section_sizing_state,
     appliance_flow_for_profile,
     minimum_appliance_internal_diameter_mm,
+    read_cell_appliance_counts,
+    read_node_local_appliance_counts,
 )
 from ndc_core.networks.hot_water import (
     HotWaterNetworkEngine,
@@ -128,4 +130,6 @@ __all__ = [
     "apply_section_sizing_state",
     "appliance_flow_for_profile",
     "minimum_appliance_internal_diameter_mm",
+    "read_cell_appliance_counts",
+    "read_node_local_appliance_counts",
 ]

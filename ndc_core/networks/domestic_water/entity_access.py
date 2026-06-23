@@ -4,6 +4,7 @@ from collections.abc import Mapping
 from typing import Any
 
 from ndc_core.networks.domestic_water.appliance_counts import (
+    merge_appliance_counts,
     normalize_appliance_counts,
 )
 
@@ -33,6 +34,59 @@ def read_downstream_section_ids(node: Any) -> tuple[str, ...]:
             ids.append(section_id)
 
     return tuple(ids)
+
+
+def read_cell_appliance_counts(cell: Any) -> dict[str, int]:
+    """Read normalized appliance counts from a Cell-like object."""
+
+    if cell is None:
+        return {}
+
+    merged: dict[str, int] = {}
+
+    for attr_name in ("appliance_counts", "appliances"):
+        value = getattr(cell, attr_name, None)
+        if isinstance(value, dict):
+            merged = merge_appliance_counts(
+                merged,
+                normalize_appliance_counts(value),
+            )
+
+    return merged
+
+
+def read_node_local_appliance_counts(node: Any) -> dict[str, int]:
+    """Read normalized local appliance counts from a Node-like object."""
+
+    if node is None:
+        return {}
+
+    local_counts_method = getattr(node, "local_appliance_counts", None)
+    if callable(local_counts_method):
+        try:
+            return normalize_appliance_counts(local_counts_method())
+        except (TypeError, ValueError):
+            return {}
+
+    merged: dict[str, int] = {}
+
+    for attr_name in ("appliance_counts", "appliances"):
+        value = getattr(node, attr_name, None)
+        if isinstance(value, dict):
+            merged = merge_appliance_counts(
+                merged,
+                normalize_appliance_counts(value),
+            )
+
+    cells = getattr(node, "cells", None)
+    if isinstance(cells, (list, tuple)):
+        for cell in cells:
+            merged = merge_appliance_counts(
+                merged,
+                read_cell_appliance_counts(cell),
+            )
+
+    return merged
 
 
 def write_section_downstream_appliance_counts(
