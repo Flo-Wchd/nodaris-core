@@ -25,6 +25,9 @@ class Network:
     sections: dict[str, Section] = field(default_factory=dict)
     cells: dict[str, Cell] = field(default_factory=dict)
 
+    engine_messages: tuple[EngineMessage, ...] = field(default_factory=tuple)
+    network_messages: tuple[EngineMessage, ...] = field(default_factory=tuple)
+
     def __post_init__(self) -> None:
         self.id = self.id.strip()
         self.name = self.name.strip()
@@ -137,6 +140,9 @@ class Network:
 
         for node in self.nodes.values():
             node.clear_pressure()
+
+        self.engine_messages = ()
+        self.network_messages = ()
 
     def validate_topology(self) -> tuple[EngineMessage, ...]:
         """

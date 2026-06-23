@@ -1,7 +1,11 @@
 from ndc_core.networks import (
     ColdWaterNetworkEngine,
+    DomesticWaterAppliancePropagationEngine,
+    DomesticWaterAppliancePropagationResult,
     DomesticWaterDemand,
     DomesticWaterDemandBuilder,
+    DomesticWaterMessageBinder,
+    DomesticWaterMessageBindingResult,
     DomesticWaterMethod,
     DomesticWaterNetworkComputeResult,
     DomesticWaterNetworkEngine,
@@ -16,21 +20,20 @@ from ndc_core.networks import (
     DomesticWaterSectionSizing,
     DomesticWaterSectionSizingEngine,
     DomesticWaterSide,
-    DomesticWaterAppliancePropagationResult,
-    DomesticWaterAppliancePropagationEngine,
     HotWaterNetworkEngine,
     NodePressureState,
     PressurePropagationStatus,
     SectionSizingMode,
     TerminalPressureStatus,
+    bind_domestic_water_messages_to_entities,
     compute_cold_water_network,
-    compute_hot_water_network,
     compute_cold_water_network_from_domain,
-    compute_hot_water_network_from_domain,
     compute_cold_water_network_from_network,
+    compute_hot_water_network,
+    compute_hot_water_network_from_domain,
     compute_hot_water_network_from_network,
-    propagate_domestic_water_appliances,
     propagate_cold_water_appliances,
+    propagate_domestic_water_appliances,
     propagate_hot_water_appliances,
 )
 from ndc_core.networks.cold_water import (
@@ -94,3 +97,9 @@ def test_networks_public_api_exports_appliance_propagation_types() -> None:
     assert callable(propagate_domestic_water_appliances)
     assert callable(propagate_cold_water_appliances)
     assert callable(propagate_hot_water_appliances)
+
+
+def test_networks_public_api_exports_message_binding_tools() -> None:
+    assert DomesticWaterMessageBinder is not None
+    assert DomesticWaterMessageBindingResult is not None
+    assert callable(bind_domestic_water_messages_to_entities)

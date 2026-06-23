@@ -38,6 +38,7 @@ class ColdWaterNetworkEngine:
     pipe_catalog: PipeCatalog
     fluid_catalog: FluidCatalog
     singular_loss_catalog: SingularLossCatalog | None = None
+    network: Network | None = None
 
     @classmethod
     def from_network(
@@ -60,6 +61,7 @@ class ColdWaterNetworkEngine:
             pipe_catalog=pipe_catalog,
             fluid_catalog=fluid_catalog,
             singular_loss_catalog=singular_loss_catalog,
+            network=network,
         )
 
     @property
@@ -67,6 +69,15 @@ class ColdWaterNetworkEngine:
         return DomesticWaterSide.COLD_WATER
 
     def domestic_engine(self) -> DomesticWaterNetworkEngine:
+        if self.network is not None:
+            return DomesticWaterNetworkEngine.cold_water_from_network(
+                network=self.network,
+                appliance_catalog=self.appliance_catalog,
+                pipe_catalog=self.pipe_catalog,
+                fluid_catalog=self.fluid_catalog,
+                singular_loss_catalog=self.singular_loss_catalog,
+            )
+
         return DomesticWaterNetworkEngine.cold_water(
             nodes=self.nodes,
             sections=self.sections,

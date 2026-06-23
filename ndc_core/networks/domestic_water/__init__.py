@@ -10,6 +10,11 @@ from ndc_core.networks.domestic_water.demand import (
     compute_cold_water_demand,
     compute_hot_water_demand,
 )
+from ndc_core.networks.domestic_water.message_binding import (
+    DomesticWaterMessageBinder,
+    DomesticWaterMessageBindingResult,
+    bind_domestic_water_messages_to_entities,
+)
 from ndc_core.networks.domestic_water.network_engine import (
     DomesticWaterNetworkComputeResult,
     DomesticWaterNetworkEngine,
@@ -70,6 +75,8 @@ __all__ = [
     "DomesticWaterAppliancePropagationResult",
     "DomesticWaterDemand",
     "DomesticWaterDemandBuilder",
+    "DomesticWaterMessageBinder",
+    "DomesticWaterMessageBindingResult",
     "DomesticWaterMethod",
     "DomesticWaterNetworkComputeResult",
     "DomesticWaterNetworkEngine",
@@ -90,6 +97,7 @@ __all__ = [
     "PressurePropagationStatus",
     "SectionSizingMode",
     "TerminalPressureStatus",
+    "bind_domestic_water_messages_to_entities",
     "clamp_simultaneity_factor",
     "collective_dtu_simultaneity_factor",
     "compute_cold_water_demand",

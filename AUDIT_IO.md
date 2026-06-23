@@ -488,7 +488,7 @@
   - doc: Build an EFS facade from the domain Network object.
 - **ndc_core.networks.cold_water.engine.ColdWaterNetworkEngine.side(self)** -> `DomesticWaterSide`
 - **ndc_core.networks.cold_water.engine.ColdWaterNetworkEngine.domestic_engine(self)** -> `DomesticWaterNetworkEngine`
-  - calls: DomesticWaterNetworkEngine.cold_water
+  - calls: DomesticWaterNetworkEngine.cold_water, DomesticWaterNetworkEngine.cold_water_from_network
 - **ndc_core.networks.cold_water.engine.ColdWaterNetworkEngine.pressure_network_engine(self)** -> `DomesticWaterPressureNetworkEngine`
   - calls: DomesticWaterPressureNetworkEngine
 - **ndc_core.networks.cold_water.engine.ColdWaterNetworkEngine.compute_sections(self, max_velocity_m_s, water_temperature_c)** -> `Result[DomesticWaterNetworkComputeResult]`
@@ -572,6 +572,28 @@
 - **ndc_core.networks.domestic_water.demand._flow_for_profile(appliance, profile)** -> `float`
   - calls: float, getattr, max
 
+## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\message_binding.py
+
+- **ndc_core.networks.domestic_water.message_binding.DomesticWaterMessageBindingResult.has_warnings(self)** -> `bool`
+  - calls: any
+- **ndc_core.networks.domestic_water.message_binding.DomesticWaterMessageBindingResult.has_errors(self)** -> `bool`
+  - calls: any
+- **ndc_core.networks.domestic_water.message_binding.DomesticWaterMessageBinder.bind(self)** -> `Result[DomesticWaterMessageBindingResult]`
+  - calls: DomesticWaterMessageBindingResult, Result.failure, Result.partial, Result.success, _dedupe_messages, _safe_set_messages, getattr, len, section_messages.items, self._collect_section_messages, self.sections.get, tuple
+- **ndc_core.networks.domestic_water.message_binding.DomesticWaterMessageBinder._collect_section_messages(self)** -> `dict[str, tuple[EngineMessage, ...]]`
+  - calls: _dedupe_messages, _message_section_id, getattr, section_messages.items, section_messages.setdefault, section_messages.setdefault(section_id, []).append, section_messages.setdefault(str(section_id), []).extend, section_results.items, str, tuple
+- **ndc_core.networks.domestic_water.message_binding.bind_domestic_water_messages_to_entities(side, sections, compute_result, network)** -> `Result[DomesticWaterMessageBindingResult]`
+  - calls: DomesticWaterMessageBinder, DomesticWaterMessageBinder(side=side, sections=sections, compute_result=compute_result, network=network).bind
+  - doc: Convenience function for binding domestic water compute messages.
+- **ndc_core.networks.domestic_water.message_binding._safe_set_messages(entity, primary_attr, secondary_attr, messages, warning_context, binding_messages)** -> `None`
+  - calls: EngineMessage.warning, binding_messages.append, setattr, tuple
+- **ndc_core.networks.domestic_water.message_binding._message_section_id(message)** -> `str | None`
+  - calls: context.get, getattr, isinstance, str, str(value or '').strip
+- **ndc_core.networks.domestic_water.message_binding._dedupe_messages(messages)** -> `tuple[EngineMessage, ...]`
+  - calls: _message_fingerprint, deduped.append, seen.add, set, tuple
+- **ndc_core.networks.domestic_water.message_binding._message_fingerprint(message)** -> `tuple[str, str, str, str]`
+  - calls: getattr, repr, str
+
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\network_engine.py
 
 - **ndc_core.networks.domestic_water.network_engine.DomesticWaterSectionComputeResult.sizing_ok(self)** -> `bool`
@@ -593,9 +615,9 @@
   - calls: any
 - **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkComputeResult.has_errors(self)** -> `bool`
   - calls: any
-- **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine.cold_water(cls, nodes, sections, appliance_catalog, pipe_catalog, fluid_catalog, singular_loss_catalog)** -> `DomesticWaterNetworkEngine`
+- **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine.cold_water(cls, nodes, sections, appliance_catalog, pipe_catalog, fluid_catalog, singular_loss_catalog, network)** -> `DomesticWaterNetworkEngine`
   - calls: cls
-- **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine.hot_water(cls, nodes, sections, appliance_catalog, pipe_catalog, fluid_catalog, singular_loss_catalog)** -> `DomesticWaterNetworkEngine`
+- **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine.hot_water(cls, nodes, sections, appliance_catalog, pipe_catalog, fluid_catalog, singular_loss_catalog, network)** -> `DomesticWaterNetworkEngine`
   - calls: cls
 - **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine.from_network(cls, network, appliance_catalog, pipe_catalog, fluid_catalog, singular_loss_catalog, side)** -> `DomesticWaterNetworkEngine`
   - calls: cls
@@ -605,11 +627,13 @@
 - **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine.hot_water_from_network(cls, network, appliance_catalog, pipe_catalog, fluid_catalog, singular_loss_catalog)** -> `DomesticWaterNetworkEngine`
   - calls: cls.from_network
 - **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine.compute_sections(self, max_velocity_m_s, water_temperature_c)** -> `Result[DomesticWaterNetworkComputeResult]`
-  - calls: DomesticWaterNetworkComputeResult, Result.failure, Result.partial, Result.success, _section_matches_side, messages.extend, propagate_domestic_water_appliances, self._compute_one_section, self.sections.items, str, tuple
+  - calls: DomesticWaterNetworkComputeResult, Result.failure, Result.partial, Result.success, _section_matches_side, messages.extend, propagate_domestic_water_appliances, self._bind_messages_to_entities, self._compute_one_section, self.sections.items, str, tuple
   - doc: Compute sizing and pressure losses for all sections matching the engine side.
 - **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine.compute_all(self, source_node_id, source_pressure_bar, min_required_pressure_bar, max_velocity_m_s, water_temperature_c)** -> `Result[DomesticWaterNetworkComputeResult]`
-  - calls: DomesticWaterNetworkComputeResult, DomesticWaterPressureNetworkEngine, Result.failure, Result.partial, Result.success, messages.extend, pressure_bar_to_pa, pressure_engine.propagate_pressures, pressure_engine.summarize_worst_terminal_pressure, self.compute_sections, tuple
+  - calls: DomesticWaterNetworkComputeResult, DomesticWaterPressureNetworkEngine, Result.failure, Result.partial, Result.success, messages.extend, pressure_bar_to_pa, pressure_engine.propagate_pressures, pressure_engine.summarize_worst_terminal_pressure, self._bind_messages_to_entities, self.compute_sections, tuple
   - doc: Compute sections, then optionally propagate pressure and summarize terminals.
+- **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine._bind_messages_to_entities(self, result)** -> `None`
+  - calls: bind_domestic_water_messages_to_entities
 - **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine._compute_one_section(self, section_id, section, max_velocity_m_s, water_temperature_c)** -> `DomesticWaterSectionComputeResult`
   - calls: DomesticWaterSectionComputeResult, EngineMessage.warning, _read_section_downstream_appliance_counts, getattr, messages.append, messages.extend, self._compute_section_pressure_loss, self._size_section, tuple
 - **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine._size_section(self, section, appliance_counts, max_velocity_m_s)** -> `Result[DomesticWaterSectionSizing]`
@@ -788,7 +812,7 @@
   - doc: Build an ECS facade from the domain Network object.
 - **ndc_core.networks.hot_water.engine.HotWaterNetworkEngine.side(self)** -> `DomesticWaterSide`
 - **ndc_core.networks.hot_water.engine.HotWaterNetworkEngine.domestic_engine(self)** -> `DomesticWaterNetworkEngine`
-  - calls: DomesticWaterNetworkEngine.hot_water
+  - calls: DomesticWaterNetworkEngine.hot_water, DomesticWaterNetworkEngine.hot_water_from_network
 - **ndc_core.networks.hot_water.engine.HotWaterNetworkEngine.pressure_network_engine(self)** -> `DomesticWaterPressureNetworkEngine`
   - calls: DomesticWaterPressureNetworkEngine
 - **ndc_core.networks.hot_water.engine.HotWaterNetworkEngine.compute_sections(self, max_velocity_m_s, water_temperature_c)** -> `Result[DomesticWaterNetworkComputeResult]`
@@ -1159,6 +1183,27 @@
 - **tests.networks.domestic_water.test_demand.test_invalid_counts_are_ignored()** -> `None`
   - calls: _catalog, compute_cold_water_demand
 
+## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_message_binding.py
+
+- **tests.networks.domestic_water.test_message_binding._appliance_catalog()** -> `ApplianceCatalog`
+  - calls: Appliance, ApplianceCatalog
+- **tests.networks.domestic_water.test_message_binding._pipe_catalog()** -> `PipeCatalog`
+  - calls: PipeCatalog, PipeMaterial, PipeSize
+- **tests.networks.domestic_water.test_message_binding._fluid_catalog()** -> `FluidCatalog`
+  - calls: Fluid, FluidCatalog
+- **tests.networks.domestic_water.test_message_binding._network_with_cell()** -> `Network`
+  - calls: Cell, Network, Node, Section, network.add_cell, network.add_node, network.add_section, network.attach_cell_to_node
+- **tests.networks.domestic_water.test_message_binding._network_without_appliances()** -> `Network`
+  - calls: Network, Node, Section, network.add_node, network.add_section
+- **tests.networks.domestic_water.test_message_binding.test_compute_from_network_binds_messages_to_network_and_sections()** -> `None`
+  - calls: _appliance_catalog, _fluid_catalog, _network_with_cell, _pipe_catalog, compute_cold_water_network_from_network, hasattr, isinstance, network.get_section
+- **tests.networks.domestic_water.test_message_binding.test_section_warning_is_bound_to_section_messages()** -> `None`
+  - calls: _appliance_catalog, _fluid_catalog, _network_without_appliances, _pipe_catalog, any, compute_cold_water_network_from_network, hasattr, network.get_section
+- **tests.networks.domestic_water.test_message_binding.test_facade_from_network_keeps_message_binding()** -> `None`
+  - calls: ColdWaterNetworkEngine.from_network, ColdWaterNetworkEngine.from_network(network=network, appliance_catalog=_appliance_catalog(), pipe_catalog=_pipe_catalog(), fluid_catalog=_fluid_catalog()).compute_all, _appliance_catalog, _fluid_catalog, _network_with_cell, _pipe_catalog, hasattr, network.get_section
+- **tests.networks.domestic_water.test_message_binding.test_public_api_exports_message_binding_tools()** -> `None`
+  - calls: callable
+
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_network_engine.py
 
 - **tests.networks.domestic_water.test_network_engine._appliance_catalog()** -> `ApplianceCatalog`
@@ -1329,4 +1374,6 @@
 - **tests.networks.test_public_api.test_networks_public_api_exports_pressure_loss_types()** -> `None`
 - **tests.networks.test_public_api.test_networks_public_api_exports_pressure_network_types()** -> `None`
 - **tests.networks.test_public_api.test_networks_public_api_exports_appliance_propagation_types()** -> `None`
+  - calls: callable
+- **tests.networks.test_public_api.test_networks_public_api_exports_message_binding_tools()** -> `None`
   - calls: callable

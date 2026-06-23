@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Mapping
 
+from ndc_core.common import EngineMessage
 from ndc_core.domain.networks.types import DiameterMode, SectionUsageContext
 from ndc_core.domain.singular_losses import SingularLoss
 
@@ -49,6 +50,9 @@ class Section:
     effective_appliance_counts: dict[str, int] = field(default_factory=dict)
     singular_losses: list[SingularLoss] = field(default_factory=list)
     metadata: Mapping[str, Any] = field(default_factory=dict)
+
+    engine_messages: tuple[EngineMessage, ...] = field(default_factory=tuple)
+    section_messages: tuple[EngineMessage, ...] = field(default_factory=tuple)
 
     def __post_init__(self) -> None:
         self.id = self.id.strip()
@@ -176,6 +180,9 @@ class Section:
 
         self.downstream_appliance_counts.clear()
         self.effective_appliance_counts.clear()
+
+        self.engine_messages = ()
+        self.section_messages =()
 
     def as_debug_dict(self) -> dict[str, Any]:
         return {

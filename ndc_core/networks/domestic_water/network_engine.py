@@ -17,6 +17,9 @@ from ndc_core.networks.domestic_water.appliance_propagation import (
     DomesticWaterAppliancePropagationResult,
     propagate_domestic_water_appliances,
 )
+from ndc_core.networks.domestic_water.message_binding import (
+    bind_domestic_water_messages_to_entities,
+)
 from ndc_core.networks.domestic_water.pressure_loss import (
     DomesticWaterPressureLossResult,
     compute_cold_water_section_pressure_loss,
@@ -138,6 +141,7 @@ class DomesticWaterNetworkEngine:
     fluid_catalog: FluidCatalog
     singular_loss_catalog: SingularLossCatalog | None = None
     side: DomesticWaterSide = DomesticWaterSide.COLD_WATER
+    network: Network | None = None
 
     @classmethod
     def cold_water(
@@ -149,6 +153,7 @@ class DomesticWaterNetworkEngine:
         pipe_catalog: PipeCatalog,
         fluid_catalog: FluidCatalog,
         singular_loss_catalog: SingularLossCatalog | None = None,
+        network: Network | None = None,
     ) -> DomesticWaterNetworkEngine:
         return cls(
             nodes=nodes,
@@ -158,6 +163,7 @@ class DomesticWaterNetworkEngine:
             fluid_catalog=fluid_catalog,
             singular_loss_catalog=singular_loss_catalog,
             side=DomesticWaterSide.COLD_WATER,
+            network=network,
         )
 
     @classmethod
@@ -170,6 +176,7 @@ class DomesticWaterNetworkEngine:
         pipe_catalog: PipeCatalog,
         fluid_catalog: FluidCatalog,
         singular_loss_catalog: SingularLossCatalog | None = None,
+        network: Network | None = None,
     ) -> DomesticWaterNetworkEngine:
         return cls(
             nodes=nodes,
@@ -179,6 +186,7 @@ class DomesticWaterNetworkEngine:
             fluid_catalog=fluid_catalog,
             singular_loss_catalog=singular_loss_catalog,
             side=DomesticWaterSide.HOT_WATER,
+            network=network,
         )
 
     @classmethod
@@ -207,6 +215,7 @@ class DomesticWaterNetworkEngine:
             fluid_catalog=fluid_catalog,
             singular_loss_catalog=singular_loss_catalog,
             side=side,
+            network=network,
         )
 
     @classmethod
@@ -289,6 +298,8 @@ class DomesticWaterNetworkEngine:
             messages=tuple(messages),
         )
 
+        self._bind_messages_to_entities(result)
+
         if result.has_errors:
             return Result.failure(value=result, messages=messages)
 
@@ -358,6 +369,8 @@ class DomesticWaterNetworkEngine:
             messages=tuple(messages),
         )
 
+        self._bind_messages_to_entities(result)
+
         if result.has_errors:
             return Result.failure(value=result, messages=messages)
 
@@ -365,6 +378,17 @@ class DomesticWaterNetworkEngine:
             return Result.partial(value=result, messages=messages)
 
         return Result.success(value=result, messages=messages)
+
+    def _bind_messages_to_entities(
+        self,
+        result: DomesticWaterNetworkComputeResult,
+    ) -> None:
+        bind_domestic_water_messages_to_entities(
+            side=self.side,
+            sections=self.sections,
+            compute_result=result,
+            network=self.network,
+        )
 
     def _compute_one_section(
         self,
