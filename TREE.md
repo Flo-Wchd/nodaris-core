@@ -450,7 +450,8 @@ PythonProject_v4
 │   │   │   ├── test_gutter_sizing.py
 │   │   │   ├── test_rainfall.py
 │   │   │   └── test_roof_area.py
-│   │   └── __init__.py
+│   │   ├── __init__.py
+│   │   └── test_public_api.py
 │   └── __init__.py
 ├── AUDIT_IO.md
 ├── mkdocs.yml

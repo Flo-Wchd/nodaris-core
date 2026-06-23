@@ -1174,3 +1174,13 @@
   - calls: HotWaterNetworkEngine, _appliance_catalog, _fluid_catalog, _network, _pipe_catalog, engine.compute_sections
 - **tests.networks.hot_water.test_engine.test_compute_hot_water_network_functional_entry_point()** -> `None`
   - calls: _appliance_catalog, _fluid_catalog, _network, _pipe_catalog, compute_hot_water_network
+
+## C:\dev\PythonProject_v4\tests\networks\test_public_api.py
+
+- **tests.networks.test_public_api.test_networks_public_api_exports_facades()** -> `None`
+  - calls: callable
+- **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_engine_types()** -> `None`
+- **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_domain_types()** -> `None`
+- **tests.networks.test_public_api.test_networks_public_api_exports_section_sizing_types()** -> `None`
+- **tests.networks.test_public_api.test_networks_public_api_exports_pressure_loss_types()** -> `None`
+- **tests.networks.test_public_api.test_networks_public_api_exports_pressure_network_types()** -> `None`
