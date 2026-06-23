@@ -280,6 +280,7 @@ PythonProject_v4
 │   │   │   └── types.py
 │   │   ├── domestic_water/
 │   │   │   ├── __init__.py
+│   │   │   ├── appliance_propagation.py
 │   │   │   ├── demand.py
 │   │   │   ├── engine.py
 │   │   │   ├── network_engine.py
@@ -414,9 +415,11 @@ PythonProject_v4
 │   │   │   └── test_profile.py
 │   │   ├── domestic_water/
 │   │   │   ├── __init__.py
+│   │   │   ├── test_appliance_propagation.py
 │   │   │   ├── test_demand.py
 │   │   │   ├── test_engine.py
 │   │   │   ├── test_network_engine.py
+│   │   │   ├── test_network_engine_appliance_propagation.py
 │   │   │   ├── test_pressure.py
 │   │   │   ├── test_pressure_loss.py
 │   │   │   ├── test_pressure_network.py

@@ -1,3 +1,10 @@
+from ndc_core.networks.domestic_water.appliance_propagation import (
+    DomesticWaterAppliancePropagationEngine,
+    DomesticWaterAppliancePropagationResult,
+    propagate_cold_water_appliances,
+    propagate_domestic_water_appliances,
+    propagate_hot_water_appliances,
+)
 from ndc_core.networks.domestic_water.demand import (
     DomesticWaterDemandBuilder,
     compute_cold_water_demand,
@@ -59,6 +66,8 @@ from ndc_core.networks.domestic_water.types import (
 __all__ = [
     "ApplianceDemandItem",
     "COLD_WATER_PROFILE",
+    "DomesticWaterAppliancePropagationEngine",
+    "DomesticWaterAppliancePropagationResult",
     "DomesticWaterDemand",
     "DomesticWaterDemandBuilder",
     "DomesticWaterMethod",
@@ -85,13 +94,16 @@ __all__ = [
     "collective_dtu_simultaneity_factor",
     "compute_cold_water_demand",
     "compute_cold_water_network",
-    "compute_cold_water_section_pressure_loss",
     "compute_cold_water_network_from_domain",
+    "compute_cold_water_section_pressure_loss",
     "compute_hot_water_demand",
     "compute_hot_water_network",
-    "compute_hot_water_section_pressure_loss",
     "compute_hot_water_network_from_domain",
+    "compute_hot_water_section_pressure_loss",
+    "propagate_cold_water_appliances",
     "propagate_cold_water_pressures",
+    "propagate_domestic_water_appliances",
+    "propagate_hot_water_appliances",
     "propagate_hot_water_pressures",
     "size_cold_water_section_from_counts",
     "size_hot_water_section_from_counts",

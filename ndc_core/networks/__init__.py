@@ -4,6 +4,8 @@ from ndc_core.networks.cold_water import (
     compute_cold_water_network_from_network,
 )
 from ndc_core.networks.domestic_water import (
+    DomesticWaterAppliancePropagationEngine,
+    DomesticWaterAppliancePropagationResult,
     DomesticWaterDemand,
     DomesticWaterDemandBuilder,
     DomesticWaterMethod,
@@ -26,6 +28,9 @@ from ndc_core.networks.domestic_water import (
     TerminalPressureStatus,
     compute_cold_water_network_from_domain,
     compute_hot_water_network_from_domain,
+    propagate_cold_water_appliances,
+    propagate_domestic_water_appliances,
+    propagate_hot_water_appliances,
 )
 from ndc_core.networks.hot_water import (
     HotWaterNetworkEngine,
@@ -35,6 +40,8 @@ from ndc_core.networks.hot_water import (
 
 __all__ = [
     "ColdWaterNetworkEngine",
+    "DomesticWaterAppliancePropagationEngine",
+    "DomesticWaterAppliancePropagationResult",
     "DomesticWaterDemand",
     "DomesticWaterDemandBuilder",
     "DomesticWaterMethod",
@@ -62,4 +69,7 @@ __all__ = [
     "compute_hot_water_network",
     "compute_hot_water_network_from_domain",
     "compute_hot_water_network_from_network",
+    "propagate_cold_water_appliances",
+    "propagate_domestic_water_appliances",
+    "propagate_hot_water_appliances",
 ]

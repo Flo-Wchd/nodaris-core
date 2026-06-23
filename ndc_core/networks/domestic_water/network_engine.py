@@ -13,6 +13,10 @@ from ndc_core.common.messages import EngineMessage
 from ndc_core.common.result import Result
 from ndc_core.domain.networks.network import Network
 from ndc_core.hydraulics.conversions import pressure_bar_to_pa
+from ndc_core.networks.domestic_water.appliance_propagation import (
+    DomesticWaterAppliancePropagationResult,
+    propagate_domestic_water_appliances,
+)
 from ndc_core.networks.domestic_water.pressure_loss import (
     DomesticWaterPressureLossResult,
     compute_cold_water_section_pressure_loss,
@@ -76,6 +80,7 @@ class DomesticWaterNetworkComputeResult:
 
     side: DomesticWaterSide
     section_results: dict[str, DomesticWaterSectionComputeResult]
+    appliance_propagation: DomesticWaterAppliancePropagationResult | None = None
     pressure_propagation: DomesticWaterPressurePropagationResult | None = None
     pressure_summary: DomesticWaterPressureSummary | None = None
     messages: tuple[EngineMessage, ...] = field(default_factory=tuple)
@@ -119,6 +124,7 @@ class DomesticWaterNetworkEngine:
     Common EFS/ECS network orchestration engine.
 
     This class does not own hydraulic formulas. It coordinates:
+    - Cell/Node appliance propagation;
     - section demand/sizing;
     - section pressure losses;
     - network pressure propagation;
@@ -254,6 +260,14 @@ class DomesticWaterNetworkEngine:
         messages: list[EngineMessage] = []
         section_results: dict[str, DomesticWaterSectionComputeResult] = {}
 
+        appliance_propagation_result = propagate_domestic_water_appliances(
+            nodes=self.nodes,
+            sections=self.sections,
+            side=self.side,
+        )
+        messages.extend(appliance_propagation_result.messages)
+        appliance_propagation = appliance_propagation_result.value
+
         for section_id, section in self.sections.items():
             if not _section_matches_side(section, self.side):
                 continue
@@ -271,6 +285,7 @@ class DomesticWaterNetworkEngine:
         result = DomesticWaterNetworkComputeResult(
             side=self.side,
             section_results=section_results,
+            appliance_propagation=appliance_propagation,
             messages=tuple(messages),
         )
 
@@ -337,6 +352,7 @@ class DomesticWaterNetworkEngine:
         result = DomesticWaterNetworkComputeResult(
             side=self.side,
             section_results=sections_result.value.section_results,
+            appliance_propagation=sections_result.value.appliance_propagation,
             pressure_propagation=pressure_propagation,
             pressure_summary=pressure_summary,
             messages=tuple(messages),

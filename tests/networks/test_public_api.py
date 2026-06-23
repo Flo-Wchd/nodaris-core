@@ -16,6 +16,8 @@ from ndc_core.networks import (
     DomesticWaterSectionSizing,
     DomesticWaterSectionSizingEngine,
     DomesticWaterSide,
+    DomesticWaterAppliancePropagationResult,
+    DomesticWaterAppliancePropagationEngine,
     HotWaterNetworkEngine,
     NodePressureState,
     PressurePropagationStatus,
@@ -27,6 +29,9 @@ from ndc_core.networks import (
     compute_hot_water_network_from_domain,
     compute_cold_water_network_from_network,
     compute_hot_water_network_from_network,
+    propagate_domestic_water_appliances,
+    propagate_cold_water_appliances,
+    propagate_hot_water_appliances,
 )
 from ndc_core.networks.cold_water import (
     ColdWaterNetworkEngine as ColdWaterNetworkEngineFromPackage,
@@ -81,3 +86,11 @@ def test_networks_public_api_exports_pressure_network_types() -> None:
     assert NodePressureState is not None
     assert TerminalPressureStatus is not None
     assert PressurePropagationStatus.SUCCESS.value == "success"
+
+
+def test_networks_public_api_exports_appliance_propagation_types() -> None:
+    assert DomesticWaterAppliancePropagationEngine is not None
+    assert DomesticWaterAppliancePropagationResult is not None
+    assert callable(propagate_domestic_water_appliances)
+    assert callable(propagate_cold_water_appliances)
+    assert callable(propagate_hot_water_appliances)

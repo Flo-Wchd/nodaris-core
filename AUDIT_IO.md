@@ -510,6 +510,44 @@
   - calls: compute_cold_water_network_from_domain
   - doc: Functional EFS entry point from the domain Network aggregate.
 
+## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\appliance_propagation.py
+
+- **ndc_core.networks.domestic_water.appliance_propagation.DomesticWaterAppliancePropagationResult.has_warnings(self)** -> `bool`
+  - calls: any
+- **ndc_core.networks.domestic_water.appliance_propagation.DomesticWaterAppliancePropagationResult.has_errors(self)** -> `bool`
+  - calls: any
+- **ndc_core.networks.domestic_water.appliance_propagation.DomesticWaterAppliancePropagationResult.propagated_section_count(self)** -> `int`
+  - calls: len
+- **ndc_core.networks.domestic_water.appliance_propagation.DomesticWaterAppliancePropagationEngine.propagate(self)** -> `Result[DomesticWaterAppliancePropagationResult]`
+  - calls: DomesticWaterAppliancePropagationResult, EngineMessage.warning, Result.success, _clean_id, _read_node_local_appliance_counts, _section_matches_side, any, bool, children_by_node[upstream_node_id].append, defaultdict, getattr, messages.append, node_local_counts.values, self.nodes.items, self.sections.items ...
+- **ndc_core.networks.domestic_water.appliance_propagation.DomesticWaterAppliancePropagationEngine.compute_node_downstream_counts(node_id)** -> `dict[str, int]`
+  - calls: EngineMessage.error, _merge_count_maps, _write_node_downstream_counts, _write_section_downstream_counts, children_by_node.get, compute_node_downstream_counts, cycle_reported.add, dict, messages.append, node_local_counts.get, self.nodes.get, self.sections.get, visiting.add, visiting.remove
+- **ndc_core.networks.domestic_water.appliance_propagation.propagate_domestic_water_appliances(nodes, sections, side)** -> `Result[DomesticWaterAppliancePropagationResult]`
+  - calls: DomesticWaterAppliancePropagationEngine, DomesticWaterAppliancePropagationEngine(nodes=nodes, sections=sections, side=side).propagate
+  - doc: Convenience function for Cell/Node -> Section appliance propagation.
+- **ndc_core.networks.domestic_water.appliance_propagation.propagate_cold_water_appliances(nodes, sections)** -> `Result[DomesticWaterAppliancePropagationResult]`
+  - calls: propagate_domestic_water_appliances
+  - doc: Convenience function for EFS appliance propagation.
+- **ndc_core.networks.domestic_water.appliance_propagation.propagate_hot_water_appliances(nodes, sections)** -> `Result[DomesticWaterAppliancePropagationResult]`
+  - calls: propagate_domestic_water_appliances
+  - doc: Convenience function for ECS appliance propagation.
+- **ndc_core.networks.domestic_water.appliance_propagation._read_node_local_appliance_counts(node)** -> `dict[str, int]`
+  - calls: _merge_count_maps, _normalize_counts, _read_cell_appliance_counts, callable, getattr, isinstance, local_counts_method
+- **ndc_core.networks.domestic_water.appliance_propagation._read_cell_appliance_counts(cell)** -> `dict[str, int]`
+  - calls: _normalize_counts, getattr, isinstance
+- **ndc_core.networks.domestic_water.appliance_propagation._normalize_counts(raw_counts)** -> `dict[str, int]`
+  - calls: int, isinstance, normalized.get, raw_counts.items, str, str(raw_code or '').strip
+- **ndc_core.networks.domestic_water.appliance_propagation._merge_count_maps(*maps)** -> `dict[str, int]`
+  - calls: (count_map or {}).items, int, merged.get, str, str(code or '').strip
+- **ndc_core.networks.domestic_water.appliance_propagation._write_section_downstream_counts(section, counts)** -> `None`
+  - calls: _normalize_counts, dict, getattr, isinstance, setattr, target.clear, target.update
+- **ndc_core.networks.domestic_water.appliance_propagation._write_node_downstream_counts(node, counts)** -> `None`
+  - calls: _normalize_counts, dict, getattr, isinstance, setattr, target.clear, target.update
+- **ndc_core.networks.domestic_water.appliance_propagation._section_matches_side(section, side)** -> `bool`
+  - calls: getattr, str, str(getattr(section, 'fluid_code', '') or '').strip, str(getattr(section, 'fluid_code', '') or '').strip().lower
+- **ndc_core.networks.domestic_water.appliance_propagation._clean_id(value)** -> `str`
+  - calls: str, str(value or '').strip
+
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\demand.py
 
 - **ndc_core.networks.domestic_water.demand.DomesticWaterDemandBuilder.cold_water(cls, appliance_catalog)** -> `DomesticWaterDemandBuilder`
@@ -567,7 +605,7 @@
 - **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine.hot_water_from_network(cls, network, appliance_catalog, pipe_catalog, fluid_catalog, singular_loss_catalog)** -> `DomesticWaterNetworkEngine`
   - calls: cls.from_network
 - **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine.compute_sections(self, max_velocity_m_s, water_temperature_c)** -> `Result[DomesticWaterNetworkComputeResult]`
-  - calls: DomesticWaterNetworkComputeResult, Result.failure, Result.partial, Result.success, _section_matches_side, messages.extend, self._compute_one_section, self.sections.items, str, tuple
+  - calls: DomesticWaterNetworkComputeResult, Result.failure, Result.partial, Result.success, _section_matches_side, messages.extend, propagate_domestic_water_appliances, self._compute_one_section, self.sections.items, str, tuple
   - doc: Compute sizing and pressure losses for all sections matching the engine side.
 - **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine.compute_all(self, source_node_id, source_pressure_bar, min_required_pressure_bar, max_velocity_m_s, water_temperature_c)** -> `Result[DomesticWaterNetworkComputeResult]`
   - calls: DomesticWaterNetworkComputeResult, DomesticWaterPressureNetworkEngine, Result.failure, Result.partial, Result.success, messages.extend, pressure_bar_to_pa, pressure_engine.propagate_pressures, pressure_engine.summarize_worst_terminal_pressure, self.compute_sections, tuple
@@ -1065,6 +1103,23 @@
 - **tests.networks.cold_water.test_engine.test_compute_cold_water_network_functional_entry_point()** -> `None`
   - calls: _appliance_catalog, _fluid_catalog, _network, _pipe_catalog, compute_cold_water_network
 
+## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_appliance_propagation.py
+
+- **tests.networks.domestic_water.test_appliance_propagation._node(node_id, kind)** -> `Node`
+  - calls: Node
+- **tests.networks.domestic_water.test_appliance_propagation._section(section_id, upstream_node_id, downstream_node_id, fluid_code)** -> `Section`
+  - calls: Section
+- **tests.networks.domestic_water.test_appliance_propagation.test_propagates_terminal_cell_appliances_to_upstream_sections()** -> `None`
+  - calls: Cell, Network, _node, _section, network.add_cell, network.add_node, network.add_section, network.attach_cell_to_node, network.get_section, propagate_cold_water_appliances
+- **tests.networks.domestic_water.test_appliance_propagation.test_propagates_branch_appliances_independently()** -> `None`
+  - calls: Cell, Network, _node, _section, network.add_cell, network.add_node, network.add_section, network.attach_cell_to_node, network.get_section, propagate_cold_water_appliances
+- **tests.networks.domestic_water.test_appliance_propagation.test_no_local_appliances_preserves_manual_section_counts()** -> `None`
+  - calls: Network, _node, _section, network.add_node, network.add_section, propagate_cold_water_appliances, section.downstream_appliance_counts.update
+- **tests.networks.domestic_water.test_appliance_propagation.test_hot_water_propagation_ignores_cold_water_sections()** -> `None`
+  - calls: Cell, Network, _node, _section, network.add_cell, network.add_node, network.add_section, network.attach_cell_to_node, propagate_hot_water_appliances
+- **tests.networks.domestic_water.test_appliance_propagation.test_cycle_is_reported_without_exception()** -> `None`
+  - calls: Cell, Network, _node, _section, any, network.add_cell, network.add_node, network.add_section, network.attach_cell_to_node, propagate_cold_water_appliances
+
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_demand.py
 
 - **tests.networks.domestic_water.test_demand._catalog()** -> `ApplianceCatalog`
@@ -1104,6 +1159,21 @@
   - calls: _Node, _appliance_catalog, _fluid_catalog, _pipe_catalog, _section, any, compute_cold_water_network
 - **tests.networks.domestic_water.test_network_engine.test_hot_water_engine_ignores_cold_water_sections()** -> `None`
   - calls: DomesticWaterNetworkEngine.hot_water, _Node, _appliance_catalog, _fluid_catalog, _pipe_catalog, _section, engine.compute_sections
+
+## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_network_engine_appliance_propagation.py
+
+- **tests.networks.domestic_water.test_network_engine_appliance_propagation._appliance_catalog()** -> `ApplianceCatalog`
+  - calls: Appliance, ApplianceCatalog
+- **tests.networks.domestic_water.test_network_engine_appliance_propagation._pipe_catalog()** -> `PipeCatalog`
+  - calls: PipeCatalog, PipeMaterial, PipeSize
+- **tests.networks.domestic_water.test_network_engine_appliance_propagation._fluid_catalog()** -> `FluidCatalog`
+  - calls: Fluid, FluidCatalog
+- **tests.networks.domestic_water.test_network_engine_appliance_propagation._network_with_terminal_cell()** -> `Network`
+  - calls: Cell, Network, Node, Section, network.add_cell, network.add_node, network.add_section, network.attach_cell_to_node
+- **tests.networks.domestic_water.test_network_engine_appliance_propagation.test_network_engine_uses_cell_node_appliance_propagation_before_sizing()** -> `None`
+  - calls: _appliance_catalog, _fluid_catalog, _network_with_terminal_cell, _pipe_catalog, compute_cold_water_network_from_network, network.get_node, network.get_section
+- **tests.networks.domestic_water.test_network_engine_appliance_propagation.test_network_engine_preserves_manual_section_counts_when_no_cells_are_attached()** -> `None`
+  - calls: Network, Node, Section, _appliance_catalog, _fluid_catalog, _pipe_catalog, compute_cold_water_network_from_network, network.add_node, network.add_section, section.downstream_appliance_counts.update
 
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_pressure_loss.py
 
@@ -1238,3 +1308,5 @@
 - **tests.networks.test_public_api.test_networks_public_api_exports_section_sizing_types()** -> `None`
 - **tests.networks.test_public_api.test_networks_public_api_exports_pressure_loss_types()** -> `None`
 - **tests.networks.test_public_api.test_networks_public_api_exports_pressure_network_types()** -> `None`
+- **tests.networks.test_public_api.test_networks_public_api_exports_appliance_propagation_types()** -> `None`
+  - calls: callable
