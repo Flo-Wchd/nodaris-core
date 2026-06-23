@@ -50,6 +50,11 @@ from ndc_core.networks.domestic_water import (
     read_downstream_section_ids,
     write_node_downstream_appliance_counts,
     write_section_downstream_appliance_counts,
+    positive_optional_float,
+    safe_float,
+    safe_non_negative_float,
+    safe_positive_float,
+    safe_pressure_pa,
 )
 from ndc_core.networks.hot_water import (
     HotWaterNetworkEngine,
@@ -110,4 +115,9 @@ __all__ = [
     "read_downstream_section_ids",
     "write_node_downstream_appliance_counts",
     "write_section_downstream_appliance_counts",
+    "positive_optional_float",
+    "safe_float",
+    "safe_non_negative_float",
+    "safe_positive_float",
+    "safe_pressure_pa",
 ]

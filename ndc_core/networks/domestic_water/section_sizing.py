@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import StrEnum
-from typing import Any, Mapping
+from typing import Mapping
 
 from ndc_core.catalogs.appliance_catalog import ApplianceCatalog
 from ndc_core.catalogs.pipe_catalog import PipeCatalog
@@ -26,6 +26,7 @@ from ndc_core.networks.domestic_water.types import (
 )
 from ndc_core.networks.domestic_water.appliance_counts import normalize_appliance_counts
 from ndc_core.networks.domestic_water.entity_access import clean_optional_code
+from ndc_core.networks.domestic_water.numeric import positive_optional_float
 
 
 class SectionSizingMode(StrEnum):
@@ -210,7 +211,7 @@ class DomesticWaterSectionSizingEngine:
         messages: list[EngineMessage],
     ) -> DomesticWaterSectionSizing:
         forced_pipe_code = clean_optional_code(section.forced_pipe_size_code)
-        forced_diameter = _positive_optional_float(
+        forced_diameter = positive_optional_float(
             section.forced_internal_diameter_mm
         )
 
@@ -611,18 +612,3 @@ def _flow_for_profile(
         return max(0.0, float(value))
     except (TypeError, ValueError):
         return 0.0
-
-
-def _positive_optional_float(value: Any) -> float | None:
-    if value is None:
-        return None
-
-    try:
-        number = float(value)
-    except (TypeError, ValueError):
-        return None
-
-    if number <= 0.0:
-        return None
-
-    return number

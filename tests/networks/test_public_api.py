@@ -51,6 +51,11 @@ from ndc_core.networks import (
     read_downstream_section_ids,
     write_node_downstream_appliance_counts,
     write_section_downstream_appliance_counts,
+    positive_optional_float,
+    safe_float,
+    safe_non_negative_float,
+    safe_positive_float,
+    safe_pressure_pa,
 )
 from ndc_core.networks.cold_water import (
     ColdWaterNetworkEngine as ColdWaterNetworkEngineFromPackage,
@@ -144,3 +149,11 @@ def test_networks_public_api_exports_domestic_water_entity_access_tools() -> Non
     assert callable(write_node_downstream_appliance_counts)
     assert callable(apply_section_pressures)
     assert callable(apply_node_pressures)
+
+
+def test_networks_public_api_exports_domestic_water_numeric_tools() -> None:
+    assert callable(safe_float)
+    assert callable(safe_positive_float)
+    assert callable(safe_non_negative_float)
+    assert callable(safe_pressure_pa)
+    assert callable(positive_optional_float)

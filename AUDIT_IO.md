@@ -677,6 +677,24 @@
 - **ndc_core.networks.domestic_water.network_engine._read_section_downstream_appliance_counts(section)** -> `dict[str, int]`
   - calls: getattr, normalize_appliance_counts
 
+## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\numeric.py
+
+- **ndc_core.networks.domestic_water.numeric.safe_float(value, default)** -> `float`
+  - calls: float, isfinite
+  - doc: Convert a value to float.
+- **ndc_core.networks.domestic_water.numeric.safe_positive_float(value)** -> `float | None`
+  - calls: safe_float
+  - doc: Convert a value to a strictly positive float.
+- **ndc_core.networks.domestic_water.numeric.positive_optional_float(value)** -> `float | None`
+  - calls: safe_positive_float
+  - doc: Alias for optional strictly positive user inputs.
+- **ndc_core.networks.domestic_water.numeric.safe_non_negative_float(value, default)** -> `float`
+  - calls: safe_float
+  - doc: Convert a value to a non-negative float.
+- **ndc_core.networks.domestic_water.numeric.safe_pressure_pa(value)** -> `float`
+  - calls: safe_non_negative_float
+  - doc: Convert a pressure value in Pa to a safe non-negative pressure.
+
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\pressure_loss.py
 
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossResult.reynolds(self)** -> `float | None`
@@ -689,7 +707,7 @@
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossResult.has_errors(self)** -> `bool`
   - calls: any
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine.compute_section_pressure_loss(self, section, water_temperature_c, singular_zeta_values)** -> `Result[DomesticWaterPressureLossResult]`
-  - calls: DomesticWaterPressureLossResult, EngineMessage.error, EngineMessage.info, Result.failure, Result.success, _apply_pressure_loss_to_section, _safe_float, _safe_positive_float, diameter_mm_to_m, max, messages.append, self._collect_section_zeta_values, self._relative_roughness_for_section, self._resolve_fluid, total_pressure_loss ...
+  - calls: DomesticWaterPressureLossResult, EngineMessage.error, EngineMessage.info, Result.failure, Result.success, _apply_pressure_loss_to_section, diameter_mm_to_m, max, messages.append, safe_float, safe_positive_float, self._collect_section_zeta_values, self._relative_roughness_for_section, self._resolve_fluid, total_pressure_loss ...
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine._resolve_fluid(self, water_temperature_c, messages)** -> `Fluid | None`
   - calls: EngineMessage.error, messages.append, self.fluid_catalog.get, self.fluid_catalog.get_water_at_temperature
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine._relative_roughness_for_section(self, section, internal_diameter_m)** -> `float`
@@ -697,7 +715,7 @@
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine._collect_section_zeta_values(self, section, flow_l_s, velocity_m_s, density_kg_m3, messages)** -> `tuple[float, ...]`
   - calls: self._zeta_from_section_item, tuple, zeta_values.append
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine._zeta_from_section_item(self, item, section, flow_l_s, velocity_m_s, density_kg_m3, messages)** -> `float`
-  - calls: EngineMessage.warning, _safe_positive_float, clean_optional_code, getattr, messages.append, self._zeta_from_catalog_loss, self.singular_loss_catalog.get
+  - calls: EngineMessage.warning, clean_optional_code, getattr, messages.append, safe_positive_float, self._zeta_from_catalog_loss, self.singular_loss_catalog.get
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine._zeta_from_catalog_loss(self, loss, quantity, section, flow_l_s, velocity_m_s, density_kg_m3, messages)** -> `float`
   - calls: EngineMessage.warning, equivalent_zeta_from_kv, float, max, messages.append
 - **ndc_core.networks.domestic_water.pressure_loss.compute_cold_water_section_pressure_loss(section, fluid_catalog, pipe_catalog, singular_loss_catalog, water_temperature_c, singular_zeta_values)** -> `Result[DomesticWaterPressureLossResult]`
@@ -707,10 +725,6 @@
   - calls: DomesticWaterPressureLossEngine, DomesticWaterPressureLossEngine(fluid_catalog=fluid_catalog, pipe_catalog=pipe_catalog, singular_loss_catalog=singular_loss_catalog, side=DomesticWaterSide.HOT_WATER).compute_section_pressure_loss
   - doc: Convenience function for ECS forward section pressure loss.
 - **ndc_core.networks.domestic_water.pressure_loss._apply_pressure_loss_to_section(section, result)** -> `None`
-- **ndc_core.networks.domestic_water.pressure_loss._safe_float(value)** -> `float`
-  - calls: float
-- **ndc_core.networks.domestic_water.pressure_loss._safe_positive_float(value)** -> `float | None`
-  - calls: float
 
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\pressure_network.py
 
@@ -726,9 +740,9 @@
 - **ndc_core.networks.domestic_water.pressure_network.DomesticWaterPressureSummary.has_errors(self)** -> `bool`
   - calls: any
 - **ndc_core.networks.domestic_water.pressure_network.DomesticWaterPressureNetworkEngine.propagate_pressures(self, source_node_id, source_pressure_pa)** -> `Result[DomesticWaterPressurePropagationResult]`
-  - calls: DomesticWaterPressurePropagationResult, EngineMessage.error, EngineMessage.warning, NodePressureState, Result.failure, Result.success, _is_terminal_node, _read_section_pressure_loss_pa, _safe_pressure_pa, apply_node_pressures, apply_section_pressures, clean_optional_code, deque, getattr, max ...
+  - calls: DomesticWaterPressurePropagationResult, EngineMessage.error, EngineMessage.warning, NodePressureState, Result.failure, Result.success, _is_terminal_node, _read_section_pressure_loss_pa, apply_node_pressures, apply_section_pressures, clean_optional_code, deque, getattr, max, messages.append ...
 - **ndc_core.networks.domestic_water.pressure_network.DomesticWaterPressureNetworkEngine.summarize_worst_terminal_pressure(self, source_node_id, source_pressure_bar, min_required_pressure_bar)** -> `Result[DomesticWaterPressureSummary]`
-  - calls: DomesticWaterPressurePropagationResult, DomesticWaterPressureSummary, EngineMessage.warning, Result.failure, Result.partial, Result.success, TerminalPressureStatus, _safe_non_negative_float, messages.append, messages.extend, min, pressure_bar_to_pa, propagation_result.value.node_pressures.items, self.propagate_pressures, str ...
+  - calls: DomesticWaterPressurePropagationResult, DomesticWaterPressureSummary, EngineMessage.warning, Result.failure, Result.partial, Result.success, TerminalPressureStatus, messages.append, messages.extend, min, pressure_bar_to_pa, propagation_result.value.node_pressures.items, safe_non_negative_float, self.propagate_pressures, str ...
 - **ndc_core.networks.domestic_water.pressure_network.propagate_cold_water_pressures(nodes, sections, source_node_id, source_pressure_pa)** -> `Result[DomesticWaterPressurePropagationResult]`
   - calls: DomesticWaterPressureNetworkEngine, DomesticWaterPressureNetworkEngine(nodes=nodes, sections=sections, side=DomesticWaterSide.COLD_WATER).propagate_pressures
   - doc: Convenience function for EFS pressure propagation.
@@ -742,13 +756,9 @@
   - calls: DomesticWaterPressureNetworkEngine, DomesticWaterPressureNetworkEngine(nodes=nodes, sections=sections, side=DomesticWaterSide.HOT_WATER).summarize_worst_terminal_pressure
   - doc: Convenience function for ECS forward worst terminal summary.
 - **ndc_core.networks.domestic_water.pressure_network._read_section_pressure_loss_pa(section_id, section, messages, warned_missing_losses)** -> `float`
-  - calls: EngineMessage.warning, float, getattr, isfinite, messages.append, warned_missing_losses.add
+  - calls: EngineMessage.warning, float, getattr, messages.append, warned_missing_losses.add
 - **ndc_core.networks.domestic_water.pressure_network._is_terminal_node(node, sections, side)** -> `bool`
   - calls: read_downstream_section_ids, section_matches_domestic_water_side, sections.get
-- **ndc_core.networks.domestic_water.pressure_network._safe_pressure_pa(value)** -> `float`
-  - calls: _safe_non_negative_float, isfinite
-- **ndc_core.networks.domestic_water.pressure_network._safe_non_negative_float(value, default)** -> `float`
-  - calls: float, isfinite, max
 
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\profiles.py
 
@@ -768,7 +778,7 @@
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine.size_section_from_counts(self, section, appliance_counts, max_velocity_m_s)** -> `Result[DomesticWaterSectionSizing]`
   - calls: DomesticWaterDemandBuilder, DomesticWaterDemandBuilder(appliance_catalog=self.appliance_catalog, profile=self.profile).compute_from_counts, DomesticWaterSectionSizing, EngineMessage.warning, Result.failure, Result.partial, Result.success, _apply_sizing_to_section, _minimum_appliance_internal_diameter_mm, max, messages.append, messages.extend, normalize_appliance_counts, self._select_or_force_diameter, tuple ...
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine._select_or_force_diameter(self, section, demand, raw_counts, effective_counts, min_required_diameter_mm, max_velocity_m_s, messages)** -> `DomesticWaterSectionSizing`
-  - calls: _positive_optional_float, clean_optional_code, self._size_automatically, self._size_with_forced_internal_diameter, self._size_with_forced_pipe
+  - calls: clean_optional_code, positive_optional_float, self._size_automatically, self._size_with_forced_internal_diameter, self._size_with_forced_pipe
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine._size_automatically(self, section, demand, raw_counts, effective_counts, min_required_diameter_mm, max_velocity_m_s, messages)** -> `DomesticWaterSectionSizing`
   - calls: DomesticWaterSectionSizing, EngineMessage.error, list, messages.append, section.fluid_code.lower, select_pipe_size_by_velocity, self.pipe_catalog.list_sizes_for_material, self.pipe_catalog.sizes_by_code.values, tuple
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine._size_with_forced_pipe(self, section, demand, forced_pipe_code, min_required_diameter_mm, max_velocity_m_s, messages)** -> `DomesticWaterSectionSizing`
@@ -790,8 +800,6 @@
   - calls: _flow_for_profile, appliance_catalog.get, appliance_counts.items, float
 - **ndc_core.networks.domestic_water.section_sizing._flow_for_profile(appliance, profile)** -> `float`
   - calls: float, getattr, max
-- **ndc_core.networks.domestic_water.section_sizing._positive_optional_float(value)** -> `float | None`
-  - calls: float
 
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\side_matching.py
 
@@ -1298,6 +1306,19 @@
 - **tests.networks.domestic_water.test_network_engine_appliance_propagation.test_network_engine_preserves_manual_section_counts_when_no_cells_are_attached()** -> `None`
   - calls: Network, Node, Section, _appliance_catalog, _fluid_catalog, _pipe_catalog, compute_cold_water_network_from_network, network.add_node, network.add_section, section.downstream_appliance_counts.update
 
+## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_numeric.py
+
+- **tests.networks.domestic_water.test_numeric.test_safe_float()** -> `None`
+  - calls: float, safe_float
+- **tests.networks.domestic_water.test_numeric.test_safe_positive_float()** -> `None`
+  - calls: float, safe_positive_float
+- **tests.networks.domestic_water.test_numeric.test_positive_optional_float_alias()** -> `None`
+  - calls: positive_optional_float
+- **tests.networks.domestic_water.test_numeric.test_safe_non_negative_float()** -> `None`
+  - calls: float, safe_non_negative_float
+- **tests.networks.domestic_water.test_numeric.test_safe_pressure_pa()** -> `None`
+  - calls: float, safe_pressure_pa
+
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_pressure_loss.py
 
 - **tests.networks.domestic_water.test_pressure_loss._DirectZeta.__init__(self, zeta, quantity)** -> `None`
@@ -1461,4 +1482,6 @@
 - **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_appliance_count_tools()** -> `None`
   - calls: callable
 - **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_entity_access_tools()** -> `None`
+  - calls: callable
+- **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_numeric_tools()** -> `None`
   - calls: callable

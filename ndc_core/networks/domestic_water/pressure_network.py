@@ -4,7 +4,6 @@ from collections import deque
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from enum import StrEnum
-from math import isfinite
 from typing import Any
 
 from ndc_core.common.messages import EngineMessage
@@ -19,6 +18,10 @@ from ndc_core.networks.domestic_water.entity_access import (
     apply_section_pressures,
     clean_optional_code,
     read_downstream_section_ids,
+)
+from ndc_core.networks.domestic_water.numeric import (
+    safe_non_negative_float,
+    safe_pressure_pa,
 )
 
 
@@ -164,7 +167,7 @@ class DomesticWaterPressureNetworkEngine:
             )
             return Result.failure(value=result, messages=messages)
 
-        source_pressure = _safe_pressure_pa(source_pressure_pa)
+        source_pressure = safe_pressure_pa(source_pressure_pa)
 
         pressures_pa: dict[str, float] = {source_id: source_pressure}
         queue: deque[str] = deque([source_id])
@@ -265,8 +268,8 @@ class DomesticWaterPressureNetworkEngine:
     ) -> Result[DomesticWaterPressureSummary]:
         messages: list[EngineMessage] = []
 
-        source_pressure_bar_f = _safe_non_negative_float(source_pressure_bar)
-        min_required_bar_f = _safe_non_negative_float(
+        source_pressure_bar_f = safe_non_negative_float(source_pressure_bar)
+        min_required_bar_f = safe_non_negative_float(
             min_required_pressure_bar,
             default=1.0,
         )
@@ -469,7 +472,7 @@ def _read_section_pressure_loss_pa(
         )
         return 0.0
 
-    if not isfinite(pressure_loss):
+    if pressure_loss != pressure_loss or pressure_loss in (float("inf"), float("-inf")):
         messages.append(
             EngineMessage.warning(
                 code="DOMESTIC_WATER_PRESSURE_LOSS_NOT_FINITE",
@@ -498,20 +501,3 @@ def _is_terminal_node(
             return False
 
     return True
-
-
-def _safe_pressure_pa(value: Any) -> float:
-    pressure = _safe_non_negative_float(value)
-    return pressure if isfinite(pressure) else 0.0
-
-
-def _safe_non_negative_float(value: Any, default: float = 0.0) -> float:
-    try:
-        number = float(value)
-    except (TypeError, ValueError):
-        return default
-
-    if not isfinite(number):
-        return default
-
-    return max(0.0, number)

@@ -89,6 +89,13 @@ from ndc_core.networks.domestic_water.entity_access import (
     write_node_downstream_appliance_counts,
     write_section_downstream_appliance_counts,
 )
+from ndc_core.networks.domestic_water.numeric import (
+    positive_optional_float,
+    safe_float,
+    safe_non_negative_float,
+    safe_positive_float,
+    safe_pressure_pa,
+)
 
 __all__ = [
     "ApplianceDemandItem",
@@ -156,4 +163,9 @@ __all__ = [
     "read_downstream_section_ids",
     "write_node_downstream_appliance_counts",
     "write_section_downstream_appliance_counts",
+    "positive_optional_float",
+    "safe_float",
+    "safe_non_negative_float",
+    "safe_positive_float",
+    "safe_pressure_pa",
 ]

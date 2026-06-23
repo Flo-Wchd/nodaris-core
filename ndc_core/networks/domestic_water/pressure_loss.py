@@ -21,6 +21,10 @@ from ndc_core.hydraulics.types import PressureLossBreakdown
 from ndc_core.hydraulics.velocity import velocity_from_l_s_and_mm
 from ndc_core.networks.domestic_water.types import DomesticWaterSide
 from ndc_core.networks.domestic_water.entity_access import clean_optional_code
+from ndc_core.networks.domestic_water.numeric import (
+    safe_float,
+    safe_positive_float,
+)
 
 
 class DomesticWaterPressureLossMode(StrEnum):
@@ -105,8 +109,8 @@ class DomesticWaterPressureLossEngine:
         if fluid is None:
             return Result.failure(messages=messages)
 
-        flow_l_s = _safe_positive_float(section.flow_l_s)
-        diameter_mm = _safe_positive_float(section.selected_internal_diameter_mm)
+        flow_l_s = safe_positive_float(section.flow_l_s)
+        diameter_mm = safe_positive_float(section.selected_internal_diameter_mm)
 
         if diameter_mm is None:
             messages.append(
@@ -118,8 +122,8 @@ class DomesticWaterPressureLossEngine:
             )
             return Result.failure(messages=messages)
 
-        length_m = max(0.0, _safe_float(section.length_m))
-        elevation_change_m = _safe_float(section.elevation_change_m)
+        length_m = max(0.0, safe_float(section.length_m))
+        elevation_change_m = safe_float(section.elevation_change_m)
 
         if flow_l_s is None:
             mode = DomesticWaterPressureLossMode.ELEVATION_ONLY
@@ -294,9 +298,9 @@ class DomesticWaterPressureLossEngine:
         density_kg_m3: float,
         messages: list[EngineMessage],
     ) -> float:
-        quantity = _safe_positive_float(getattr(item, "quantity", 1.0)) or 1.0
+        quantity = safe_positive_float(getattr(item, "quantity", 1.0)) or 1.0
 
-        direct_zeta = _safe_positive_float(getattr(item, "zeta", None))
+        direct_zeta = safe_positive_float(getattr(item, "zeta", None))
         if direct_zeta is not None:
             return direct_zeta * quantity
 
@@ -456,25 +460,3 @@ def _apply_pressure_loss_to_section(
     )
     section.total_pressure_loss_pa = result.breakdown.total_pressure_change_pa
     section.singular_zeta_total = result.breakdown.singular_zeta_total
-
-
-def _safe_float(value: Any) -> float:
-    try:
-        return float(value)
-    except (TypeError, ValueError):
-        return 0.0
-
-
-def _safe_positive_float(value: Any) -> float | None:
-    if value is None:
-        return None
-
-    try:
-        number = float(value)
-    except (TypeError, ValueError):
-        return None
-
-    if number <= 0.0:
-        return None
-
-    return number
