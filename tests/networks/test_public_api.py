@@ -66,6 +66,9 @@ from ndc_core.networks import (
     SectionPressureLossRead,
     node_is_terminal_for_domestic_water_side,
     read_section_pressure_loss_pa,
+    collect_section_singular_zeta_values,
+    zeta_from_catalog_singular_loss,
+    zeta_from_section_singular_loss_item,
 )
 from ndc_core.networks.cold_water import (
     ColdWaterNetworkEngine as ColdWaterNetworkEngineFromPackage,
@@ -183,3 +186,9 @@ def test_networks_public_api_exports_domestic_water_section_state_tools() -> Non
 def test_networks_public_api_exports_domestic_water_appliance_rules_tools() -> None:
     assert callable(appliance_flow_for_profile)
     assert callable(minimum_appliance_internal_diameter_mm)
+
+
+def test_networks_public_api_exports_domestic_water_singular_loss_rules() -> None:
+    assert callable(collect_section_singular_zeta_values)
+    assert callable(zeta_from_catalog_singular_loss)
+    assert callable(zeta_from_section_singular_loss_item)

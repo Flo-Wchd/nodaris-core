@@ -65,6 +65,9 @@ from ndc_core.networks.domestic_water import (
     SectionPressureLossRead,
     node_is_terminal_for_domestic_water_side,
     read_section_pressure_loss_pa,
+    collect_section_singular_zeta_values,
+    zeta_from_catalog_singular_loss,
+    zeta_from_section_singular_loss_item,
 )
 from ndc_core.networks.hot_water import (
     HotWaterNetworkEngine,
@@ -140,4 +143,7 @@ __all__ = [
     "SectionPressureLossRead",
     "node_is_terminal_for_domestic_water_side",
     "read_section_pressure_loss_pa",
+    "collect_section_singular_zeta_values",
+    "zeta_from_catalog_singular_loss",
+    "zeta_from_section_singular_loss_item",
 ]

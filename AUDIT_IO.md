@@ -723,17 +723,11 @@
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossResult.has_errors(self)** -> `bool`
   - calls: any
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine.compute_section_pressure_loss(self, section, water_temperature_c, singular_zeta_values)** -> `Result[DomesticWaterPressureLossResult]`
-  - calls: DomesticWaterPressureLossResult, EngineMessage.error, EngineMessage.info, Result.failure, Result.success, apply_section_pressure_loss_state, diameter_mm_to_m, max, messages.append, safe_float, safe_positive_float, self._collect_section_zeta_values, self._relative_roughness_for_section, self._resolve_fluid, total_pressure_loss ...
+  - calls: DomesticWaterPressureLossResult, EngineMessage.error, EngineMessage.info, Result.failure, Result.success, apply_section_pressure_loss_state, collect_section_singular_zeta_values, diameter_mm_to_m, max, messages.append, safe_float, safe_positive_float, self._relative_roughness_for_section, self._resolve_fluid, total_pressure_loss ...
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine._resolve_fluid(self, water_temperature_c, messages)** -> `Fluid | None`
   - calls: EngineMessage.error, messages.append, self.fluid_catalog.get, self.fluid_catalog.get_water_at_temperature
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine._relative_roughness_for_section(self, section, internal_diameter_m)** -> `float`
   - calls: clean_optional_code, getattr, relative_roughness, self.pipe_catalog.get_size, self.pipe_catalog.materials_by_code.get
-- **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine._collect_section_zeta_values(self, section, flow_l_s, velocity_m_s, density_kg_m3, messages)** -> `tuple[float, ...]`
-  - calls: self._zeta_from_section_item, tuple, zeta_values.append
-- **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine._zeta_from_section_item(self, item, section, flow_l_s, velocity_m_s, density_kg_m3, messages)** -> `float`
-  - calls: EngineMessage.warning, clean_optional_code, getattr, messages.append, safe_positive_float, self._zeta_from_catalog_loss, self.singular_loss_catalog.get
-- **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine._zeta_from_catalog_loss(self, loss, quantity, section, flow_l_s, velocity_m_s, density_kg_m3, messages)** -> `float`
-  - calls: EngineMessage.warning, equivalent_zeta_from_kv, float, max, messages.append
 - **ndc_core.networks.domestic_water.pressure_loss.compute_cold_water_section_pressure_loss(section, fluid_catalog, pipe_catalog, singular_loss_catalog, water_temperature_c, singular_zeta_values)** -> `Result[DomesticWaterPressureLossResult]`
   - calls: DomesticWaterPressureLossEngine, DomesticWaterPressureLossEngine(fluid_catalog=fluid_catalog, pipe_catalog=pipe_catalog, singular_loss_catalog=singular_loss_catalog, side=DomesticWaterSide.COLD_WATER).compute_section_pressure_loss
   - doc: Convenience function for EFS section pressure loss.
@@ -846,6 +840,18 @@
 - **ndc_core.networks.domestic_water.simultaneity.clamp_simultaneity_factor(value)** -> `float`
   - calls: float, min
   - doc: Keep a simultaneity factor in a safe range.
+
+## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\singular_loss_rules.py
+
+- **ndc_core.networks.domestic_water.singular_loss_rules.collect_section_singular_zeta_values(section, singular_loss_catalog, flow_l_s, velocity_m_s, density_kg_m3, messages)** -> `tuple[float, ...]`
+  - calls: tuple, zeta_from_section_singular_loss_item, zeta_values.append
+  - doc: Collect positive singular zeta values declared on a section.
+- **ndc_core.networks.domestic_water.singular_loss_rules.zeta_from_section_singular_loss_item(item, section, singular_loss_catalog, flow_l_s, velocity_m_s, density_kg_m3, messages)** -> `float`
+  - calls: EngineMessage.warning, clean_optional_code, getattr, messages.append, safe_positive_float, singular_loss_catalog.get, zeta_from_catalog_singular_loss
+  - doc: Resolve one section singular-loss item to an equivalent zeta value.
+- **ndc_core.networks.domestic_water.singular_loss_rules.zeta_from_catalog_singular_loss(loss, quantity, section, flow_l_s, velocity_m_s, density_kg_m3, messages)** -> `float`
+  - calls: EngineMessage.warning, equivalent_zeta_from_kv, float, max, messages.append
+  - doc: Resolve one catalog singular loss to an equivalent zeta value.
 
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\types.py
 
@@ -1476,6 +1482,27 @@
 - **tests.networks.domestic_water.test_simultaneity.test_clamp_simultaneity_factor()** -> `None`
   - calls: clamp_simultaneity_factor
 
+## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_singular_loss_rules.py
+
+- **tests.networks.domestic_water.test_singular_loss_rules._section()** -> `Section`
+  - calls: Section
+- **tests.networks.domestic_water.test_singular_loss_rules._catalog()** -> `SingularLossCatalog`
+  - calls: SingularLoss, SingularLossCatalog
+- **tests.networks.domestic_water.test_singular_loss_rules.test_zeta_from_direct_section_item()** -> `None`
+  - calls: _DirectZeta, _section, zeta_from_section_singular_loss_item
+- **tests.networks.domestic_water.test_singular_loss_rules.test_zeta_from_catalog_zeta_loss()** -> `None`
+  - calls: _CatalogLoss, _catalog, _section, isclose, zeta_from_section_singular_loss_item
+- **tests.networks.domestic_water.test_singular_loss_rules.test_zeta_from_catalog_kv_loss()** -> `None`
+  - calls: _CatalogLoss, _catalog, _section, zeta_from_section_singular_loss_item
+- **tests.networks.domestic_water.test_singular_loss_rules.test_unknown_catalog_loss_adds_warning()** -> `None`
+  - calls: _CatalogLoss, _catalog, _section, len, zeta_from_section_singular_loss_item
+- **tests.networks.domestic_water.test_singular_loss_rules.test_missing_catalog_adds_warning()** -> `None`
+  - calls: _CatalogLoss, _section, len, zeta_from_section_singular_loss_item
+- **tests.networks.domestic_water.test_singular_loss_rules.test_kv_loss_without_flow_adds_warning()** -> `None`
+  - calls: _CatalogLoss, _catalog, _section, len, zeta_from_section_singular_loss_item
+- **tests.networks.domestic_water.test_singular_loss_rules.test_collect_section_singular_zeta_values()** -> `None`
+  - calls: _CatalogLoss, _DirectZeta, _catalog, _section, collect_section_singular_zeta_values, section.singular_losses.append
+
 ## C:\dev\PythonProject_v4\tests\networks\hot_water\test_engine.py
 
 - **tests.networks.hot_water.test_engine._appliance_catalog()** -> `ApplianceCatalog`
@@ -1550,4 +1577,6 @@
 - **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_section_state_tools()** -> `None`
   - calls: callable
 - **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_appliance_rules_tools()** -> `None`
+  - calls: callable
+- **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_singular_loss_rules()** -> `None`
   - calls: callable

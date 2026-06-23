@@ -297,6 +297,7 @@ PythonProject_v4
 │   │   │   ├── section_state.py
 │   │   │   ├── side_matching.py
 │   │   │   ├── simultaneity.py
+│   │   │   ├── singular_loss_rules.py
 │   │   │   ├── types.py
 │   │   │   └── worst_path.py
 │   │   ├── drainage/
@@ -440,7 +441,8 @@ PythonProject_v4
 │   │   │   ├── test_section_sizing.py
 │   │   │   ├── test_section_state.py
 │   │   │   ├── test_side_matching.py
-│   │   │   └── test_simultaneity.py
+│   │   │   ├── test_simultaneity.py
+│   │   │   └── test_singular_loss_rules.py
 │   │   ├── drainage/
 │   │   │   ├── __init__.py
 │   │   │   ├── test_branch_sizing.py
