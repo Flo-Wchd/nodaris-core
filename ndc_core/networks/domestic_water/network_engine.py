@@ -11,6 +11,7 @@ from ndc_core.catalogs.pipe_catalog import PipeCatalog
 from ndc_core.catalogs.singular_loss_catalog import SingularLossCatalog
 from ndc_core.common.messages import EngineMessage
 from ndc_core.common.result import Result
+from ndc_core.domain.networks.network import Network
 from ndc_core.hydraulics.conversions import pressure_bar_to_pa
 from ndc_core.networks.domestic_water.pressure_loss import (
     DomesticWaterPressureLossResult,
@@ -167,6 +168,72 @@ class DomesticWaterNetworkEngine:
         return cls(
             nodes=nodes,
             sections=sections,
+            appliance_catalog=appliance_catalog,
+            pipe_catalog=pipe_catalog,
+            fluid_catalog=fluid_catalog,
+            singular_loss_catalog=singular_loss_catalog,
+            side=DomesticWaterSide.HOT_WATER,
+        )
+
+    @classmethod
+    def from_network(
+        cls,
+        *,
+        network: Network,
+        appliance_catalog: ApplianceCatalog,
+        pipe_catalog: PipeCatalog,
+        fluid_catalog: FluidCatalog,
+        singular_loss_catalog: SingularLossCatalog | None = None,
+        side: DomesticWaterSide = DomesticWaterSide.COLD_WATER,
+    ) -> DomesticWaterNetworkEngine:
+        """
+        Build a domestic water engine from the domain Network object.
+
+        This is the preferred entry point for GUI/export layers because they
+        should manipulate the business aggregate, not raw node/section mappings.
+        """
+
+        return cls(
+            nodes=network.nodes,
+            sections=network.sections,
+            appliance_catalog=appliance_catalog,
+            pipe_catalog=pipe_catalog,
+            fluid_catalog=fluid_catalog,
+            singular_loss_catalog=singular_loss_catalog,
+            side=side,
+        )
+
+    @classmethod
+    def cold_water_from_network(
+        cls,
+        *,
+        network: Network,
+        appliance_catalog: ApplianceCatalog,
+        pipe_catalog: PipeCatalog,
+        fluid_catalog: FluidCatalog,
+        singular_loss_catalog: SingularLossCatalog | None = None,
+    ) -> DomesticWaterNetworkEngine:
+        return cls.from_network(
+            network=network,
+            appliance_catalog=appliance_catalog,
+            pipe_catalog=pipe_catalog,
+            fluid_catalog=fluid_catalog,
+            singular_loss_catalog=singular_loss_catalog,
+            side=DomesticWaterSide.COLD_WATER,
+        )
+
+    @classmethod
+    def hot_water_from_network(
+        cls,
+        *,
+        network: Network,
+        appliance_catalog: ApplianceCatalog,
+        pipe_catalog: PipeCatalog,
+        fluid_catalog: FluidCatalog,
+        singular_loss_catalog: SingularLossCatalog | None = None,
+    ) -> DomesticWaterNetworkEngine:
+        return cls.from_network(
+            network=network,
             appliance_catalog=appliance_catalog,
             pipe_catalog=pipe_catalog,
             fluid_catalog=fluid_catalog,
@@ -456,6 +523,66 @@ def compute_hot_water_network(
     return DomesticWaterNetworkEngine.hot_water(
         nodes=nodes,
         sections=sections,
+        appliance_catalog=appliance_catalog,
+        pipe_catalog=pipe_catalog,
+        fluid_catalog=fluid_catalog,
+        singular_loss_catalog=singular_loss_catalog,
+    ).compute_all(
+        source_node_id=source_node_id,
+        source_pressure_bar=source_pressure_bar,
+        min_required_pressure_bar=min_required_pressure_bar,
+        max_velocity_m_s=max_velocity_m_s,
+        water_temperature_c=water_temperature_c,
+    )
+
+
+def compute_cold_water_network_from_domain(
+    *,
+    network: Network,
+    appliance_catalog: ApplianceCatalog,
+    pipe_catalog: PipeCatalog,
+    fluid_catalog: FluidCatalog,
+    singular_loss_catalog: SingularLossCatalog | None = None,
+    source_node_id: str | None = None,
+    source_pressure_bar: float | None = None,
+    min_required_pressure_bar: float = 1.0,
+    max_velocity_m_s: float | None = None,
+    water_temperature_c: float | None = None,
+) -> Result[DomesticWaterNetworkComputeResult]:
+    """Convenience function for full EFS computation from a domain Network."""
+
+    return DomesticWaterNetworkEngine.cold_water_from_network(
+        network=network,
+        appliance_catalog=appliance_catalog,
+        pipe_catalog=pipe_catalog,
+        fluid_catalog=fluid_catalog,
+        singular_loss_catalog=singular_loss_catalog,
+    ).compute_all(
+        source_node_id=source_node_id,
+        source_pressure_bar=source_pressure_bar,
+        min_required_pressure_bar=min_required_pressure_bar,
+        max_velocity_m_s=max_velocity_m_s,
+        water_temperature_c=water_temperature_c,
+    )
+
+
+def compute_hot_water_network_from_domain(
+    *,
+    network: Network,
+    appliance_catalog: ApplianceCatalog,
+    pipe_catalog: PipeCatalog,
+    fluid_catalog: FluidCatalog,
+    singular_loss_catalog: SingularLossCatalog | None = None,
+    source_node_id: str | None = None,
+    source_pressure_bar: float | None = None,
+    min_required_pressure_bar: float = 1.0,
+    max_velocity_m_s: float | None = None,
+    water_temperature_c: float | None = None,
+) -> Result[DomesticWaterNetworkComputeResult]:
+    """Convenience function for full ECS forward computation from a domain Network."""
+
+    return DomesticWaterNetworkEngine.hot_water_from_network(
+        network=network,
         appliance_catalog=appliance_catalog,
         pipe_catalog=pipe_catalog,
         fluid_catalog=fluid_catalog,

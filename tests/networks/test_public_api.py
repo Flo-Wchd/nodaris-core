@@ -23,6 +23,10 @@ from ndc_core.networks import (
     TerminalPressureStatus,
     compute_cold_water_network,
     compute_hot_water_network,
+    compute_cold_water_network_from_domain,
+    compute_hot_water_network_from_domain,
+    compute_cold_water_network_from_network,
+    compute_hot_water_network_from_network,
 )
 from ndc_core.networks.cold_water import (
     ColdWaterNetworkEngine as ColdWaterNetworkEngineFromPackage,
@@ -36,7 +40,11 @@ def test_networks_public_api_exports_facades() -> None:
     assert ColdWaterNetworkEngine is ColdWaterNetworkEngineFromPackage
     assert HotWaterNetworkEngine is HotWaterNetworkEngineFromPackage
     assert callable(compute_cold_water_network)
+    assert callable(compute_cold_water_network_from_network)
+    assert callable(compute_cold_water_network_from_domain)
     assert callable(compute_hot_water_network)
+    assert callable(compute_hot_water_network_from_network)
+    assert callable(compute_hot_water_network_from_domain)
 
 
 def test_networks_public_api_exports_domestic_water_engine_types() -> None:

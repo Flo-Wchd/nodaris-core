@@ -9,7 +9,9 @@ from ndc_core.networks.domestic_water.network_engine import (
     DomesticWaterNetworkStep,
     DomesticWaterSectionComputeResult,
     compute_cold_water_network,
+    compute_cold_water_network_from_domain,
     compute_hot_water_network,
+    compute_hot_water_network_from_domain,
 )
 from ndc_core.networks.domestic_water.pressure_loss import (
     DomesticWaterPressureLossEngine,
@@ -84,9 +86,11 @@ __all__ = [
     "compute_cold_water_demand",
     "compute_cold_water_network",
     "compute_cold_water_section_pressure_loss",
+    "compute_cold_water_network_from_domain",
     "compute_hot_water_demand",
     "compute_hot_water_network",
     "compute_hot_water_section_pressure_loss",
+    "compute_hot_water_network_from_domain",
     "propagate_cold_water_pressures",
     "propagate_hot_water_pressures",
     "size_cold_water_section_from_counts",

@@ -1,6 +1,7 @@
 from ndc_core.networks.cold_water import (
     ColdWaterNetworkEngine,
     compute_cold_water_network,
+    compute_cold_water_network_from_network,
 )
 from ndc_core.networks.domestic_water import (
     DomesticWaterDemand,
@@ -23,10 +24,13 @@ from ndc_core.networks.domestic_water import (
     PressurePropagationStatus,
     SectionSizingMode,
     TerminalPressureStatus,
+    compute_cold_water_network_from_domain,
+    compute_hot_water_network_from_domain,
 )
 from ndc_core.networks.hot_water import (
     HotWaterNetworkEngine,
     compute_hot_water_network,
+    compute_hot_water_network_from_network,
 )
 
 __all__ = [
@@ -53,5 +57,9 @@ __all__ = [
     "SectionSizingMode",
     "TerminalPressureStatus",
     "compute_cold_water_network",
+    "compute_cold_water_network_from_domain",
+    "compute_cold_water_network_from_network",
     "compute_hot_water_network",
+    "compute_hot_water_network_from_domain",
+    "compute_hot_water_network_from_network",
 ]
