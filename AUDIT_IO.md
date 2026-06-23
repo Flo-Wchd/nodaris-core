@@ -711,6 +711,12 @@
   - calls: safe_non_negative_float
   - doc: Convert a pressure value in Pa to a safe non-negative pressure.
 
+## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\pipe_rules.py
+
+- **ndc_core.networks.domestic_water.pipe_rules.relative_roughness_for_section(section, pipe_catalog, internal_diameter_m)** -> `float`
+  - calls: clean_optional_code, getattr, pipe_catalog.get_size, pipe_catalog.materials_by_code.get, relative_roughness
+  - doc: Resolve the relative roughness for a Section-like pipe.
+
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\pressure_loss.py
 
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossResult.reynolds(self)** -> `float | None`
@@ -723,11 +729,9 @@
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossResult.has_errors(self)** -> `bool`
   - calls: any
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine.compute_section_pressure_loss(self, section, water_temperature_c, singular_zeta_values)** -> `Result[DomesticWaterPressureLossResult]`
-  - calls: DomesticWaterPressureLossResult, EngineMessage.error, EngineMessage.info, Result.failure, Result.success, apply_section_pressure_loss_state, collect_section_singular_zeta_values, diameter_mm_to_m, max, messages.append, safe_float, safe_positive_float, self._relative_roughness_for_section, self._resolve_fluid, total_pressure_loss ...
+  - calls: DomesticWaterPressureLossResult, EngineMessage.error, EngineMessage.info, Result.failure, Result.success, apply_section_pressure_loss_state, collect_section_singular_zeta_values, diameter_mm_to_m, max, messages.append, relative_roughness_for_section, safe_float, safe_positive_float, self._resolve_fluid, total_pressure_loss ...
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine._resolve_fluid(self, water_temperature_c, messages)** -> `Fluid | None`
   - calls: EngineMessage.error, messages.append, self.fluid_catalog.get, self.fluid_catalog.get_water_at_temperature
-- **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine._relative_roughness_for_section(self, section, internal_diameter_m)** -> `float`
-  - calls: clean_optional_code, getattr, relative_roughness, self.pipe_catalog.get_size, self.pipe_catalog.materials_by_code.get
 - **ndc_core.networks.domestic_water.pressure_loss.compute_cold_water_section_pressure_loss(section, fluid_catalog, pipe_catalog, singular_loss_catalog, water_temperature_c, singular_zeta_values)** -> `Result[DomesticWaterPressureLossResult]`
   - calls: DomesticWaterPressureLossEngine, DomesticWaterPressureLossEngine(fluid_catalog=fluid_catalog, pipe_catalog=pipe_catalog, singular_loss_catalog=singular_loss_catalog, side=DomesticWaterSide.COLD_WATER).compute_section_pressure_loss
   - doc: Convenience function for EFS section pressure loss.
@@ -1378,6 +1382,23 @@
 - **tests.networks.domestic_water.test_numeric.test_safe_pressure_pa()** -> `None`
   - calls: float, safe_pressure_pa
 
+## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_pipe_rules.py
+
+- **tests.networks.domestic_water.test_pipe_rules._section()** -> `Section`
+  - calls: Section
+- **tests.networks.domestic_water.test_pipe_rules._pipe_catalog()** -> `PipeCatalog`
+  - calls: PipeCatalog, PipeMaterial, PipeSize
+- **tests.networks.domestic_water.test_pipe_rules.test_relative_roughness_for_section()** -> `None`
+  - calls: _pipe_catalog, _section, isclose, relative_roughness_for_section
+- **tests.networks.domestic_water.test_pipe_rules.test_relative_roughness_for_section_without_catalog_returns_zero()** -> `None`
+  - calls: _section, relative_roughness_for_section
+- **tests.networks.domestic_water.test_pipe_rules.test_relative_roughness_for_section_without_selected_pipe_returns_zero()** -> `None`
+  - calls: _pipe_catalog, _section, relative_roughness_for_section
+- **tests.networks.domestic_water.test_pipe_rules.test_relative_roughness_for_section_with_unknown_pipe_returns_zero()** -> `None`
+  - calls: _pipe_catalog, _section, relative_roughness_for_section
+- **tests.networks.domestic_water.test_pipe_rules.test_relative_roughness_for_section_with_unknown_material_returns_zero()** -> `None`
+  - calls: PipeCatalog, PipeSize, _section, relative_roughness_for_section
+
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_pressure_loss.py
 
 - **tests.networks.domestic_water.test_pressure_loss._DirectZeta.__init__(self, zeta, quantity)** -> `None`
@@ -1392,6 +1413,8 @@
   - calls: Section, values.update
 - **tests.networks.domestic_water.test_pressure_loss.test_compute_cold_water_section_pressure_loss_with_direct_zeta()** -> `None`
   - calls: _DirectZeta, _fluid_catalog, _pipe_catalog, _section, compute_cold_water_section_pressure_loss, section.singular_losses.append
+- **tests.networks.domestic_water.test_pressure_loss.test_compute_pressure_loss_uses_pipe_catalog_roughness()** -> `None`
+  - calls: _fluid_catalog, _pipe_catalog, _section, compute_cold_water_section_pressure_loss
 - **tests.networks.domestic_water.test_pressure_loss.test_compute_pressure_loss_from_catalog_zeta()** -> `None`
   - calls: _CatalogLoss, _fluid_catalog, _pipe_catalog, _section, _singular_loss_catalog, compute_cold_water_section_pressure_loss, isclose, section.singular_losses.append
 - **tests.networks.domestic_water.test_pressure_loss.test_compute_pressure_loss_from_catalog_kv()** -> `None`
@@ -1579,4 +1602,6 @@
 - **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_appliance_rules_tools()** -> `None`
   - calls: callable
 - **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_singular_loss_rules()** -> `None`
+  - calls: callable
+- **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_pipe_rules()** -> `None`
   - calls: callable

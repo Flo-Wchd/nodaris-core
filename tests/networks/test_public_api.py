@@ -69,6 +69,7 @@ from ndc_core.networks import (
     collect_section_singular_zeta_values,
     zeta_from_catalog_singular_loss,
     zeta_from_section_singular_loss_item,
+    relative_roughness_for_section,
 )
 from ndc_core.networks.cold_water import (
     ColdWaterNetworkEngine as ColdWaterNetworkEngineFromPackage,
@@ -192,3 +193,7 @@ def test_networks_public_api_exports_domestic_water_singular_loss_rules() -> Non
     assert callable(collect_section_singular_zeta_values)
     assert callable(zeta_from_catalog_singular_loss)
     assert callable(zeta_from_section_singular_loss_item)
+
+
+def test_networks_public_api_exports_domestic_water_pipe_rules() -> None:
+    assert callable(relative_roughness_for_section)

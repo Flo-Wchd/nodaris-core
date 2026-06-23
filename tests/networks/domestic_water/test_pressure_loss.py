@@ -153,6 +153,20 @@ def test_compute_cold_water_section_pressure_loss_with_direct_zeta() -> None:
     assert section.singular_zeta_total == 2.0
 
 
+def test_compute_pressure_loss_uses_pipe_catalog_roughness() -> None:
+    section = _section()
+
+    result = compute_cold_water_section_pressure_loss(
+        section=section,
+        fluid_catalog=_fluid_catalog(),
+        pipe_catalog=_pipe_catalog(),
+    )
+
+    assert result.ok
+    assert result.value is not None
+    assert result.value.relative_roughness_value > 0.0
+
+
 def test_compute_pressure_loss_from_catalog_zeta() -> None:
     section = _section()
     section.singular_losses.append(_CatalogLoss("coude_90", quantity=2.0))

@@ -115,6 +115,9 @@ from ndc_core.networks.domestic_water.singular_loss_rules import (
     zeta_from_catalog_singular_loss,
     zeta_from_section_singular_loss_item,
 )
+from ndc_core.networks.domestic_water.pipe_rules import (
+    relative_roughness_for_section,
+)
 
 __all__ = [
     "ApplianceDemandItem",
@@ -200,4 +203,5 @@ __all__ = [
     "collect_section_singular_zeta_values",
     "zeta_from_catalog_singular_loss",
     "zeta_from_section_singular_loss_item",
+    "relative_roughness_for_section",
 ]

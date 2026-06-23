@@ -12,12 +12,10 @@ from ndc_core.common.result import Result
 from ndc_core.domain.fluids import Fluid
 from ndc_core.domain.networks.section import Section
 from ndc_core.hydraulics.conversions import diameter_mm_to_m
-from ndc_core.hydraulics.friction import relative_roughness
 from ndc_core.hydraulics.total_pressure_loss import total_pressure_loss
 from ndc_core.hydraulics.types import PressureLossBreakdown
 from ndc_core.hydraulics.velocity import velocity_from_l_s_and_mm
 from ndc_core.networks.domestic_water.types import DomesticWaterSide
-from ndc_core.networks.domestic_water.entity_access import clean_optional_code
 from ndc_core.networks.domestic_water.numeric import (
     safe_float,
     safe_positive_float,
@@ -25,6 +23,9 @@ from ndc_core.networks.domestic_water.numeric import (
 from ndc_core.networks.domestic_water.section_state import apply_section_pressure_loss_state
 from ndc_core.networks.domestic_water.singular_loss_rules import (
     collect_section_singular_zeta_values,
+)
+from ndc_core.networks.domestic_water.pipe_rules import (
+    relative_roughness_for_section,
 )
 
 
@@ -163,8 +164,9 @@ class DomesticWaterPressureLossEngine:
             )
         )
 
-        roughness_value = self._relative_roughness_for_section(
+        roughness_value = relative_roughness_for_section(
             section=section,
+            pipe_catalog=self.pipe_catalog,
             internal_diameter_m=diameter_m,
         )
 
@@ -237,33 +239,6 @@ class DomesticWaterPressureLossEngine:
             )
         )
         return None
-
-    def _relative_roughness_for_section(
-        self,
-        *,
-        section: Section,
-        internal_diameter_m: float,
-    ) -> float:
-        if self.pipe_catalog is None:
-            return 0.0
-
-        pipe_code = clean_optional_code(section.selected_pipe_size_code)
-        if pipe_code is None:
-            return 0.0
-
-        pipe_size = self.pipe_catalog.get_size(pipe_code)
-        if pipe_size is None:
-            return 0.0
-
-        material = self.pipe_catalog.materials_by_code.get(pipe_size.material_code)
-        if material is None:
-            return 0.0
-
-        roughness_m = getattr(material, "default_roughness_m", 0.0)
-        return relative_roughness(
-            roughness_m=roughness_m,
-            internal_diameter_m=internal_diameter_m,
-        )
 
 
 def compute_cold_water_section_pressure_loss(
