@@ -41,6 +41,9 @@ from ndc_core.networks import (
     hot_water_fluid_codes,
     normalize_domestic_water_fluid_code,
     section_matches_domestic_water_side,
+    apply_machine_exclusivity,
+    merge_appliance_counts,
+    normalize_appliance_counts,
 )
 from ndc_core.networks.cold_water import (
     ColdWaterNetworkEngine as ColdWaterNetworkEngineFromPackage,
@@ -118,3 +121,9 @@ def test_networks_public_api_exports_domestic_water_side_matching_tools() -> Non
     assert callable(domestic_water_side_from_fluid_code)
     assert callable(normalize_domestic_water_fluid_code)
     assert callable(section_matches_domestic_water_side)
+
+
+def test_networks_public_api_exports_domestic_water_appliance_count_tools() -> None:
+    assert callable(normalize_appliance_counts)
+    assert callable(merge_appliance_counts)
+    assert callable(apply_machine_exclusivity)

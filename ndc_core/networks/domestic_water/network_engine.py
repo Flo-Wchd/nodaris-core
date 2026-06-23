@@ -39,7 +39,7 @@ from ndc_core.networks.domestic_water.types import DomesticWaterSide
 from ndc_core.networks.domestic_water.side_matching import (
     section_matches_domestic_water_side,
 )
-
+from ndc_core.networks.domestic_water.appliance_counts import normalize_appliance_counts
 
 class DomesticWaterNetworkStep(StrEnum):
     """Network compute step names."""
@@ -678,22 +678,6 @@ def compute_hot_water_network_from_domain(
 
 
 def _read_section_downstream_appliance_counts(section: Any) -> dict[str, int]:
-    raw_counts = getattr(section, "downstream_appliance_counts", None) or {}
-    normalized: dict[str, int] = {}
-
-    for raw_code, raw_count in raw_counts.items():
-        code = str(raw_code or "").strip()
-        if not code:
-            continue
-
-        try:
-            count = int(raw_count)
-        except (TypeError, ValueError):
-            continue
-
-        if count <= 0:
-            continue
-
-        normalized[code] = normalized.get(code, 0) + count
-
-    return normalized
+    return normalize_appliance_counts(
+        getattr(section, "downstream_appliance_counts", None)
+    )

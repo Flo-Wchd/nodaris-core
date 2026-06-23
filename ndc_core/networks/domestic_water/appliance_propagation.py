@@ -11,6 +11,10 @@ from ndc_core.networks.domestic_water.types import DomesticWaterSide
 from ndc_core.networks.domestic_water.side_matching import (
     section_matches_domestic_water_side,
 )
+from ndc_core.networks.domestic_water.appliance_counts import (
+    merge_appliance_counts,
+    normalize_appliance_counts,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -189,7 +193,7 @@ class DomesticWaterAppliancePropagationEngine:
                 if section is not None:
                     _write_section_downstream_counts(section, downstream_counts)
 
-                total_counts = _merge_count_maps(total_counts, downstream_counts)
+                total_counts = merge_appliance_counts(total_counts, downstream_counts)
 
             visiting.remove(node_id)
 
@@ -278,7 +282,7 @@ def _read_node_local_appliance_counts(node: Any) -> dict[str, int]:
     local_counts_method = getattr(node, "local_appliance_counts", None)
     if callable(local_counts_method):
         try:
-            return _normalize_counts(local_counts_method())
+            return normalize_appliance_counts(local_counts_method())
         except (TypeError, ValueError):
             return {}
 
@@ -287,12 +291,12 @@ def _read_node_local_appliance_counts(node: Any) -> dict[str, int]:
     for attr_name in ("appliance_counts", "appliances"):
         value = getattr(node, attr_name, None)
         if isinstance(value, dict):
-            merged = _merge_count_maps(merged, _normalize_counts(value))
+            merged = merge_appliance_counts(merged, normalize_appliance_counts(value))
 
     cells = getattr(node, "cells", None)
     if isinstance(cells, (list, tuple)):
         for cell in cells:
-            merged = _merge_count_maps(merged, _read_cell_appliance_counts(cell))
+            merged = merge_appliance_counts(merged, _read_cell_appliance_counts(cell))
 
     return merged
 
@@ -304,59 +308,13 @@ def _read_cell_appliance_counts(cell: Any) -> dict[str, int]:
     for attr_name in ("appliance_counts", "appliances"):
         value = getattr(cell, attr_name, None)
         if isinstance(value, dict):
-            return _normalize_counts(value)
+            return normalize_appliance_counts(value)
 
     return {}
 
 
-def _normalize_counts(raw_counts: Any) -> dict[str, int]:
-    if not isinstance(raw_counts, dict):
-        return {}
-
-    normalized: dict[str, int] = {}
-
-    for raw_code, raw_count in raw_counts.items():
-        code = str(raw_code or "").strip()
-        if not code:
-            continue
-
-        try:
-            count = int(raw_count)
-        except (TypeError, ValueError):
-            continue
-
-        if count <= 0:
-            continue
-
-        normalized[code] = normalized.get(code, 0) + count
-
-    return normalized
-
-
-def _merge_count_maps(*maps: dict[str, int]) -> dict[str, int]:
-    merged: dict[str, int] = {}
-
-    for count_map in maps:
-        for code, count in (count_map or {}).items():
-            code_s = str(code or "").strip()
-            if not code_s:
-                continue
-
-            try:
-                count_i = int(count)
-            except (TypeError, ValueError):
-                continue
-
-            if count_i <= 0:
-                continue
-
-            merged[code_s] = merged.get(code_s, 0) + count_i
-
-    return merged
-
-
 def _write_section_downstream_counts(section: Any, counts: dict[str, int]) -> None:
-    normalized = _normalize_counts(counts)
+    normalized = normalize_appliance_counts(counts)
 
     target = getattr(section, "downstream_appliance_counts", None)
     if isinstance(target, dict):
@@ -371,7 +329,7 @@ def _write_section_downstream_counts(section: Any, counts: dict[str, int]) -> No
 
 
 def _write_node_downstream_counts(node: Any, counts: dict[str, int]) -> None:
-    normalized = _normalize_counts(counts)
+    normalized = normalize_appliance_counts(counts)
 
     target = getattr(node, "downstream_appliance_counts", None)
     if isinstance(target, dict):

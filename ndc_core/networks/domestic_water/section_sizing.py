@@ -24,6 +24,7 @@ from ndc_core.networks.domestic_water.types import (
     DomesticWaterDemand,
     DomesticWaterSide,
 )
+from ndc_core.networks.domestic_water.appliance_counts import normalize_appliance_counts
 
 
 class SectionSizingMode(StrEnum):
@@ -126,7 +127,7 @@ class DomesticWaterSectionSizingEngine:
             section.usage_context
         )
 
-        raw_counts = _normalize_counts(appliance_counts)
+        raw_counts = normalize_appliance_counts(appliance_counts)
         effective_counts = {
             item.appliance_code: item.effective_count
             for item in demand.items
@@ -609,27 +610,6 @@ def _flow_for_profile(
         return max(0.0, float(value))
     except (TypeError, ValueError):
         return 0.0
-
-
-def _normalize_counts(appliance_counts: Mapping[str, int]) -> dict[str, int]:
-    normalized: dict[str, int] = {}
-
-    for raw_code, raw_count in appliance_counts.items():
-        code = str(raw_code or "").strip()
-        if not code:
-            continue
-
-        try:
-            count = int(raw_count)
-        except (TypeError, ValueError):
-            continue
-
-        if count <= 0:
-            continue
-
-        normalized[code] = normalized.get(code, 0) + count
-
-    return normalized
 
 
 def _clean_optional_code(value: Any) -> str | None:

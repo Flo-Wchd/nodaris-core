@@ -510,6 +510,18 @@
   - calls: compute_cold_water_network_from_domain
   - doc: Functional EFS entry point from the domain Network aggregate.
 
+## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\appliance_counts.py
+
+- **ndc_core.networks.domestic_water.appliance_counts.normalize_appliance_counts(raw_counts)** -> `dict[str, int]`
+  - calls: int, isinstance, normalized.get, raw_counts.items, str, str(raw_code or '').strip
+  - doc: Normalize an appliance count mapping.
+- **ndc_core.networks.domestic_water.appliance_counts.merge_appliance_counts(*count_maps)** -> `dict[str, int]`
+  - calls: merged.get, normalize_appliance_counts, normalized.items
+  - doc: Merge several appliance count mappings using the shared normalization rules.
+- **ndc_core.networks.domestic_water.appliance_counts.apply_machine_exclusivity(counts, exclusive_codes)** -> `dict[str, int]`
+  - calls: code.strip, code.strip().upper, next, normalize_appliance_counts, normalized_counts.items, str, str(code or '').strip, str(code or '').strip().upper, sum
+  - doc: Apply the domestic water washing-machine exclusivity rule.
+
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\appliance_propagation.py
 
 - **ndc_core.networks.domestic_water.appliance_propagation.DomesticWaterAppliancePropagationResult.has_warnings(self)** -> `bool`
@@ -521,7 +533,7 @@
 - **ndc_core.networks.domestic_water.appliance_propagation.DomesticWaterAppliancePropagationEngine.propagate(self)** -> `Result[DomesticWaterAppliancePropagationResult]`
   - calls: DomesticWaterAppliancePropagationResult, EngineMessage.warning, Result.success, _clean_id, _read_node_local_appliance_counts, any, bool, children_by_node[upstream_node_id].append, defaultdict, getattr, messages.append, node_local_counts.values, section_matches_domestic_water_side, self.nodes.items, self.sections.items ...
 - **ndc_core.networks.domestic_water.appliance_propagation.DomesticWaterAppliancePropagationEngine.compute_node_downstream_counts(node_id)** -> `dict[str, int]`
-  - calls: EngineMessage.error, _merge_count_maps, _write_node_downstream_counts, _write_section_downstream_counts, children_by_node.get, compute_node_downstream_counts, cycle_reported.add, dict, messages.append, node_local_counts.get, self.nodes.get, self.sections.get, visiting.add, visiting.remove
+  - calls: EngineMessage.error, _write_node_downstream_counts, _write_section_downstream_counts, children_by_node.get, compute_node_downstream_counts, cycle_reported.add, dict, merge_appliance_counts, messages.append, node_local_counts.get, self.nodes.get, self.sections.get, visiting.add, visiting.remove
 - **ndc_core.networks.domestic_water.appliance_propagation.propagate_domestic_water_appliances(nodes, sections, side)** -> `Result[DomesticWaterAppliancePropagationResult]`
   - calls: DomesticWaterAppliancePropagationEngine, DomesticWaterAppliancePropagationEngine(nodes=nodes, sections=sections, side=side).propagate
   - doc: Convenience function for Cell/Node -> Section appliance propagation.
@@ -532,17 +544,13 @@
   - calls: propagate_domestic_water_appliances
   - doc: Convenience function for ECS appliance propagation.
 - **ndc_core.networks.domestic_water.appliance_propagation._read_node_local_appliance_counts(node)** -> `dict[str, int]`
-  - calls: _merge_count_maps, _normalize_counts, _read_cell_appliance_counts, callable, getattr, isinstance, local_counts_method
+  - calls: _read_cell_appliance_counts, callable, getattr, isinstance, local_counts_method, merge_appliance_counts, normalize_appliance_counts
 - **ndc_core.networks.domestic_water.appliance_propagation._read_cell_appliance_counts(cell)** -> `dict[str, int]`
-  - calls: _normalize_counts, getattr, isinstance
-- **ndc_core.networks.domestic_water.appliance_propagation._normalize_counts(raw_counts)** -> `dict[str, int]`
-  - calls: int, isinstance, normalized.get, raw_counts.items, str, str(raw_code or '').strip
-- **ndc_core.networks.domestic_water.appliance_propagation._merge_count_maps(*maps)** -> `dict[str, int]`
-  - calls: (count_map or {}).items, int, merged.get, str, str(code or '').strip
+  - calls: getattr, isinstance, normalize_appliance_counts
 - **ndc_core.networks.domestic_water.appliance_propagation._write_section_downstream_counts(section, counts)** -> `None`
-  - calls: _normalize_counts, dict, getattr, isinstance, setattr, target.clear, target.update
+  - calls: dict, getattr, isinstance, normalize_appliance_counts, setattr, target.clear, target.update
 - **ndc_core.networks.domestic_water.appliance_propagation._write_node_downstream_counts(node, counts)** -> `None`
-  - calls: _normalize_counts, dict, getattr, isinstance, setattr, target.clear, target.update
+  - calls: dict, getattr, isinstance, normalize_appliance_counts, setattr, target.clear, target.update
 - **ndc_core.networks.domestic_water.appliance_propagation._clean_id(value)** -> `str`
   - calls: str, str(value or '').strip
 
@@ -553,7 +561,7 @@
 - **ndc_core.networks.domestic_water.demand.DomesticWaterDemandBuilder.hot_water(cls, appliance_catalog)** -> `DomesticWaterDemandBuilder`
   - calls: cls
 - **ndc_core.networks.domestic_water.demand.DomesticWaterDemandBuilder.compute_from_counts(self, appliance_counts)** -> `Result[DomesticWaterDemand]`
-  - calls: ApplianceDemandItem, DomesticWaterDemand, EngineMessage.info, EngineMessage.warning, Result.success, _apply_machine_exclusivity, _flow_for_profile, _normalize_counts, declared_counts.get, declared_counts.values, effective_counts.values, items.append, messages.append, self._simultaneity_factor, self.appliance_catalog.get ...
+  - calls: ApplianceDemandItem, DomesticWaterDemand, EngineMessage.info, EngineMessage.warning, Result.success, _flow_for_profile, apply_machine_exclusivity, declared_counts.get, declared_counts.values, effective_counts.values, items.append, messages.append, normalize_appliance_counts, self._simultaneity_factor, self.appliance_catalog.get ...
 - **ndc_core.networks.domestic_water.demand.DomesticWaterDemandBuilder._simultaneity_factor(self, effective_appliance_count)** -> `float`
   - calls: clamp_simultaneity_factor, collective_dtu_simultaneity_factor
 - **ndc_core.networks.domestic_water.demand.compute_cold_water_demand(appliance_catalog, appliance_counts)** -> `Result[DomesticWaterDemand]`
@@ -562,11 +570,6 @@
 - **ndc_core.networks.domestic_water.demand.compute_hot_water_demand(appliance_catalog, appliance_counts)** -> `Result[DomesticWaterDemand]`
   - calls: DomesticWaterDemandBuilder.hot_water, DomesticWaterDemandBuilder.hot_water(appliance_catalog).compute_from_counts
   - doc: Convenience function for ECS forward demand.
-- **ndc_core.networks.domestic_water.demand._normalize_counts(appliance_counts)** -> `dict[str, int]`
-  - calls: appliance_counts.items, int, normalized.get, str, str(raw_code or '').strip
-- **ndc_core.networks.domestic_water.demand._apply_machine_exclusivity(counts, exclusive_codes)** -> `dict[str, int]`
-  - calls: code.strip, code.strip().upper, counts.items, dict, effective.pop, list, next, sum
-  - doc: Apply LL + LV counted as one effective machine.
 - **ndc_core.networks.domestic_water.demand._flow_for_profile(appliance, profile)** -> `float`
   - calls: float, getattr, max
 
@@ -653,7 +656,7 @@
   - calls: DomesticWaterNetworkEngine.hot_water_from_network, DomesticWaterNetworkEngine.hot_water_from_network(network=network, appliance_catalog=appliance_catalog, pipe_catalog=pipe_catalog, fluid_catalog=fluid_catalog, singular_loss_catalog=singular_loss_catalog).compute_all
   - doc: Convenience function for full ECS forward computation from a domain Network.
 - **ndc_core.networks.domestic_water.network_engine._read_section_downstream_appliance_counts(section)** -> `dict[str, int]`
-  - calls: getattr, int, normalized.get, raw_counts.items, str, str(raw_code or '').strip
+  - calls: getattr, normalize_appliance_counts
 
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\pressure_loss.py
 
@@ -753,7 +756,7 @@
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine.hot_water(cls, appliance_catalog, pipe_catalog)** -> `DomesticWaterSectionSizingEngine`
   - calls: cls
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine.size_section_from_counts(self, section, appliance_counts, max_velocity_m_s)** -> `Result[DomesticWaterSectionSizing]`
-  - calls: DomesticWaterDemandBuilder, DomesticWaterDemandBuilder(appliance_catalog=self.appliance_catalog, profile=self.profile).compute_from_counts, DomesticWaterSectionSizing, EngineMessage.warning, Result.failure, Result.partial, Result.success, _apply_sizing_to_section, _minimum_appliance_internal_diameter_mm, _normalize_counts, max, messages.append, messages.extend, self._select_or_force_diameter, tuple ...
+  - calls: DomesticWaterDemandBuilder, DomesticWaterDemandBuilder(appliance_catalog=self.appliance_catalog, profile=self.profile).compute_from_counts, DomesticWaterSectionSizing, EngineMessage.warning, Result.failure, Result.partial, Result.success, _apply_sizing_to_section, _minimum_appliance_internal_diameter_mm, max, messages.append, messages.extend, normalize_appliance_counts, self._select_or_force_diameter, tuple ...
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine._select_or_force_diameter(self, section, demand, raw_counts, effective_counts, min_required_diameter_mm, max_velocity_m_s, messages)** -> `DomesticWaterSectionSizing`
   - calls: _clean_optional_code, _positive_optional_float, self._size_automatically, self._size_with_forced_internal_diameter, self._size_with_forced_pipe
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine._size_automatically(self, section, demand, raw_counts, effective_counts, min_required_diameter_mm, max_velocity_m_s, messages)** -> `DomesticWaterSectionSizing`
@@ -777,8 +780,6 @@
   - calls: _flow_for_profile, appliance_catalog.get, appliance_counts.items, float
 - **ndc_core.networks.domestic_water.section_sizing._flow_for_profile(appliance, profile)** -> `float`
   - calls: float, getattr, max
-- **ndc_core.networks.domestic_water.section_sizing._normalize_counts(appliance_counts)** -> `dict[str, int]`
-  - calls: appliance_counts.items, int, normalized.get, str, str(raw_code or '').strip
 - **ndc_core.networks.domestic_water.section_sizing._clean_optional_code(value)** -> `str | None`
   - calls: str, str(value or '').strip
 - **ndc_core.networks.domestic_water.section_sizing._positive_optional_float(value)** -> `float | None`
@@ -1162,6 +1163,23 @@
 - **tests.networks.cold_water.test_engine.test_compute_cold_water_network_functional_entry_point()** -> `None`
   - calls: _appliance_catalog, _fluid_catalog, _network, _pipe_catalog, compute_cold_water_network
 
+## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_appliance_counts.py
+
+- **tests.networks.domestic_water.test_appliance_counts.test_normalize_appliance_counts_ignores_invalid_values()** -> `None`
+  - calls: normalize_appliance_counts
+- **tests.networks.domestic_water.test_appliance_counts.test_normalize_appliance_counts_merges_duplicate_codes()** -> `None`
+  - calls: normalize_appliance_counts
+- **tests.networks.domestic_water.test_appliance_counts.test_normalize_appliance_counts_accepts_non_mapping_input()** -> `None`
+  - calls: normalize_appliance_counts
+- **tests.networks.domestic_water.test_appliance_counts.test_merge_appliance_counts()** -> `None`
+  - calls: merge_appliance_counts
+- **tests.networks.domestic_water.test_appliance_counts.test_apply_machine_exclusivity_counts_ll_lv_as_one()** -> `None`
+  - calls: apply_machine_exclusivity
+- **tests.networks.domestic_water.test_appliance_counts.test_apply_machine_exclusivity_keeps_single_machine()** -> `None`
+  - calls: apply_machine_exclusivity
+- **tests.networks.domestic_water.test_appliance_counts.test_apply_machine_exclusivity_is_case_insensitive()** -> `None`
+  - calls: apply_machine_exclusivity
+
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_appliance_propagation.py
 
 - **tests.networks.domestic_water.test_appliance_propagation._node(node_id, kind)** -> `Node`
@@ -1414,4 +1432,6 @@
 - **tests.networks.test_public_api.test_networks_public_api_exports_message_binding_tools()** -> `None`
   - calls: callable
 - **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_side_matching_tools()** -> `None`
+  - calls: callable
+- **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_appliance_count_tools()** -> `None`
   - calls: callable

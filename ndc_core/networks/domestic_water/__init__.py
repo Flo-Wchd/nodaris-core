@@ -75,6 +75,11 @@ from ndc_core.networks.domestic_water.side_matching import (
     normalize_domestic_water_fluid_code,
     section_matches_domestic_water_side,
 )
+from ndc_core.networks.domestic_water.appliance_counts import (
+    apply_machine_exclusivity,
+    merge_appliance_counts,
+    normalize_appliance_counts,
+)
 
 __all__ = [
     "ApplianceDemandItem",
@@ -132,4 +137,7 @@ __all__ = [
     "hot_water_fluid_codes",
     "normalize_domestic_water_fluid_code",
     "section_matches_domestic_water_side",
+    "apply_machine_exclusivity",
+    "merge_appliance_counts",
+    "normalize_appliance_counts",
 ]

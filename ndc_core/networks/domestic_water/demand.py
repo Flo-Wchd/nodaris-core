@@ -21,6 +21,10 @@ from ndc_core.networks.domestic_water.types import (
     DomesticWaterDemand,
     DomesticWaterMethod,
 )
+from ndc_core.networks.domestic_water.appliance_counts import (
+    apply_machine_exclusivity,
+    normalize_appliance_counts,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -44,8 +48,8 @@ class DomesticWaterDemandBuilder:
     ) -> Result[DomesticWaterDemand]:
         messages: list[EngineMessage] = []
 
-        declared_counts = _normalize_counts(appliance_counts)
-        effective_counts = _apply_machine_exclusivity(
+        declared_counts = normalize_appliance_counts(appliance_counts)
+        effective_counts = apply_machine_exclusivity(
             declared_counts,
             exclusive_codes=self.profile.machine_exclusive_codes,
         )
@@ -162,70 +166,6 @@ def compute_hot_water_demand(
     return DomesticWaterDemandBuilder.hot_water(appliance_catalog).compute_from_counts(
         appliance_counts
     )
-
-
-def _normalize_counts(appliance_counts: Mapping[str, int]) -> dict[str, int]:
-    normalized: dict[str, int] = {}
-
-    for raw_code, raw_count in appliance_counts.items():
-        code = str(raw_code or "").strip()
-        if not code:
-            continue
-
-        try:
-            count = int(raw_count)
-        except (TypeError, ValueError):
-            continue
-
-        if count <= 0:
-            continue
-
-        normalized[code] = normalized.get(code, 0) + count
-
-    return normalized
-
-
-def _apply_machine_exclusivity(
-    counts: Mapping[str, int],
-    *,
-    exclusive_codes: frozenset[str],
-) -> dict[str, int]:
-    """
-    Apply LL + LV counted as one effective machine.
-
-    Declared values are preserved outside this function. The demand result keeps
-    both declared_count and effective_count for GUI/export transparency.
-    """
-
-    effective = dict(counts)
-
-    declared_machine_count = sum(
-        count
-        for code, count in counts.items()
-        if code.strip().upper() in exclusive_codes
-    )
-
-    if declared_machine_count <= 1:
-        return effective
-
-    first_machine_code = next(
-        (
-            code
-            for code in counts
-            if code.strip().upper() in exclusive_codes
-        ),
-        None,
-    )
-
-    if first_machine_code is None:
-        return effective
-
-    for code in list(effective):
-        if code.strip().upper() in exclusive_codes:
-            effective.pop(code)
-
-    effective[first_machine_code] = 1
-    return effective
 
 
 def _flow_for_profile(

@@ -40,6 +40,9 @@ from ndc_core.networks.domestic_water import (
     hot_water_fluid_codes,
     normalize_domestic_water_fluid_code,
     section_matches_domestic_water_side,
+    apply_machine_exclusivity,
+    merge_appliance_counts,
+    normalize_appliance_counts,
 )
 from ndc_core.networks.hot_water import (
     HotWaterNetworkEngine,
@@ -90,4 +93,7 @@ __all__ = [
     "hot_water_fluid_codes",
     "normalize_domestic_water_fluid_code",
     "section_matches_domestic_water_side",
+    "apply_machine_exclusivity",
+    "merge_appliance_counts",
+    "normalize_appliance_counts",
 ]
