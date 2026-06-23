@@ -707,7 +707,7 @@
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossResult.has_errors(self)** -> `bool`
   - calls: any
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine.compute_section_pressure_loss(self, section, water_temperature_c, singular_zeta_values)** -> `Result[DomesticWaterPressureLossResult]`
-  - calls: DomesticWaterPressureLossResult, EngineMessage.error, EngineMessage.info, Result.failure, Result.success, _apply_pressure_loss_to_section, diameter_mm_to_m, max, messages.append, safe_float, safe_positive_float, self._collect_section_zeta_values, self._relative_roughness_for_section, self._resolve_fluid, total_pressure_loss ...
+  - calls: DomesticWaterPressureLossResult, EngineMessage.error, EngineMessage.info, Result.failure, Result.success, apply_section_pressure_loss_state, diameter_mm_to_m, max, messages.append, safe_float, safe_positive_float, self._collect_section_zeta_values, self._relative_roughness_for_section, self._resolve_fluid, total_pressure_loss ...
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine._resolve_fluid(self, water_temperature_c, messages)** -> `Fluid | None`
   - calls: EngineMessage.error, messages.append, self.fluid_catalog.get, self.fluid_catalog.get_water_at_temperature
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine._relative_roughness_for_section(self, section, internal_diameter_m)** -> `float`
@@ -724,7 +724,6 @@
 - **ndc_core.networks.domestic_water.pressure_loss.compute_hot_water_section_pressure_loss(section, fluid_catalog, pipe_catalog, singular_loss_catalog, water_temperature_c, singular_zeta_values)** -> `Result[DomesticWaterPressureLossResult]`
   - calls: DomesticWaterPressureLossEngine, DomesticWaterPressureLossEngine(fluid_catalog=fluid_catalog, pipe_catalog=pipe_catalog, singular_loss_catalog=singular_loss_catalog, side=DomesticWaterSide.HOT_WATER).compute_section_pressure_loss
   - doc: Convenience function for ECS forward section pressure loss.
-- **ndc_core.networks.domestic_water.pressure_loss._apply_pressure_loss_to_section(section, result)** -> `None`
 
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\pressure_network.py
 
@@ -776,7 +775,7 @@
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine.hot_water(cls, appliance_catalog, pipe_catalog)** -> `DomesticWaterSectionSizingEngine`
   - calls: cls
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine.size_section_from_counts(self, section, appliance_counts, max_velocity_m_s)** -> `Result[DomesticWaterSectionSizing]`
-  - calls: DomesticWaterDemandBuilder, DomesticWaterDemandBuilder(appliance_catalog=self.appliance_catalog, profile=self.profile).compute_from_counts, DomesticWaterSectionSizing, EngineMessage.warning, Result.failure, Result.partial, Result.success, _apply_sizing_to_section, _minimum_appliance_internal_diameter_mm, max, messages.append, messages.extend, normalize_appliance_counts, self._select_or_force_diameter, tuple ...
+  - calls: DomesticWaterDemandBuilder, DomesticWaterDemandBuilder(appliance_catalog=self.appliance_catalog, profile=self.profile).compute_from_counts, DomesticWaterSectionSizing, EngineMessage.warning, Result.failure, Result.partial, Result.success, _minimum_appliance_internal_diameter_mm, apply_section_sizing_state, max, messages.append, messages.extend, normalize_appliance_counts, self._select_or_force_diameter, tuple ...
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine._select_or_force_diameter(self, section, demand, raw_counts, effective_counts, min_required_diameter_mm, max_velocity_m_s, messages)** -> `DomesticWaterSectionSizing`
   - calls: clean_optional_code, positive_optional_float, self._size_automatically, self._size_with_forced_internal_diameter, self._size_with_forced_pipe
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine._size_automatically(self, section, demand, raw_counts, effective_counts, min_required_diameter_mm, max_velocity_m_s, messages)** -> `DomesticWaterSectionSizing`
@@ -794,12 +793,20 @@
 - **ndc_core.networks.domestic_water.section_sizing.velocity_limit_for_context(usage_context)** -> `float`
   - calls: isinstance, str, value.strip, value.strip().lower
   - doc: Return default velocity limit for domestic water.
-- **ndc_core.networks.domestic_water.section_sizing._apply_sizing_to_section(section, sizing, raw_counts, effective_counts)** -> `None`
-  - calls: section.downstream_appliance_counts.clear, section.downstream_appliance_counts.update, section.effective_appliance_counts.clear, section.effective_appliance_counts.update
 - **ndc_core.networks.domestic_water.section_sizing._minimum_appliance_internal_diameter_mm(appliance_catalog, appliance_counts, profile)** -> `float`
   - calls: _flow_for_profile, appliance_catalog.get, appliance_counts.items, float
 - **ndc_core.networks.domestic_water.section_sizing._flow_for_profile(appliance, profile)** -> `float`
   - calls: float, getattr, max
+
+## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\section_state.py
+
+- **ndc_core.networks.domestic_water.section_state.apply_section_sizing_state(section, sizing, raw_counts, effective_counts)** -> `None`
+  - calls: _replace_mapping_attribute, normalize_appliance_counts
+  - doc: Apply domestic water sizing outputs to a Section-like object.
+- **ndc_core.networks.domestic_water.section_state.apply_section_pressure_loss_state(section, pressure_loss)** -> `None`
+  - doc: Apply domestic water pressure-loss outputs to a Section-like object.
+- **ndc_core.networks.domestic_water.section_state._replace_mapping_attribute(entity, attribute_name, values)** -> `None`
+  - calls: dict, getattr, isinstance, setattr, target.clear, target.update
 
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\side_matching.py
 
@@ -1390,6 +1397,13 @@
 - **tests.networks.domestic_water.test_section_sizing.test_zero_hot_water_demand_returns_partial_without_exception()** -> `None`
   - calls: _appliance_catalog, _pipe_catalog, _section, any, size_hot_water_section_from_counts
 
+## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_section_state.py
+
+- **tests.networks.domestic_water.test_section_state.test_apply_section_sizing_state()** -> `None`
+  - calls: SimpleNamespace, _Section, apply_section_sizing_state
+- **tests.networks.domestic_water.test_section_state.test_apply_section_pressure_loss_state()** -> `None`
+  - calls: SimpleNamespace, _Section, apply_section_pressure_loss_state
+
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_side_matching.py
 
 - **tests.networks.domestic_water.test_side_matching.test_normalize_domestic_water_fluid_code()** -> `None`
@@ -1484,4 +1498,6 @@
 - **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_entity_access_tools()** -> `None`
   - calls: callable
 - **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_numeric_tools()** -> `None`
+  - calls: callable
+- **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_section_state_tools()** -> `None`
   - calls: callable

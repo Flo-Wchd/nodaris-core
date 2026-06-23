@@ -55,6 +55,8 @@ from ndc_core.networks.domestic_water import (
     safe_non_negative_float,
     safe_positive_float,
     safe_pressure_pa,
+    apply_section_pressure_loss_state,
+    apply_section_sizing_state,
 )
 from ndc_core.networks.hot_water import (
     HotWaterNetworkEngine,
@@ -120,4 +122,6 @@ __all__ = [
     "safe_non_negative_float",
     "safe_positive_float",
     "safe_pressure_pa",
+    "apply_section_pressure_loss_state",
+    "apply_section_sizing_state",
 ]

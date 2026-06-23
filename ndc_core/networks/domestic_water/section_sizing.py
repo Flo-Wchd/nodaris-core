@@ -27,6 +27,7 @@ from ndc_core.networks.domestic_water.types import (
 from ndc_core.networks.domestic_water.appliance_counts import normalize_appliance_counts
 from ndc_core.networks.domestic_water.entity_access import clean_optional_code
 from ndc_core.networks.domestic_water.numeric import positive_optional_float
+from ndc_core.networks.domestic_water.section_state import apply_section_sizing_state
 
 
 class SectionSizingMode(StrEnum):
@@ -170,7 +171,7 @@ class DomesticWaterSectionSizingEngine:
                 velocity_ok=None,
                 messages=tuple(messages),
             )
-            _apply_sizing_to_section(
+            apply_section_sizing_state(
                 section=section,
                 sizing=sizing,
                 raw_counts=raw_counts,
@@ -188,7 +189,7 @@ class DomesticWaterSectionSizingEngine:
             messages=messages,
         )
 
-        _apply_sizing_to_section(
+        apply_section_sizing_state(
             section=section,
             sizing=sizing,
             raw_counts=raw_counts,
@@ -547,26 +548,6 @@ def velocity_limit_for_context(
         return 1.5
 
     return 2.0
-
-
-def _apply_sizing_to_section(
-    *,
-    section: Section,
-    sizing: DomesticWaterSectionSizing,
-    raw_counts: dict[str, int],
-    effective_counts: dict[str, int],
-) -> None:
-    section.flow_l_s = sizing.demand.design_flow_l_s
-    section.velocity_m_s = sizing.velocity_m_s
-
-    section.downstream_appliance_counts.clear()
-    section.downstream_appliance_counts.update(raw_counts)
-
-    section.effective_appliance_counts.clear()
-    section.effective_appliance_counts.update(effective_counts)
-
-    section.selected_pipe_size_code = sizing.selected_pipe_size_code
-    section.selected_internal_diameter_mm = sizing.used_internal_diameter_mm
 
 
 def _minimum_appliance_internal_diameter_mm(

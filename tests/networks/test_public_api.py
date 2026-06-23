@@ -56,6 +56,8 @@ from ndc_core.networks import (
     safe_non_negative_float,
     safe_positive_float,
     safe_pressure_pa,
+    apply_section_pressure_loss_state,
+    apply_section_sizing_state,
 )
 from ndc_core.networks.cold_water import (
     ColdWaterNetworkEngine as ColdWaterNetworkEngineFromPackage,
@@ -157,3 +159,8 @@ def test_networks_public_api_exports_domestic_water_numeric_tools() -> None:
     assert callable(safe_non_negative_float)
     assert callable(safe_pressure_pa)
     assert callable(positive_optional_float)
+
+
+def test_networks_public_api_exports_domestic_water_section_state_tools() -> None:
+    assert callable(apply_section_sizing_state)
+    assert callable(apply_section_pressure_loss_state)

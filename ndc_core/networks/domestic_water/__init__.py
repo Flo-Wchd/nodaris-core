@@ -96,6 +96,10 @@ from ndc_core.networks.domestic_water.numeric import (
     safe_positive_float,
     safe_pressure_pa,
 )
+from ndc_core.networks.domestic_water.section_state import (
+    apply_section_pressure_loss_state,
+    apply_section_sizing_state,
+)
 
 __all__ = [
     "ApplianceDemandItem",
@@ -168,4 +172,6 @@ __all__ = [
     "safe_non_negative_float",
     "safe_positive_float",
     "safe_pressure_pa",
+    "apply_section_pressure_loss_state",
+    "apply_section_sizing_state",
 ]

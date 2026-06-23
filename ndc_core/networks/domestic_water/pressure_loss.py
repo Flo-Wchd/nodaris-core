@@ -25,6 +25,7 @@ from ndc_core.networks.domestic_water.numeric import (
     safe_float,
     safe_positive_float,
 )
+from ndc_core.networks.domestic_water.section_state import apply_section_pressure_loss_state
 
 
 class DomesticWaterPressureLossMode(StrEnum):
@@ -191,7 +192,7 @@ class DomesticWaterPressureLossEngine:
             messages=tuple(messages),
         )
 
-        _apply_pressure_loss_to_section(section=section, result=result)
+        apply_section_pressure_loss_state(section=section, pressure_loss=result)
 
         if result.has_errors:
             return Result.failure(value=result, messages=messages)
@@ -443,20 +444,3 @@ def compute_hot_water_section_pressure_loss(
         water_temperature_c=water_temperature_c,
         singular_zeta_values=singular_zeta_values,
     )
-
-
-def _apply_pressure_loss_to_section(
-    *,
-    section: Section,
-    result: DomesticWaterPressureLossResult,
-) -> None:
-    section.velocity_m_s = result.velocity_m_s
-    section.reynolds = result.breakdown.reynolds
-    section.friction_factor = result.breakdown.friction_factor
-    section.linear_pressure_loss_pa = result.breakdown.linear_pressure_loss_pa
-    section.singular_pressure_loss_pa = result.breakdown.singular_pressure_loss_pa
-    section.elevation_pressure_loss_pa = (
-        result.breakdown.elevation_pressure_change_pa
-    )
-    section.total_pressure_loss_pa = result.breakdown.total_pressure_change_pa
-    section.singular_zeta_total = result.breakdown.singular_zeta_total
