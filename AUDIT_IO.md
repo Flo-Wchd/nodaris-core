@@ -589,6 +589,9 @@
 - **ndc_core.networks.domestic_water.entity_access.read_node_local_appliance_counts(node)** -> `dict[str, int]`
   - calls: callable, getattr, isinstance, local_counts_method, merge_appliance_counts, normalize_appliance_counts, read_cell_appliance_counts
   - doc: Read normalized local appliance counts from a Node-like object.
+- **ndc_core.networks.domestic_water.entity_access.read_section_downstream_appliance_counts(section)** -> `dict[str, int]`
+  - calls: getattr, normalize_appliance_counts
+  - doc: Read normalized downstream appliance counts from a Section-like object.
 - **ndc_core.networks.domestic_water.entity_access.write_section_downstream_appliance_counts(section, counts)** -> `None`
   - calls: _write_mapping_attribute, normalize_appliance_counts
   - doc: Write normalized downstream appliance counts on a Section-like object.
@@ -668,7 +671,7 @@
 - **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine._bind_messages_to_entities(self, result)** -> `None`
   - calls: bind_domestic_water_messages_to_entities
 - **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine._compute_one_section(self, section_id, section, max_velocity_m_s, water_temperature_c)** -> `DomesticWaterSectionComputeResult`
-  - calls: DomesticWaterSectionComputeResult, EngineMessage.warning, _read_section_downstream_appliance_counts, getattr, messages.append, messages.extend, self._compute_section_pressure_loss, self._size_section, tuple
+  - calls: DomesticWaterSectionComputeResult, EngineMessage.warning, getattr, messages.append, messages.extend, read_section_downstream_appliance_counts, self._compute_section_pressure_loss, self._size_section, tuple
 - **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine._size_section(self, section, appliance_counts, max_velocity_m_s)** -> `Result[DomesticWaterSectionSizing]`
   - calls: size_cold_water_section_from_counts, size_hot_water_section_from_counts
 - **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine._compute_section_pressure_loss(self, section, water_temperature_c)** -> `Result[DomesticWaterPressureLossResult]`
@@ -685,8 +688,6 @@
 - **ndc_core.networks.domestic_water.network_engine.compute_hot_water_network_from_domain(network, appliance_catalog, pipe_catalog, fluid_catalog, singular_loss_catalog, source_node_id, source_pressure_bar, min_required_pressure_bar, max_velocity_m_s, water_temperature_c)** -> `Result[DomesticWaterNetworkComputeResult]`
   - calls: DomesticWaterNetworkEngine.hot_water_from_network, DomesticWaterNetworkEngine.hot_water_from_network(network=network, appliance_catalog=appliance_catalog, pipe_catalog=pipe_catalog, fluid_catalog=fluid_catalog, singular_loss_catalog=singular_loss_catalog).compute_all
   - doc: Convenience function for full ECS forward computation from a domain Network.
-- **ndc_core.networks.domestic_water.network_engine._read_section_downstream_appliance_counts(section)** -> `dict[str, int]`
-  - calls: getattr, normalize_appliance_counts
 
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\numeric.py
 
@@ -1271,6 +1272,8 @@
   - calls: _Node, read_downstream_section_ids
 - **tests.networks.domestic_water.test_entity_access.test_write_section_downstream_appliance_counts()** -> `None`
   - calls: _Section, write_section_downstream_appliance_counts
+- **tests.networks.domestic_water.test_entity_access.test_read_section_downstream_appliance_counts()** -> `None`
+  - calls: _Section, read_section_downstream_appliance_counts
 - **tests.networks.domestic_water.test_entity_access.test_write_node_downstream_appliance_counts()** -> `None`
   - calls: _Node, write_node_downstream_appliance_counts
 - **tests.networks.domestic_water.test_entity_access.test_apply_section_pressures()** -> `None`

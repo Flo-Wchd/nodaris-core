@@ -62,6 +62,7 @@ from ndc_core.networks import (
     minimum_appliance_internal_diameter_mm,
     read_cell_appliance_counts,
     read_node_local_appliance_counts,
+    read_section_downstream_appliance_counts,
 )
 from ndc_core.networks.cold_water import (
     ColdWaterNetworkEngine as ColdWaterNetworkEngineFromPackage,
@@ -157,6 +158,7 @@ def test_networks_public_api_exports_domestic_water_entity_access_tools() -> Non
     assert callable(apply_node_pressures)
     assert callable(read_cell_appliance_counts)
     assert callable(read_node_local_appliance_counts)
+    assert callable(read_section_downstream_appliance_counts)
 
 
 def test_networks_public_api_exports_domestic_water_numeric_tools() -> None:

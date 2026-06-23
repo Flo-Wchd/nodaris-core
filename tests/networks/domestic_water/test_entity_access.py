@@ -12,6 +12,7 @@ from ndc_core.networks.domestic_water.entity_access import (
     write_section_downstream_appliance_counts,
     read_cell_appliance_counts,
     read_node_local_appliance_counts,
+    read_section_downstream_appliance_counts,
 )
 
 
@@ -73,6 +74,21 @@ def test_write_section_downstream_appliance_counts() -> None:
     )
 
     assert section.downstream_appliance_counts == {"L": 1, "D": 2}
+
+
+def test_read_section_downstream_appliance_counts() -> None:
+    section = _Section(
+        downstream_appliance_counts={
+            "L": 1,
+            "D": "2",
+            "BAD": 0,
+        },
+    )
+
+    assert read_section_downstream_appliance_counts(section) == {
+        "L": 1,
+        "D": 2,
+    }
 
 
 def test_write_node_downstream_appliance_counts() -> None:

@@ -89,6 +89,17 @@ def read_node_local_appliance_counts(node: Any) -> dict[str, int]:
     return merged
 
 
+def read_section_downstream_appliance_counts(section: Any) -> dict[str, int]:
+    """Read normalized downstream appliance counts from a Section-like object."""
+
+    if section is None:
+        return {}
+
+    return normalize_appliance_counts(
+        getattr(section, "downstream_appliance_counts", None)
+    )
+
+
 def write_section_downstream_appliance_counts(
     section: Any,
     counts: Mapping[str, int] | None,

@@ -39,7 +39,9 @@ from ndc_core.networks.domestic_water.types import DomesticWaterSide
 from ndc_core.networks.domestic_water.side_matching import (
     section_matches_domestic_water_side,
 )
-from ndc_core.networks.domestic_water.appliance_counts import normalize_appliance_counts
+from ndc_core.networks.domestic_water.entity_access import (
+    read_section_downstream_appliance_counts,
+)
 
 class DomesticWaterNetworkStep(StrEnum):
     """Network compute step names."""
@@ -441,7 +443,7 @@ class DomesticWaterNetworkEngine:
     ) -> DomesticWaterSectionComputeResult:
         messages: list[EngineMessage] = []
 
-        appliance_counts = _read_section_downstream_appliance_counts(section)
+        appliance_counts = read_section_downstream_appliance_counts(section)
         if not appliance_counts:
             messages.append(
                 EngineMessage.warning(
@@ -674,10 +676,4 @@ def compute_hot_water_network_from_domain(
         min_required_pressure_bar=min_required_pressure_bar,
         max_velocity_m_s=max_velocity_m_s,
         water_temperature_c=water_temperature_c,
-    )
-
-
-def _read_section_downstream_appliance_counts(section: Any) -> dict[str, int]:
-    return normalize_appliance_counts(
-        getattr(section, "downstream_appliance_counts", None)
     )

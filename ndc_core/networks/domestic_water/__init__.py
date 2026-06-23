@@ -90,6 +90,7 @@ from ndc_core.networks.domestic_water.entity_access import (
     write_section_downstream_appliance_counts,
     read_cell_appliance_counts,
     read_node_local_appliance_counts,
+    read_section_downstream_appliance_counts,
 )
 from ndc_core.networks.domestic_water.numeric import (
     positive_optional_float,
@@ -184,4 +185,5 @@ __all__ = [
     "minimum_appliance_internal_diameter_mm",
     "read_cell_appliance_counts",
     "read_node_local_appliance_counts",
+    "read_section_downstream_appliance_counts",
 ]
