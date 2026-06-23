@@ -519,7 +519,7 @@
 - **ndc_core.networks.domestic_water.appliance_propagation.DomesticWaterAppliancePropagationResult.propagated_section_count(self)** -> `int`
   - calls: len
 - **ndc_core.networks.domestic_water.appliance_propagation.DomesticWaterAppliancePropagationEngine.propagate(self)** -> `Result[DomesticWaterAppliancePropagationResult]`
-  - calls: DomesticWaterAppliancePropagationResult, EngineMessage.warning, Result.success, _clean_id, _read_node_local_appliance_counts, _section_matches_side, any, bool, children_by_node[upstream_node_id].append, defaultdict, getattr, messages.append, node_local_counts.values, self.nodes.items, self.sections.items ...
+  - calls: DomesticWaterAppliancePropagationResult, EngineMessage.warning, Result.success, _clean_id, _read_node_local_appliance_counts, any, bool, children_by_node[upstream_node_id].append, defaultdict, getattr, messages.append, node_local_counts.values, section_matches_domestic_water_side, self.nodes.items, self.sections.items ...
 - **ndc_core.networks.domestic_water.appliance_propagation.DomesticWaterAppliancePropagationEngine.compute_node_downstream_counts(node_id)** -> `dict[str, int]`
   - calls: EngineMessage.error, _merge_count_maps, _write_node_downstream_counts, _write_section_downstream_counts, children_by_node.get, compute_node_downstream_counts, cycle_reported.add, dict, messages.append, node_local_counts.get, self.nodes.get, self.sections.get, visiting.add, visiting.remove
 - **ndc_core.networks.domestic_water.appliance_propagation.propagate_domestic_water_appliances(nodes, sections, side)** -> `Result[DomesticWaterAppliancePropagationResult]`
@@ -543,8 +543,6 @@
   - calls: _normalize_counts, dict, getattr, isinstance, setattr, target.clear, target.update
 - **ndc_core.networks.domestic_water.appliance_propagation._write_node_downstream_counts(node, counts)** -> `None`
   - calls: _normalize_counts, dict, getattr, isinstance, setattr, target.clear, target.update
-- **ndc_core.networks.domestic_water.appliance_propagation._section_matches_side(section, side)** -> `bool`
-  - calls: getattr, str, str(getattr(section, 'fluid_code', '') or '').strip, str(getattr(section, 'fluid_code', '') or '').strip().lower
 - **ndc_core.networks.domestic_water.appliance_propagation._clean_id(value)** -> `str`
   - calls: str, str(value or '').strip
 
@@ -627,7 +625,7 @@
 - **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine.hot_water_from_network(cls, network, appliance_catalog, pipe_catalog, fluid_catalog, singular_loss_catalog)** -> `DomesticWaterNetworkEngine`
   - calls: cls.from_network
 - **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine.compute_sections(self, max_velocity_m_s, water_temperature_c)** -> `Result[DomesticWaterNetworkComputeResult]`
-  - calls: DomesticWaterNetworkComputeResult, Result.failure, Result.partial, Result.success, _section_matches_side, any, messages.extend, propagate_domestic_water_appliances, self._bind_messages_to_entities, self._compute_one_section, self._validate_topology, self.sections.items, str, tuple
+  - calls: DomesticWaterNetworkComputeResult, Result.failure, Result.partial, Result.success, any, messages.extend, propagate_domestic_water_appliances, section_matches_domestic_water_side, self._bind_messages_to_entities, self._compute_one_section, self._validate_topology, self.sections.items, str, tuple
   - doc: Compute sizing and pressure losses for all sections matching the engine side.
 - **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine.compute_all(self, source_node_id, source_pressure_bar, min_required_pressure_bar, max_velocity_m_s, water_temperature_c)** -> `Result[DomesticWaterNetworkComputeResult]`
   - calls: DomesticWaterNetworkComputeResult, DomesticWaterPressureNetworkEngine, Result.failure, Result.partial, Result.success, messages.extend, pressure_bar_to_pa, pressure_engine.propagate_pressures, pressure_engine.summarize_worst_terminal_pressure, self._bind_messages_to_entities, self.compute_sections, tuple
@@ -656,8 +654,6 @@
   - doc: Convenience function for full ECS forward computation from a domain Network.
 - **ndc_core.networks.domestic_water.network_engine._read_section_downstream_appliance_counts(section)** -> `dict[str, int]`
   - calls: getattr, int, normalized.get, raw_counts.items, str, str(raw_code or '').strip
-- **ndc_core.networks.domestic_water.network_engine._section_matches_side(section, side)** -> `bool`
-  - calls: getattr, str, str(getattr(section, 'fluid_code', '') or '').strip, str(getattr(section, 'fluid_code', '') or '').strip().lower
 
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\pressure_loss.py
 
@@ -710,7 +706,7 @@
 - **ndc_core.networks.domestic_water.pressure_network.DomesticWaterPressureSummary.has_errors(self)** -> `bool`
   - calls: any
 - **ndc_core.networks.domestic_water.pressure_network.DomesticWaterPressureNetworkEngine.propagate_pressures(self, source_node_id, source_pressure_pa)** -> `Result[DomesticWaterPressurePropagationResult]`
-  - calls: DomesticWaterPressurePropagationResult, EngineMessage.error, EngineMessage.warning, NodePressureState, Result.failure, Result.success, _apply_node_pressures, _apply_section_pressures, _clean_optional_code, _is_terminal_node, _read_downstream_section_ids, _read_section_pressure_loss_pa, _safe_pressure_pa, _section_matches_side, deque ...
+  - calls: DomesticWaterPressurePropagationResult, EngineMessage.error, EngineMessage.warning, NodePressureState, Result.failure, Result.success, _apply_node_pressures, _apply_section_pressures, _clean_optional_code, _is_terminal_node, _read_downstream_section_ids, _read_section_pressure_loss_pa, _safe_pressure_pa, deque, getattr ...
 - **ndc_core.networks.domestic_water.pressure_network.DomesticWaterPressureNetworkEngine.summarize_worst_terminal_pressure(self, source_node_id, source_pressure_bar, min_required_pressure_bar)** -> `Result[DomesticWaterPressureSummary]`
   - calls: DomesticWaterPressurePropagationResult, DomesticWaterPressureSummary, EngineMessage.warning, Result.failure, Result.partial, Result.success, TerminalPressureStatus, _safe_non_negative_float, messages.append, messages.extend, min, pressure_bar_to_pa, propagation_result.value.node_pressures.items, self.propagate_pressures, str ...
 - **ndc_core.networks.domestic_water.pressure_network.propagate_cold_water_pressures(nodes, sections, source_node_id, source_pressure_pa)** -> `Result[DomesticWaterPressurePropagationResult]`
@@ -727,12 +723,10 @@
   - doc: Convenience function for ECS forward worst terminal summary.
 - **ndc_core.networks.domestic_water.pressure_network._read_downstream_section_ids(node)** -> `tuple[str, ...]`
   - calls: getattr, str, str(section_id).strip, tuple
-- **ndc_core.networks.domestic_water.pressure_network._section_matches_side(section, side)** -> `bool`
-  - calls: getattr, str, str(getattr(section, 'fluid_code', '') or '').strip, str(getattr(section, 'fluid_code', '') or '').strip().lower
 - **ndc_core.networks.domestic_water.pressure_network._read_section_pressure_loss_pa(section_id, section, messages, warned_missing_losses)** -> `float`
   - calls: EngineMessage.warning, float, getattr, isfinite, messages.append, warned_missing_losses.add
 - **ndc_core.networks.domestic_water.pressure_network._is_terminal_node(node, sections, side)** -> `bool`
-  - calls: _read_downstream_section_ids, _section_matches_side, sections.get
+  - calls: _read_downstream_section_ids, section_matches_domestic_water_side, sections.get
 - **ndc_core.networks.domestic_water.pressure_network._apply_section_pressures(section, pressure_start_pa, pressure_end_pa)** -> `None`
 - **ndc_core.networks.domestic_water.pressure_network._apply_node_pressures(nodes, node_states)** -> `None`
   - calls: node_states.items, nodes.get
@@ -789,6 +783,25 @@
   - calls: str, str(value or '').strip
 - **ndc_core.networks.domestic_water.section_sizing._positive_optional_float(value)** -> `float | None`
   - calls: float
+
+## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\side_matching.py
+
+- **ndc_core.networks.domestic_water.side_matching.normalize_domestic_water_fluid_code(value)** -> `str`
+  - calls: str, str(value or '').strip, str(value or '').strip().lower, str(value or '').strip().lower().replace, str(value or '').strip().lower().replace('-', '_').replace
+  - doc: Normalize a domestic water section fluid code.
+- **ndc_core.networks.domestic_water.side_matching.cold_water_fluid_codes()** -> `tuple[str, ...]`
+  - doc: Return canonical fluid codes accepted for EFS sections.
+- **ndc_core.networks.domestic_water.side_matching.hot_water_fluid_codes()** -> `tuple[str, ...]`
+  - doc: Return canonical fluid codes accepted for ECS sections.
+- **ndc_core.networks.domestic_water.side_matching.domestic_water_fluid_codes_for_side(side)** -> `tuple[str, ...]`
+  - calls: cold_water_fluid_codes, hot_water_fluid_codes
+  - doc: Return accepted fluid codes for the requested domestic water side.
+- **ndc_core.networks.domestic_water.side_matching.domestic_water_side_from_fluid_code(value)** -> `DomesticWaterSide | None`
+  - calls: cold_water_fluid_codes, hot_water_fluid_codes, normalize_domestic_water_fluid_code
+  - doc: Resolve a domestic water side from a fluid code.
+- **ndc_core.networks.domestic_water.side_matching.section_matches_domestic_water_side(section, side)** -> `bool`
+  - calls: domestic_water_fluid_codes_for_side, getattr, normalize_domestic_water_fluid_code
+  - doc: Return whether a section belongs to the requested domestic water side.
 
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\simultaneity.py
 
@@ -1313,6 +1326,19 @@
 - **tests.networks.domestic_water.test_section_sizing.test_zero_hot_water_demand_returns_partial_without_exception()** -> `None`
   - calls: _appliance_catalog, _pipe_catalog, _section, any, size_hot_water_section_from_counts
 
+## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_side_matching.py
+
+- **tests.networks.domestic_water.test_side_matching.test_normalize_domestic_water_fluid_code()** -> `None`
+  - calls: normalize_domestic_water_fluid_code
+- **tests.networks.domestic_water.test_side_matching.test_domestic_water_fluid_codes_are_canonical()** -> `None`
+  - calls: cold_water_fluid_codes, hot_water_fluid_codes
+- **tests.networks.domestic_water.test_side_matching.test_domestic_water_fluid_codes_for_side()** -> `None`
+  - calls: domestic_water_fluid_codes_for_side
+- **tests.networks.domestic_water.test_side_matching.test_domestic_water_side_from_fluid_code()** -> `None`
+  - calls: domestic_water_side_from_fluid_code
+- **tests.networks.domestic_water.test_side_matching.test_section_matches_domestic_water_side()** -> `None`
+  - calls: _Section, section_matches_domestic_water_side
+
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_simultaneity.py
 
 - **tests.networks.domestic_water.test_simultaneity.test_collective_dtu_simultaneity_is_one_below_threshold()** -> `None`
@@ -1386,4 +1412,6 @@
 - **tests.networks.test_public_api.test_networks_public_api_exports_appliance_propagation_types()** -> `None`
   - calls: callable
 - **tests.networks.test_public_api.test_networks_public_api_exports_message_binding_tools()** -> `None`
+  - calls: callable
+- **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_side_matching_tools()** -> `None`
   - calls: callable

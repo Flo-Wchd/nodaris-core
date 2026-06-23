@@ -11,6 +11,9 @@ from ndc_core.common.messages import EngineMessage
 from ndc_core.common.result import Result
 from ndc_core.hydraulics.conversions import pressure_bar_to_pa, pressure_pa_to_bar
 from ndc_core.networks.domestic_water.types import DomesticWaterSide
+from ndc_core.networks.domestic_water.side_matching import (
+    section_matches_domestic_water_side,
+)
 
 
 class PressurePropagationStatus(StrEnum):
@@ -183,7 +186,7 @@ class DomesticWaterPressureNetworkEngine:
                     )
                     continue
 
-                if not _section_matches_side(section, self.side):
+                if not section_matches_domestic_water_side(section, self.side):
                     continue
 
                 downstream_node_id = _clean_optional_code(
@@ -431,15 +434,6 @@ def _read_downstream_section_ids(node: Any) -> tuple[str, ...]:
     return tuple(str(section_id) for section_id in raw_ids if str(section_id).strip())
 
 
-def _section_matches_side(section: Any, side: DomesticWaterSide) -> bool:
-    fluid_code = str(getattr(section, "fluid_code", "") or "").strip().lower()
-
-    if side is DomesticWaterSide.HOT_WATER:
-        return fluid_code in {"ecs", "hot_water", "hot water", "domestic_hot_water"}
-
-    return fluid_code in {"efs", "cold_water", "cold water", "domestic_cold_water"}
-
-
 def _read_section_pressure_loss_pa(
     *,
     section_id: str,
@@ -499,7 +493,7 @@ def _is_terminal_node(
 
     for section_id in downstream_section_ids:
         section = sections.get(section_id)
-        if section is not None and _section_matches_side(section, side):
+        if section is not None and section_matches_domestic_water_side(section, side):
             return False
 
     return True

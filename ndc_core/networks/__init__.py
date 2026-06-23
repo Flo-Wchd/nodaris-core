@@ -34,6 +34,12 @@ from ndc_core.networks.domestic_water import (
     propagate_cold_water_appliances,
     propagate_domestic_water_appliances,
     propagate_hot_water_appliances,
+    cold_water_fluid_codes,
+    domestic_water_fluid_codes_for_side,
+    domestic_water_side_from_fluid_code,
+    hot_water_fluid_codes,
+    normalize_domestic_water_fluid_code,
+    section_matches_domestic_water_side,
 )
 from ndc_core.networks.hot_water import (
     HotWaterNetworkEngine,
@@ -78,4 +84,10 @@ __all__ = [
     "propagate_cold_water_appliances",
     "propagate_domestic_water_appliances",
     "propagate_hot_water_appliances",
+    "cold_water_fluid_codes",
+    "domestic_water_fluid_codes_for_side",
+    "domestic_water_side_from_fluid_code",
+    "hot_water_fluid_codes",
+    "normalize_domestic_water_fluid_code",
+    "section_matches_domestic_water_side",
 ]

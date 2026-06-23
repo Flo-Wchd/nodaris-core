@@ -36,6 +36,9 @@ from ndc_core.networks.domestic_water.section_sizing import (
     size_hot_water_section_from_counts,
 )
 from ndc_core.networks.domestic_water.types import DomesticWaterSide
+from ndc_core.networks.domestic_water.side_matching import (
+    section_matches_domestic_water_side,
+)
 
 
 class DomesticWaterNetworkStep(StrEnum):
@@ -292,7 +295,7 @@ class DomesticWaterNetworkEngine:
         appliance_propagation = appliance_propagation_result.value
 
         for section_id, section in self.sections.items():
-            if not _section_matches_side(section, self.side):
+            if not section_matches_domestic_water_side(section, self.side):
                 continue
 
             section_result = self._compute_one_section(
@@ -694,12 +697,3 @@ def _read_section_downstream_appliance_counts(section: Any) -> dict[str, int]:
         normalized[code] = normalized.get(code, 0) + count
 
     return normalized
-
-
-def _section_matches_side(section: Any, side: DomesticWaterSide) -> bool:
-    fluid_code = str(getattr(section, "fluid_code", "") or "").strip().lower()
-
-    if side is DomesticWaterSide.HOT_WATER:
-        return fluid_code in {"ecs", "hot_water", "hot water", "domestic_hot_water"}
-
-    return fluid_code in {"efs", "cold_water", "cold water", "domestic_cold_water"}

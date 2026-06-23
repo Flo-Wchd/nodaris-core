@@ -290,6 +290,7 @@ PythonProject_v4
 │   │   │   ├── pressure_network.py
 │   │   │   ├── profiles.py
 │   │   │   ├── section_sizing.py
+│   │   │   ├── side_matching.py
 │   │   │   ├── simultaneity.py
 │   │   │   ├── types.py
 │   │   │   └── worst_path.py
@@ -428,6 +429,7 @@ PythonProject_v4
 │   │   │   ├── test_pressure_network.py
 │   │   │   ├── test_profiles.py
 │   │   │   ├── test_section_sizing.py
+│   │   │   ├── test_side_matching.py
 │   │   │   └── test_simultaneity.py
 │   │   ├── drainage/
 │   │   │   ├── __init__.py

@@ -67,6 +67,14 @@ from ndc_core.networks.domestic_water.types import (
     DomesticWaterMethod,
     DomesticWaterSide,
 )
+from ndc_core.networks.domestic_water.side_matching import (
+    cold_water_fluid_codes,
+    domestic_water_fluid_codes_for_side,
+    domestic_water_side_from_fluid_code,
+    hot_water_fluid_codes,
+    normalize_domestic_water_fluid_code,
+    section_matches_domestic_water_side,
+)
 
 __all__ = [
     "ApplianceDemandItem",
@@ -118,4 +126,10 @@ __all__ = [
     "summarize_cold_water_worst_terminal_pressure",
     "summarize_hot_water_worst_terminal_pressure",
     "velocity_limit_for_context",
+    "cold_water_fluid_codes",
+    "domestic_water_fluid_codes_for_side",
+    "domestic_water_side_from_fluid_code",
+    "hot_water_fluid_codes",
+    "normalize_domestic_water_fluid_code",
+    "section_matches_domestic_water_side",
 ]

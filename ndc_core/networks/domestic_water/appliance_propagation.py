@@ -8,6 +8,9 @@ from typing import Any
 from ndc_core.common.messages import EngineMessage
 from ndc_core.common.result import Result
 from ndc_core.networks.domestic_water.types import DomesticWaterSide
+from ndc_core.networks.domestic_water.side_matching import (
+    section_matches_domestic_water_side,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -92,7 +95,7 @@ class DomesticWaterAppliancePropagationEngine:
         for section_id, section in self.sections.items():
             section_id_s = str(section_id)
 
-            if not _section_matches_side(section, self.side):
+            if not section_matches_domestic_water_side(section, self.side):
                 continue
 
             upstream_node_id = _clean_id(getattr(section, "upstream_node_id", None))
@@ -380,15 +383,6 @@ def _write_node_downstream_counts(node: Any, counts: dict[str, int]) -> None:
         setattr(node, "downstream_appliance_counts", dict(normalized))
     except (AttributeError, TypeError):
         return
-
-
-def _section_matches_side(section: Any, side: DomesticWaterSide) -> bool:
-    fluid_code = str(getattr(section, "fluid_code", "") or "").strip().lower()
-
-    if side is DomesticWaterSide.HOT_WATER:
-        return fluid_code in {"ecs", "hot_water", "hot water", "domestic_hot_water"}
-
-    return fluid_code in {"efs", "cold_water", "cold water", "domestic_cold_water"}
 
 
 def _clean_id(value: Any) -> str:
