@@ -69,6 +69,8 @@ from ndc_core.networks.domestic_water import (
     zeta_from_catalog_singular_loss,
     zeta_from_section_singular_loss_item,
     relative_roughness_for_section,
+    default_domestic_water_fluid_code,
+    resolve_domestic_water_fluid,
 )
 from ndc_core.networks.hot_water import (
     HotWaterNetworkEngine,
@@ -148,4 +150,6 @@ __all__ = [
     "zeta_from_catalog_singular_loss",
     "zeta_from_section_singular_loss_item",
     "relative_roughness_for_section",
+    "default_domestic_water_fluid_code",
+    "resolve_domestic_water_fluid",
 ]

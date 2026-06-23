@@ -27,6 +27,9 @@ from ndc_core.networks.domestic_water.singular_loss_rules import (
 from ndc_core.networks.domestic_water.pipe_rules import (
     relative_roughness_for_section,
 )
+from ndc_core.networks.domestic_water.fluid_rules import (
+    resolve_domestic_water_fluid,
+)
 
 
 class DomesticWaterPressureLossMode(StrEnum):
@@ -104,7 +107,9 @@ class DomesticWaterPressureLossEngine:
     ) -> Result[DomesticWaterPressureLossResult]:
         messages: list[EngineMessage] = []
 
-        fluid = self._resolve_fluid(
+        fluid = resolve_domestic_water_fluid(
+            fluid_catalog=self.fluid_catalog,
+            side=self.side,
             water_temperature_c=water_temperature_c,
             messages=messages,
         )
@@ -201,44 +206,6 @@ class DomesticWaterPressureLossEngine:
             return Result.failure(value=result, messages=messages)
 
         return Result.success(value=result, messages=messages)
-
-    def _resolve_fluid(
-        self,
-        *,
-        water_temperature_c: float | None,
-        messages: list[EngineMessage],
-    ) -> Fluid | None:
-        if water_temperature_c is not None:
-            fluid = self.fluid_catalog.get_water_at_temperature(water_temperature_c)
-            if fluid is not None:
-                return fluid
-
-            messages.append(
-                EngineMessage.error(
-                    code="DOMESTIC_WATER_FLUID_TEMPERATURE_UNKNOWN",
-                    text="Water properties could not be resolved for requested temperature.",
-                    context={"water_temperature_c": water_temperature_c},
-                )
-            )
-            return None
-
-        default_code = (
-            "hot_water"
-            if self.side is DomesticWaterSide.HOT_WATER
-            else "cold_water"
-        )
-        fluid = self.fluid_catalog.get(default_code)
-        if fluid is not None:
-            return fluid
-
-        messages.append(
-            EngineMessage.error(
-                code="DOMESTIC_WATER_FLUID_MISSING",
-                text="Default water fluid is missing from the fluid catalog.",
-                context={"fluid_code": default_code},
-            )
-        )
-        return None
 
 
 def compute_cold_water_section_pressure_loss(

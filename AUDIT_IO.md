@@ -610,6 +610,16 @@
 - **ndc_core.networks.domestic_water.entity_access._write_mapping_attribute(entity, attribute_name, values)** -> `None`
   - calls: dict, getattr, isinstance, setattr, target.clear, target.update
 
+## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\fluid_rules.py
+
+- **ndc_core.networks.domestic_water.fluid_rules.default_domestic_water_fluid_code(side)** -> `str`
+  - doc: Return the default fluid catalog code for a domestic water side.
+- **ndc_core.networks.domestic_water.fluid_rules.resolve_domestic_water_fluid(fluid_catalog, side, water_temperature_c, messages)** -> `Fluid | None`
+  - calls: EngineMessage.error, _temperature_is_inside_catalog_range, default_domestic_water_fluid_code, fluid_catalog.get, fluid_catalog.get_water_at_temperature, messages.append
+  - doc: Resolve water properties for a domestic water pressure-loss calculation.
+- **ndc_core.networks.domestic_water.fluid_rules._temperature_is_inside_catalog_range(fluid_catalog, temperature_c)** -> `bool`
+  - calls: sorted, tuple
+
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\message_binding.py
 
 - **ndc_core.networks.domestic_water.message_binding.DomesticWaterMessageBindingResult.has_warnings(self)** -> `bool`
@@ -729,9 +739,7 @@
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossResult.has_errors(self)** -> `bool`
   - calls: any
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine.compute_section_pressure_loss(self, section, water_temperature_c, singular_zeta_values)** -> `Result[DomesticWaterPressureLossResult]`
-  - calls: DomesticWaterPressureLossResult, EngineMessage.error, EngineMessage.info, Result.failure, Result.success, apply_section_pressure_loss_state, collect_section_singular_zeta_values, diameter_mm_to_m, max, messages.append, relative_roughness_for_section, safe_float, safe_positive_float, self._resolve_fluid, total_pressure_loss ...
-- **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine._resolve_fluid(self, water_temperature_c, messages)** -> `Fluid | None`
-  - calls: EngineMessage.error, messages.append, self.fluid_catalog.get, self.fluid_catalog.get_water_at_temperature
+  - calls: DomesticWaterPressureLossResult, EngineMessage.error, EngineMessage.info, Result.failure, Result.success, apply_section_pressure_loss_state, collect_section_singular_zeta_values, diameter_mm_to_m, max, messages.append, relative_roughness_for_section, resolve_domestic_water_fluid, safe_float, safe_positive_float, total_pressure_loss ...
 - **ndc_core.networks.domestic_water.pressure_loss.compute_cold_water_section_pressure_loss(section, fluid_catalog, pipe_catalog, singular_loss_catalog, water_temperature_c, singular_zeta_values)** -> `Result[DomesticWaterPressureLossResult]`
   - calls: DomesticWaterPressureLossEngine, DomesticWaterPressureLossEngine(fluid_catalog=fluid_catalog, pipe_catalog=pipe_catalog, singular_loss_catalog=singular_loss_catalog, side=DomesticWaterSide.COLD_WATER).compute_section_pressure_loss
   - doc: Convenience function for EFS section pressure loss.
@@ -1312,6 +1320,23 @@
 - **tests.networks.domestic_water.test_entity_access.test_read_section_pressure_loss_pa_not_finite()** -> `None`
   - calls: _Section, float, read_section_pressure_loss_pa
 
+## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_fluid_rules.py
+
+- **tests.networks.domestic_water.test_fluid_rules._fluid_catalog()** -> `FluidCatalog`
+  - calls: Fluid, FluidCatalog
+- **tests.networks.domestic_water.test_fluid_rules.test_default_domestic_water_fluid_code()** -> `None`
+  - calls: default_domestic_water_fluid_code
+- **tests.networks.domestic_water.test_fluid_rules.test_resolve_domestic_water_fluid_uses_cold_default()** -> `None`
+  - calls: _fluid_catalog, resolve_domestic_water_fluid
+- **tests.networks.domestic_water.test_fluid_rules.test_resolve_domestic_water_fluid_uses_hot_default()** -> `None`
+  - calls: _fluid_catalog, resolve_domestic_water_fluid
+- **tests.networks.domestic_water.test_fluid_rules.test_resolve_domestic_water_fluid_temperature_override_has_priority()** -> `None`
+  - calls: _fluid_catalog, resolve_domestic_water_fluid
+- **tests.networks.domestic_water.test_fluid_rules.test_resolve_domestic_water_fluid_unknown_temperature_adds_error()** -> `None`
+  - calls: _fluid_catalog, len, resolve_domestic_water_fluid
+- **tests.networks.domestic_water.test_fluid_rules.test_resolve_domestic_water_fluid_missing_default_adds_error()** -> `None`
+  - calls: FluidCatalog, len, resolve_domestic_water_fluid
+
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_message_binding.py
 
 - **tests.networks.domestic_water.test_message_binding._appliance_catalog()** -> `ApplianceCatalog`
@@ -1604,4 +1629,6 @@
 - **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_singular_loss_rules()** -> `None`
   - calls: callable
 - **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_pipe_rules()** -> `None`
+  - calls: callable
+- **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_fluid_rules()** -> `None`
   - calls: callable
