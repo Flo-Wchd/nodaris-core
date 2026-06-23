@@ -481,6 +481,27 @@
   - calls: flow_l_s_to_m3_s, theoretical_diameter_m_for_velocity
   - doc: Return theoretical internal diameter in mm from flow in L/s.
 
+## C:\dev\PythonProject_v4\ndc_core\networks\cold_water\engine.py
+
+- **ndc_core.networks.cold_water.engine.ColdWaterNetworkEngine.side(self)** -> `DomesticWaterSide`
+- **ndc_core.networks.cold_water.engine.ColdWaterNetworkEngine.domestic_engine(self)** -> `DomesticWaterNetworkEngine`
+  - calls: DomesticWaterNetworkEngine.cold_water
+- **ndc_core.networks.cold_water.engine.ColdWaterNetworkEngine.compute_sections(self, max_velocity_m_s, water_temperature_c)** -> `Result[DomesticWaterNetworkComputeResult]`
+  - calls: self.domestic_engine, self.domestic_engine().compute_sections
+  - doc: Compute EFS section sizing and pressure losses.
+- **ndc_core.networks.cold_water.engine.ColdWaterNetworkEngine.compute_all(self, source_node_id, source_pressure_bar, min_required_pressure_bar, max_velocity_m_s, water_temperature_c)** -> `Result[DomesticWaterNetworkComputeResult]`
+  - calls: self.domestic_engine, self.domestic_engine().compute_all
+  - doc: Compute full EFS network.
+- **ndc_core.networks.cold_water.engine.ColdWaterNetworkEngine.propagate_pressures(self, source_node_id, source_pressure_pa)** -> `Result[DomesticWaterPressurePropagationResult]`
+  - calls: self.domestic_engine, self.domestic_engine().compute_all, self.domestic_engine().compute_all(source_node_id=source_node_id, source_pressure_bar=source_pressure_pa / 100000.0).with_value
+  - doc: Propagate EFS pressures using already computed section pressure losses.
+- **ndc_core.networks.cold_water.engine.ColdWaterNetworkEngine.summarize_worst_terminal_pressure(self, source_node_id, source_pressure_bar, min_required_pressure_bar)** -> `Result[DomesticWaterPressureSummary]`
+  - calls: self.domestic_engine, self.domestic_engine().compute_all, self.domestic_engine().compute_all(source_node_id=source_node_id, source_pressure_bar=source_pressure_bar, min_required_pressure_bar=min_required_pressure_bar).with_value
+  - doc: Compute EFS worst terminal pressure summary.
+- **ndc_core.networks.cold_water.engine.compute_cold_water_network(nodes, sections, appliance_catalog, pipe_catalog, fluid_catalog, singular_loss_catalog, source_node_id, source_pressure_bar, min_required_pressure_bar, max_velocity_m_s, water_temperature_c)** -> `Result[DomesticWaterNetworkComputeResult]`
+  - calls: ColdWaterNetworkEngine, ColdWaterNetworkEngine(nodes=nodes, sections=sections, appliance_catalog=appliance_catalog, pipe_catalog=pipe_catalog, fluid_catalog=fluid_catalog, singular_loss_catalog=singular_loss_catalog).compute_all
+  - doc: Functional EFS entry point.
+
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\demand.py
 
 - **ndc_core.networks.domestic_water.demand.DomesticWaterDemandBuilder.cold_water(cls, appliance_catalog)** -> `DomesticWaterDemandBuilder`
@@ -700,6 +721,27 @@
   - calls: any
 - **ndc_core.networks.domestic_water.types.DomesticWaterDemand.has_errors(self)** -> `bool`
   - calls: any
+
+## C:\dev\PythonProject_v4\ndc_core\networks\hot_water\engine.py
+
+- **ndc_core.networks.hot_water.engine.HotWaterNetworkEngine.side(self)** -> `DomesticWaterSide`
+- **ndc_core.networks.hot_water.engine.HotWaterNetworkEngine.domestic_engine(self)** -> `DomesticWaterNetworkEngine`
+  - calls: DomesticWaterNetworkEngine.hot_water
+- **ndc_core.networks.hot_water.engine.HotWaterNetworkEngine.compute_sections(self, max_velocity_m_s, water_temperature_c)** -> `Result[DomesticWaterNetworkComputeResult]`
+  - calls: self.domestic_engine, self.domestic_engine().compute_sections
+  - doc: Compute ECS section sizing and pressure losses.
+- **ndc_core.networks.hot_water.engine.HotWaterNetworkEngine.compute_all(self, source_node_id, source_pressure_bar, min_required_pressure_bar, max_velocity_m_s, water_temperature_c)** -> `Result[DomesticWaterNetworkComputeResult]`
+  - calls: self.domestic_engine, self.domestic_engine().compute_all
+  - doc: Compute full ECS forward network.
+- **ndc_core.networks.hot_water.engine.HotWaterNetworkEngine.propagate_pressures(self, source_node_id, source_pressure_pa)** -> `Result[DomesticWaterPressurePropagationResult]`
+  - calls: self.domestic_engine, self.domestic_engine().compute_all, self.domestic_engine().compute_all(source_node_id=source_node_id, source_pressure_bar=source_pressure_pa / 100000.0).with_value
+  - doc: Propagate ECS pressures using already computed section pressure losses.
+- **ndc_core.networks.hot_water.engine.HotWaterNetworkEngine.summarize_worst_terminal_pressure(self, source_node_id, source_pressure_bar, min_required_pressure_bar)** -> `Result[DomesticWaterPressureSummary]`
+  - calls: self.domestic_engine, self.domestic_engine().compute_all, self.domestic_engine().compute_all(source_node_id=source_node_id, source_pressure_bar=source_pressure_bar, min_required_pressure_bar=min_required_pressure_bar).with_value
+  - doc: Compute ECS worst terminal pressure summary.
+- **ndc_core.networks.hot_water.engine.compute_hot_water_network(nodes, sections, appliance_catalog, pipe_catalog, fluid_catalog, singular_loss_catalog, source_node_id, source_pressure_bar, min_required_pressure_bar, max_velocity_m_s, water_temperature_c)** -> `Result[DomesticWaterNetworkComputeResult]`
+  - calls: HotWaterNetworkEngine, HotWaterNetworkEngine(nodes=nodes, sections=sections, appliance_catalog=appliance_catalog, pipe_catalog=pipe_catalog, fluid_catalog=fluid_catalog, singular_loss_catalog=singular_loss_catalog).compute_all
+  - doc: Functional ECS forward entry point.
 
 ## C:\dev\PythonProject_v4\tests\catalogs\test_appliance_catalog.py
 
@@ -977,6 +1019,23 @@
 - **tests.hydraulics.test_velocity.test_theoretical_diameter_mm_for_velocity()** -> `None`
   - calls: theoretical_diameter_mm_for_velocity
 
+## C:\dev\PythonProject_v4\tests\networks\cold_water\test_engine.py
+
+- **tests.networks.cold_water.test_engine._appliance_catalog()** -> `ApplianceCatalog`
+  - calls: Appliance, ApplianceCatalog
+- **tests.networks.cold_water.test_engine._pipe_catalog()** -> `PipeCatalog`
+  - calls: PipeCatalog, PipeMaterial, PipeSize
+- **tests.networks.cold_water.test_engine._fluid_catalog()** -> `FluidCatalog`
+  - calls: Fluid, FluidCatalog
+- **tests.networks.cold_water.test_engine._network()** -> `tuple[dict[str, _Node], dict[str, Section]]`
+  - calls: Section, _Node, section.downstream_appliance_counts.update
+- **tests.networks.cold_water.test_engine.test_cold_water_facade_exposes_cold_water_side()** -> `None`
+  - calls: ColdWaterNetworkEngine, _appliance_catalog, _fluid_catalog, _network, _pipe_catalog, engine.domestic_engine
+- **tests.networks.cold_water.test_engine.test_cold_water_facade_compute_sections()** -> `None`
+  - calls: ColdWaterNetworkEngine, _appliance_catalog, _fluid_catalog, _network, _pipe_catalog, engine.compute_sections
+- **tests.networks.cold_water.test_engine.test_compute_cold_water_network_functional_entry_point()** -> `None`
+  - calls: _appliance_catalog, _fluid_catalog, _network, _pipe_catalog, compute_cold_water_network
+
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_demand.py
 
 - **tests.networks.domestic_water.test_demand._catalog()** -> `ApplianceCatalog`
@@ -1098,3 +1157,20 @@
   - calls: collective_dtu_simultaneity_factor
 - **tests.networks.domestic_water.test_simultaneity.test_clamp_simultaneity_factor()** -> `None`
   - calls: clamp_simultaneity_factor
+
+## C:\dev\PythonProject_v4\tests\networks\hot_water\test_engine.py
+
+- **tests.networks.hot_water.test_engine._appliance_catalog()** -> `ApplianceCatalog`
+  - calls: Appliance, ApplianceCatalog
+- **tests.networks.hot_water.test_engine._pipe_catalog()** -> `PipeCatalog`
+  - calls: PipeCatalog, PipeMaterial, PipeSize
+- **tests.networks.hot_water.test_engine._fluid_catalog()** -> `FluidCatalog`
+  - calls: Fluid, FluidCatalog
+- **tests.networks.hot_water.test_engine._network()** -> `tuple[dict[str, _Node], dict[str, Section]]`
+  - calls: Section, _Node, section.downstream_appliance_counts.update
+- **tests.networks.hot_water.test_engine.test_hot_water_facade_exposes_hot_water_side()** -> `None`
+  - calls: HotWaterNetworkEngine, _appliance_catalog, _fluid_catalog, _network, _pipe_catalog, engine.domestic_engine
+- **tests.networks.hot_water.test_engine.test_hot_water_facade_compute_sections_uses_hot_water_flow()** -> `None`
+  - calls: HotWaterNetworkEngine, _appliance_catalog, _fluid_catalog, _network, _pipe_catalog, engine.compute_sections
+- **tests.networks.hot_water.test_engine.test_compute_hot_water_network_functional_entry_point()** -> `None`
+  - calls: _appliance_catalog, _fluid_catalog, _network, _pipe_catalog, compute_hot_water_network
