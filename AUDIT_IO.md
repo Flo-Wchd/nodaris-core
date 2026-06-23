@@ -531,9 +531,9 @@
 - **ndc_core.networks.domestic_water.appliance_propagation.DomesticWaterAppliancePropagationResult.propagated_section_count(self)** -> `int`
   - calls: len
 - **ndc_core.networks.domestic_water.appliance_propagation.DomesticWaterAppliancePropagationEngine.propagate(self)** -> `Result[DomesticWaterAppliancePropagationResult]`
-  - calls: DomesticWaterAppliancePropagationResult, EngineMessage.warning, Result.success, _clean_id, _read_node_local_appliance_counts, any, bool, children_by_node[upstream_node_id].append, defaultdict, getattr, messages.append, node_local_counts.values, section_matches_domestic_water_side, self.nodes.items, self.sections.items ...
+  - calls: DomesticWaterAppliancePropagationResult, EngineMessage.warning, Result.success, _read_node_local_appliance_counts, any, bool, children_by_node[upstream_node_id].append, clean_entity_id, defaultdict, getattr, messages.append, node_local_counts.values, section_matches_domestic_water_side, self.nodes.items, self.sections.items ...
 - **ndc_core.networks.domestic_water.appliance_propagation.DomesticWaterAppliancePropagationEngine.compute_node_downstream_counts(node_id)** -> `dict[str, int]`
-  - calls: EngineMessage.error, _write_node_downstream_counts, _write_section_downstream_counts, children_by_node.get, compute_node_downstream_counts, cycle_reported.add, dict, merge_appliance_counts, messages.append, node_local_counts.get, self.nodes.get, self.sections.get, visiting.add, visiting.remove
+  - calls: EngineMessage.error, children_by_node.get, compute_node_downstream_counts, cycle_reported.add, dict, merge_appliance_counts, messages.append, node_local_counts.get, self.nodes.get, self.sections.get, visiting.add, visiting.remove, write_node_downstream_appliance_counts, write_section_downstream_appliance_counts
 - **ndc_core.networks.domestic_water.appliance_propagation.propagate_domestic_water_appliances(nodes, sections, side)** -> `Result[DomesticWaterAppliancePropagationResult]`
   - calls: DomesticWaterAppliancePropagationEngine, DomesticWaterAppliancePropagationEngine(nodes=nodes, sections=sections, side=side).propagate
   - doc: Convenience function for Cell/Node -> Section appliance propagation.
@@ -547,12 +547,6 @@
   - calls: _read_cell_appliance_counts, callable, getattr, isinstance, local_counts_method, merge_appliance_counts, normalize_appliance_counts
 - **ndc_core.networks.domestic_water.appliance_propagation._read_cell_appliance_counts(cell)** -> `dict[str, int]`
   - calls: getattr, isinstance, normalize_appliance_counts
-- **ndc_core.networks.domestic_water.appliance_propagation._write_section_downstream_counts(section, counts)** -> `None`
-  - calls: dict, getattr, isinstance, normalize_appliance_counts, setattr, target.clear, target.update
-- **ndc_core.networks.domestic_water.appliance_propagation._write_node_downstream_counts(node, counts)** -> `None`
-  - calls: dict, getattr, isinstance, normalize_appliance_counts, setattr, target.clear, target.update
-- **ndc_core.networks.domestic_water.appliance_propagation._clean_id(value)** -> `str`
-  - calls: str, str(value or '').strip
 
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\demand.py
 
@@ -572,6 +566,31 @@
   - doc: Convenience function for ECS forward demand.
 - **ndc_core.networks.domestic_water.demand._flow_for_profile(appliance, profile)** -> `float`
   - calls: float, getattr, max
+
+## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\entity_access.py
+
+- **ndc_core.networks.domestic_water.entity_access.clean_entity_id(value)** -> `str`
+  - calls: str, str(value or '').strip
+  - doc: Return a normalized non-optional entity id string.
+- **ndc_core.networks.domestic_water.entity_access.clean_optional_code(value)** -> `str | None`
+  - calls: clean_entity_id
+  - doc: Return a normalized optional code, or None when empty.
+- **ndc_core.networks.domestic_water.entity_access.read_downstream_section_ids(node)** -> `tuple[str, ...]`
+  - calls: clean_entity_id, getattr, ids.append, tuple
+  - doc: Read downstream section ids from a Node-like object.
+- **ndc_core.networks.domestic_water.entity_access.write_section_downstream_appliance_counts(section, counts)** -> `None`
+  - calls: _write_mapping_attribute, normalize_appliance_counts
+  - doc: Write normalized downstream appliance counts on a Section-like object.
+- **ndc_core.networks.domestic_water.entity_access.write_node_downstream_appliance_counts(node, counts)** -> `None`
+  - calls: _write_mapping_attribute, normalize_appliance_counts
+  - doc: Write normalized downstream appliance counts on a Node-like object.
+- **ndc_core.networks.domestic_water.entity_access.apply_section_pressures(section, pressure_start_pa, pressure_end_pa)** -> `None`
+  - doc: Write computed start/end pressures on a Section-like object.
+- **ndc_core.networks.domestic_water.entity_access.apply_node_pressures(nodes, node_states)** -> `None`
+  - calls: getattr, node_states.items, nodes.get
+  - doc: Write computed pressures on Node-like objects.
+- **ndc_core.networks.domestic_water.entity_access._write_mapping_attribute(entity, attribute_name, values)** -> `None`
+  - calls: dict, getattr, isinstance, setattr, target.clear, target.update
 
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\message_binding.py
 
@@ -674,11 +693,11 @@
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine._resolve_fluid(self, water_temperature_c, messages)** -> `Fluid | None`
   - calls: EngineMessage.error, messages.append, self.fluid_catalog.get, self.fluid_catalog.get_water_at_temperature
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine._relative_roughness_for_section(self, section, internal_diameter_m)** -> `float`
-  - calls: _clean_optional_code, getattr, relative_roughness, self.pipe_catalog.get_size, self.pipe_catalog.materials_by_code.get
+  - calls: clean_optional_code, getattr, relative_roughness, self.pipe_catalog.get_size, self.pipe_catalog.materials_by_code.get
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine._collect_section_zeta_values(self, section, flow_l_s, velocity_m_s, density_kg_m3, messages)** -> `tuple[float, ...]`
   - calls: self._zeta_from_section_item, tuple, zeta_values.append
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine._zeta_from_section_item(self, item, section, flow_l_s, velocity_m_s, density_kg_m3, messages)** -> `float`
-  - calls: EngineMessage.warning, _clean_optional_code, _safe_positive_float, getattr, messages.append, self._zeta_from_catalog_loss, self.singular_loss_catalog.get
+  - calls: EngineMessage.warning, _safe_positive_float, clean_optional_code, getattr, messages.append, self._zeta_from_catalog_loss, self.singular_loss_catalog.get
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine._zeta_from_catalog_loss(self, loss, quantity, section, flow_l_s, velocity_m_s, density_kg_m3, messages)** -> `float`
   - calls: EngineMessage.warning, equivalent_zeta_from_kv, float, max, messages.append
 - **ndc_core.networks.domestic_water.pressure_loss.compute_cold_water_section_pressure_loss(section, fluid_catalog, pipe_catalog, singular_loss_catalog, water_temperature_c, singular_zeta_values)** -> `Result[DomesticWaterPressureLossResult]`
@@ -692,8 +711,6 @@
   - calls: float
 - **ndc_core.networks.domestic_water.pressure_loss._safe_positive_float(value)** -> `float | None`
   - calls: float
-- **ndc_core.networks.domestic_water.pressure_loss._clean_optional_code(value)** -> `str | None`
-  - calls: str, str(value or '').strip
 
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\pressure_network.py
 
@@ -709,7 +726,7 @@
 - **ndc_core.networks.domestic_water.pressure_network.DomesticWaterPressureSummary.has_errors(self)** -> `bool`
   - calls: any
 - **ndc_core.networks.domestic_water.pressure_network.DomesticWaterPressureNetworkEngine.propagate_pressures(self, source_node_id, source_pressure_pa)** -> `Result[DomesticWaterPressurePropagationResult]`
-  - calls: DomesticWaterPressurePropagationResult, EngineMessage.error, EngineMessage.warning, NodePressureState, Result.failure, Result.success, _apply_node_pressures, _apply_section_pressures, _clean_optional_code, _is_terminal_node, _read_downstream_section_ids, _read_section_pressure_loss_pa, _safe_pressure_pa, deque, getattr ...
+  - calls: DomesticWaterPressurePropagationResult, EngineMessage.error, EngineMessage.warning, NodePressureState, Result.failure, Result.success, _is_terminal_node, _read_section_pressure_loss_pa, _safe_pressure_pa, apply_node_pressures, apply_section_pressures, clean_optional_code, deque, getattr, max ...
 - **ndc_core.networks.domestic_water.pressure_network.DomesticWaterPressureNetworkEngine.summarize_worst_terminal_pressure(self, source_node_id, source_pressure_bar, min_required_pressure_bar)** -> `Result[DomesticWaterPressureSummary]`
   - calls: DomesticWaterPressurePropagationResult, DomesticWaterPressureSummary, EngineMessage.warning, Result.failure, Result.partial, Result.success, TerminalPressureStatus, _safe_non_negative_float, messages.append, messages.extend, min, pressure_bar_to_pa, propagation_result.value.node_pressures.items, self.propagate_pressures, str ...
 - **ndc_core.networks.domestic_water.pressure_network.propagate_cold_water_pressures(nodes, sections, source_node_id, source_pressure_pa)** -> `Result[DomesticWaterPressurePropagationResult]`
@@ -724,17 +741,10 @@
 - **ndc_core.networks.domestic_water.pressure_network.summarize_hot_water_worst_terminal_pressure(nodes, sections, source_node_id, source_pressure_bar, min_required_pressure_bar)** -> `Result[DomesticWaterPressureSummary]`
   - calls: DomesticWaterPressureNetworkEngine, DomesticWaterPressureNetworkEngine(nodes=nodes, sections=sections, side=DomesticWaterSide.HOT_WATER).summarize_worst_terminal_pressure
   - doc: Convenience function for ECS forward worst terminal summary.
-- **ndc_core.networks.domestic_water.pressure_network._read_downstream_section_ids(node)** -> `tuple[str, ...]`
-  - calls: getattr, str, str(section_id).strip, tuple
 - **ndc_core.networks.domestic_water.pressure_network._read_section_pressure_loss_pa(section_id, section, messages, warned_missing_losses)** -> `float`
   - calls: EngineMessage.warning, float, getattr, isfinite, messages.append, warned_missing_losses.add
 - **ndc_core.networks.domestic_water.pressure_network._is_terminal_node(node, sections, side)** -> `bool`
-  - calls: _read_downstream_section_ids, section_matches_domestic_water_side, sections.get
-- **ndc_core.networks.domestic_water.pressure_network._apply_section_pressures(section, pressure_start_pa, pressure_end_pa)** -> `None`
-- **ndc_core.networks.domestic_water.pressure_network._apply_node_pressures(nodes, node_states)** -> `None`
-  - calls: node_states.items, nodes.get
-- **ndc_core.networks.domestic_water.pressure_network._clean_optional_code(value)** -> `str | None`
-  - calls: str, str(value or '').strip
+  - calls: read_downstream_section_ids, section_matches_domestic_water_side, sections.get
 - **ndc_core.networks.domestic_water.pressure_network._safe_pressure_pa(value)** -> `float`
   - calls: _safe_non_negative_float, isfinite
 - **ndc_core.networks.domestic_water.pressure_network._safe_non_negative_float(value, default)** -> `float`
@@ -758,7 +768,7 @@
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine.size_section_from_counts(self, section, appliance_counts, max_velocity_m_s)** -> `Result[DomesticWaterSectionSizing]`
   - calls: DomesticWaterDemandBuilder, DomesticWaterDemandBuilder(appliance_catalog=self.appliance_catalog, profile=self.profile).compute_from_counts, DomesticWaterSectionSizing, EngineMessage.warning, Result.failure, Result.partial, Result.success, _apply_sizing_to_section, _minimum_appliance_internal_diameter_mm, max, messages.append, messages.extend, normalize_appliance_counts, self._select_or_force_diameter, tuple ...
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine._select_or_force_diameter(self, section, demand, raw_counts, effective_counts, min_required_diameter_mm, max_velocity_m_s, messages)** -> `DomesticWaterSectionSizing`
-  - calls: _clean_optional_code, _positive_optional_float, self._size_automatically, self._size_with_forced_internal_diameter, self._size_with_forced_pipe
+  - calls: _positive_optional_float, clean_optional_code, self._size_automatically, self._size_with_forced_internal_diameter, self._size_with_forced_pipe
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine._size_automatically(self, section, demand, raw_counts, effective_counts, min_required_diameter_mm, max_velocity_m_s, messages)** -> `DomesticWaterSectionSizing`
   - calls: DomesticWaterSectionSizing, EngineMessage.error, list, messages.append, section.fluid_code.lower, select_pipe_size_by_velocity, self.pipe_catalog.list_sizes_for_material, self.pipe_catalog.sizes_by_code.values, tuple
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine._size_with_forced_pipe(self, section, demand, forced_pipe_code, min_required_diameter_mm, max_velocity_m_s, messages)** -> `DomesticWaterSectionSizing`
@@ -780,8 +790,6 @@
   - calls: _flow_for_profile, appliance_catalog.get, appliance_counts.items, float
 - **ndc_core.networks.domestic_water.section_sizing._flow_for_profile(appliance, profile)** -> `float`
   - calls: float, getattr, max
-- **ndc_core.networks.domestic_water.section_sizing._clean_optional_code(value)** -> `str | None`
-  - calls: str, str(value or '').strip
 - **ndc_core.networks.domestic_water.section_sizing._positive_optional_float(value)** -> `float | None`
   - calls: float
 
@@ -1216,6 +1224,23 @@
 - **tests.networks.domestic_water.test_demand.test_invalid_counts_are_ignored()** -> `None`
   - calls: _catalog, compute_cold_water_demand
 
+## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_entity_access.py
+
+- **tests.networks.domestic_water.test_entity_access.test_clean_entity_id()** -> `None`
+  - calls: clean_entity_id
+- **tests.networks.domestic_water.test_entity_access.test_clean_optional_code()** -> `None`
+  - calls: clean_optional_code
+- **tests.networks.domestic_water.test_entity_access.test_read_downstream_section_ids()** -> `None`
+  - calls: _Node, read_downstream_section_ids
+- **tests.networks.domestic_water.test_entity_access.test_write_section_downstream_appliance_counts()** -> `None`
+  - calls: _Section, write_section_downstream_appliance_counts
+- **tests.networks.domestic_water.test_entity_access.test_write_node_downstream_appliance_counts()** -> `None`
+  - calls: _Node, write_node_downstream_appliance_counts
+- **tests.networks.domestic_water.test_entity_access.test_apply_section_pressures()** -> `None`
+  - calls: _Section, apply_section_pressures
+- **tests.networks.domestic_water.test_entity_access.test_apply_node_pressures()** -> `None`
+  - calls: _Node, _NodeState, apply_node_pressures
+
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_message_binding.py
 
 - **tests.networks.domestic_water.test_message_binding._appliance_catalog()** -> `ApplianceCatalog`
@@ -1434,4 +1459,6 @@
 - **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_side_matching_tools()** -> `None`
   - calls: callable
 - **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_appliance_count_tools()** -> `None`
+  - calls: callable
+- **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_entity_access_tools()** -> `None`
   - calls: callable

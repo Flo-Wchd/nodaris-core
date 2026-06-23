@@ -14,6 +14,12 @@ from ndc_core.networks.domestic_water.types import DomesticWaterSide
 from ndc_core.networks.domestic_water.side_matching import (
     section_matches_domestic_water_side,
 )
+from ndc_core.networks.domestic_water.entity_access import (
+    apply_node_pressures,
+    apply_section_pressures,
+    clean_optional_code,
+    read_downstream_section_ids,
+)
 
 
 class PressurePropagationStatus(StrEnum):
@@ -169,7 +175,7 @@ class DomesticWaterPressureNetworkEngine:
             current_pressure_pa = pressures_pa.get(current_node_id, 0.0)
 
             node = self.nodes.get(current_node_id)
-            downstream_section_ids = _read_downstream_section_ids(node)
+            downstream_section_ids = read_downstream_section_ids(node)
 
             for section_id in downstream_section_ids:
                 section = self.sections.get(section_id)
@@ -189,7 +195,7 @@ class DomesticWaterPressureNetworkEngine:
                 if not section_matches_domestic_water_side(section, self.side):
                     continue
 
-                downstream_node_id = _clean_optional_code(
+                downstream_node_id = clean_optional_code(
                     getattr(section, "downstream_node_id", None)
                 )
                 if downstream_node_id is None:
@@ -211,7 +217,7 @@ class DomesticWaterPressureNetworkEngine:
 
                 downstream_pressure_pa = max(0.0, current_pressure_pa - delta_p_pa)
 
-                _apply_section_pressures(
+                apply_section_pressures(
                     section=section,
                     pressure_start_pa=current_pressure_pa,
                     pressure_end_pa=downstream_pressure_pa,
@@ -236,7 +242,7 @@ class DomesticWaterPressureNetworkEngine:
             for node_id, pressure_pa in pressures_pa.items()
         }
 
-        _apply_node_pressures(self.nodes, node_states)
+        apply_node_pressures(self.nodes, node_states)
 
         result = DomesticWaterPressurePropagationResult(
             source_node_id=source_id,
@@ -429,11 +435,6 @@ def summarize_hot_water_worst_terminal_pressure(
     )
 
 
-def _read_downstream_section_ids(node: Any) -> tuple[str, ...]:
-    raw_ids = getattr(node, "downstream_section_ids", None) or []
-    return tuple(str(section_id) for section_id in raw_ids if str(section_id).strip())
-
-
 def _read_section_pressure_loss_pa(
     *,
     section_id: str,
@@ -486,7 +487,7 @@ def _is_terminal_node(
     sections: Mapping[str, Any],
     side: DomesticWaterSide,
 ) -> bool:
-    downstream_section_ids = _read_downstream_section_ids(node)
+    downstream_section_ids = read_downstream_section_ids(node)
 
     if not downstream_section_ids:
         return True
@@ -497,39 +498,6 @@ def _is_terminal_node(
             return False
 
     return True
-
-
-def _apply_section_pressures(
-    *,
-    section: Any,
-    pressure_start_pa: float,
-    pressure_end_pa: float,
-) -> None:
-    try:
-        section.pressure_start_pa = pressure_start_pa
-        section.pressure_end_pa = pressure_end_pa
-    except (AttributeError, TypeError):
-        return
-
-
-def _apply_node_pressures(
-    nodes: Mapping[str, Any],
-    node_states: Mapping[str, NodePressureState],
-) -> None:
-    for node_id, state in node_states.items():
-        node = nodes.get(node_id)
-        if node is None:
-            continue
-
-        try:
-            node.pressure_pa = state.pressure_pa
-        except (AttributeError, TypeError):
-            continue
-
-
-def _clean_optional_code(value: Any) -> str | None:
-    text = str(value or "").strip()
-    return text or None
 
 
 def _safe_pressure_pa(value: Any) -> float:

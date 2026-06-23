@@ -25,6 +25,7 @@ from ndc_core.networks.domestic_water.types import (
     DomesticWaterSide,
 )
 from ndc_core.networks.domestic_water.appliance_counts import normalize_appliance_counts
+from ndc_core.networks.domestic_water.entity_access import clean_optional_code
 
 
 class SectionSizingMode(StrEnum):
@@ -208,7 +209,7 @@ class DomesticWaterSectionSizingEngine:
         max_velocity_m_s: float,
         messages: list[EngineMessage],
     ) -> DomesticWaterSectionSizing:
-        forced_pipe_code = _clean_optional_code(section.forced_pipe_size_code)
+        forced_pipe_code = clean_optional_code(section.forced_pipe_size_code)
         forced_diameter = _positive_optional_float(
             section.forced_internal_diameter_mm
         )
@@ -610,11 +611,6 @@ def _flow_for_profile(
         return max(0.0, float(value))
     except (TypeError, ValueError):
         return 0.0
-
-
-def _clean_optional_code(value: Any) -> str | None:
-    text = str(value or "").strip()
-    return text or None
 
 
 def _positive_optional_float(value: Any) -> float | None:

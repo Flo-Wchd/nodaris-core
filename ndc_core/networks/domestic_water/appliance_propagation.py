@@ -15,6 +15,11 @@ from ndc_core.networks.domestic_water.appliance_counts import (
     merge_appliance_counts,
     normalize_appliance_counts,
 )
+from ndc_core.networks.domestic_water.entity_access import (
+    clean_entity_id,
+    write_node_downstream_appliance_counts,
+    write_section_downstream_appliance_counts,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -102,8 +107,8 @@ class DomesticWaterAppliancePropagationEngine:
             if not section_matches_domestic_water_side(section, self.side):
                 continue
 
-            upstream_node_id = _clean_id(getattr(section, "upstream_node_id", None))
-            downstream_node_id = _clean_id(getattr(section, "downstream_node_id", None))
+            upstream_node_id = clean_entity_id(getattr(section, "upstream_node_id", None))
+            downstream_node_id = clean_entity_id(getattr(section, "downstream_node_id", None))
 
             if not upstream_node_id or not downstream_node_id:
                 messages.append(
@@ -191,7 +196,7 @@ class DomesticWaterAppliancePropagationEngine:
 
                 section = self.sections.get(section_id)
                 if section is not None:
-                    _write_section_downstream_counts(section, downstream_counts)
+                    write_section_downstream_appliance_counts(section, downstream_counts)
 
                 total_counts = merge_appliance_counts(total_counts, downstream_counts)
 
@@ -201,7 +206,7 @@ class DomesticWaterAppliancePropagationEngine:
 
             node = self.nodes.get(node_id)
             if node is not None:
-                _write_node_downstream_counts(node, total_counts)
+                write_node_downstream_appliance_counts(node, total_counts)
 
             return dict(total_counts)
 
@@ -311,37 +316,3 @@ def _read_cell_appliance_counts(cell: Any) -> dict[str, int]:
             return normalize_appliance_counts(value)
 
     return {}
-
-
-def _write_section_downstream_counts(section: Any, counts: dict[str, int]) -> None:
-    normalized = normalize_appliance_counts(counts)
-
-    target = getattr(section, "downstream_appliance_counts", None)
-    if isinstance(target, dict):
-        target.clear()
-        target.update(normalized)
-        return
-
-    try:
-        setattr(section, "downstream_appliance_counts", dict(normalized))
-    except (AttributeError, TypeError):
-        return
-
-
-def _write_node_downstream_counts(node: Any, counts: dict[str, int]) -> None:
-    normalized = normalize_appliance_counts(counts)
-
-    target = getattr(node, "downstream_appliance_counts", None)
-    if isinstance(target, dict):
-        target.clear()
-        target.update(normalized)
-        return
-
-    try:
-        setattr(node, "downstream_appliance_counts", dict(normalized))
-    except (AttributeError, TypeError):
-        return
-
-
-def _clean_id(value: Any) -> str:
-    return str(value or "").strip()

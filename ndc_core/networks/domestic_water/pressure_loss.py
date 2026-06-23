@@ -20,6 +20,7 @@ from ndc_core.hydraulics.total_pressure_loss import total_pressure_loss
 from ndc_core.hydraulics.types import PressureLossBreakdown
 from ndc_core.hydraulics.velocity import velocity_from_l_s_and_mm
 from ndc_core.networks.domestic_water.types import DomesticWaterSide
+from ndc_core.networks.domestic_water.entity_access import clean_optional_code
 
 
 class DomesticWaterPressureLossMode(StrEnum):
@@ -240,7 +241,7 @@ class DomesticWaterPressureLossEngine:
         if self.pipe_catalog is None:
             return 0.0
 
-        pipe_code = _clean_optional_code(section.selected_pipe_size_code)
+        pipe_code = clean_optional_code(section.selected_pipe_size_code)
         if pipe_code is None:
             return 0.0
 
@@ -299,7 +300,7 @@ class DomesticWaterPressureLossEngine:
         if direct_zeta is not None:
             return direct_zeta * quantity
 
-        loss_code = _clean_optional_code(
+        loss_code = clean_optional_code(
             getattr(item, "loss_code", None)
             or getattr(item, "singular_loss_code", None)
             or getattr(item, "code", None)
@@ -477,8 +478,3 @@ def _safe_positive_float(value: Any) -> float | None:
         return None
 
     return number
-
-
-def _clean_optional_code(value: Any) -> str | None:
-    text = str(value or "").strip()
-    return text or None

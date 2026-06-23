@@ -43,6 +43,13 @@ from ndc_core.networks.domestic_water import (
     apply_machine_exclusivity,
     merge_appliance_counts,
     normalize_appliance_counts,
+    apply_node_pressures,
+    apply_section_pressures,
+    clean_entity_id,
+    clean_optional_code,
+    read_downstream_section_ids,
+    write_node_downstream_appliance_counts,
+    write_section_downstream_appliance_counts,
 )
 from ndc_core.networks.hot_water import (
     HotWaterNetworkEngine,
@@ -96,4 +103,11 @@ __all__ = [
     "apply_machine_exclusivity",
     "merge_appliance_counts",
     "normalize_appliance_counts",
+    "apply_node_pressures",
+    "apply_section_pressures",
+    "clean_entity_id",
+    "clean_optional_code",
+    "read_downstream_section_ids",
+    "write_node_downstream_appliance_counts",
+    "write_section_downstream_appliance_counts",
 ]

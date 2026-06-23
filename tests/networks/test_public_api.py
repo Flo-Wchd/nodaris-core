@@ -44,6 +44,13 @@ from ndc_core.networks import (
     apply_machine_exclusivity,
     merge_appliance_counts,
     normalize_appliance_counts,
+    apply_node_pressures,
+    apply_section_pressures,
+    clean_entity_id,
+    clean_optional_code,
+    read_downstream_section_ids,
+    write_node_downstream_appliance_counts,
+    write_section_downstream_appliance_counts,
 )
 from ndc_core.networks.cold_water import (
     ColdWaterNetworkEngine as ColdWaterNetworkEngineFromPackage,
@@ -127,3 +134,13 @@ def test_networks_public_api_exports_domestic_water_appliance_count_tools() -> N
     assert callable(normalize_appliance_counts)
     assert callable(merge_appliance_counts)
     assert callable(apply_machine_exclusivity)
+
+
+def test_networks_public_api_exports_domestic_water_entity_access_tools() -> None:
+    assert callable(clean_entity_id)
+    assert callable(clean_optional_code)
+    assert callable(read_downstream_section_ids)
+    assert callable(write_section_downstream_appliance_counts)
+    assert callable(write_node_downstream_appliance_counts)
+    assert callable(apply_section_pressures)
+    assert callable(apply_node_pressures)
