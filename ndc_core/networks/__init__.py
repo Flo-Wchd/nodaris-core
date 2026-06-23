@@ -71,6 +71,8 @@ from ndc_core.networks.domestic_water import (
     relative_roughness_for_section,
     default_domestic_water_fluid_code,
     resolve_domestic_water_fluid,
+    DomesticWaterSectionHydraulicInputs,
+    prepare_section_hydraulic_inputs,
 )
 from ndc_core.networks.hot_water import (
     HotWaterNetworkEngine,
@@ -152,4 +154,6 @@ __all__ = [
     "relative_roughness_for_section",
     "default_domestic_water_fluid_code",
     "resolve_domestic_water_fluid",
+    "DomesticWaterSectionHydraulicInputs",
+    "prepare_section_hydraulic_inputs",
 ]

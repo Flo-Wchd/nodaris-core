@@ -72,6 +72,8 @@ from ndc_core.networks import (
     relative_roughness_for_section,
     default_domestic_water_fluid_code,
     resolve_domestic_water_fluid,
+    DomesticWaterSectionHydraulicInputs,
+    prepare_section_hydraulic_inputs,
 )
 from ndc_core.networks.cold_water import (
     ColdWaterNetworkEngine as ColdWaterNetworkEngineFromPackage,
@@ -204,3 +206,8 @@ def test_networks_public_api_exports_domestic_water_pipe_rules() -> None:
 def test_networks_public_api_exports_domestic_water_fluid_rules() -> None:
     assert callable(default_domestic_water_fluid_code)
     assert callable(resolve_domestic_water_fluid)
+
+
+def test_networks_public_api_exports_domestic_water_section_hydraulic_inputs() -> None:
+    assert DomesticWaterSectionHydraulicInputs is not None
+    assert callable(prepare_section_hydraulic_inputs)

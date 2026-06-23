@@ -739,7 +739,7 @@
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossResult.has_errors(self)** -> `bool`
   - calls: any
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine.compute_section_pressure_loss(self, section, water_temperature_c, singular_zeta_values)** -> `Result[DomesticWaterPressureLossResult]`
-  - calls: DomesticWaterPressureLossResult, EngineMessage.error, EngineMessage.info, Result.failure, Result.success, apply_section_pressure_loss_state, collect_section_singular_zeta_values, diameter_mm_to_m, max, messages.append, relative_roughness_for_section, resolve_domestic_water_fluid, safe_float, safe_positive_float, total_pressure_loss ...
+  - calls: DomesticWaterPressureLossResult, Result.failure, Result.success, apply_section_pressure_loss_state, collect_section_singular_zeta_values, prepare_section_hydraulic_inputs, relative_roughness_for_section, resolve_domestic_water_fluid, total_pressure_loss, tuple
 - **ndc_core.networks.domestic_water.pressure_loss.compute_cold_water_section_pressure_loss(section, fluid_catalog, pipe_catalog, singular_loss_catalog, water_temperature_c, singular_zeta_values)** -> `Result[DomesticWaterPressureLossResult]`
   - calls: DomesticWaterPressureLossEngine, DomesticWaterPressureLossEngine(fluid_catalog=fluid_catalog, pipe_catalog=pipe_catalog, singular_loss_catalog=singular_loss_catalog, side=DomesticWaterSide.COLD_WATER).compute_section_pressure_loss
   - doc: Convenience function for EFS section pressure loss.
@@ -780,6 +780,12 @@
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\profiles.py
 
 - **ndc_core.networks.domestic_water.profiles.DomesticWaterProfile.flow_attribute_name(self)** -> `str`
+
+## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\section_hydraulic_inputs.py
+
+- **ndc_core.networks.domestic_water.section_hydraulic_inputs.prepare_section_hydraulic_inputs(section, messages)** -> `DomesticWaterSectionHydraulicInputs | None`
+  - calls: DomesticWaterSectionHydraulicInputs, EngineMessage.error, EngineMessage.info, diameter_mm_to_m, max, messages.append, safe_float, safe_positive_float, velocity_from_l_s_and_mm
+  - doc: Prepare safe hydraulic inputs from a Section-like object.
 
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\section_sizing.py
 
@@ -1472,6 +1478,19 @@
 - **tests.networks.domestic_water.test_pressure_network.test_hot_water_sections_are_ignored_by_cold_water_engine()** -> `None`
   - calls: _Node, _Section, propagate_cold_water_pressures, set
 
+## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_section_hydraulic_inputs.py
+
+- **tests.networks.domestic_water.test_section_hydraulic_inputs._section()** -> `Section`
+  - calls: Section
+- **tests.networks.domestic_water.test_section_hydraulic_inputs.test_prepare_section_hydraulic_inputs_full_mode()** -> `None`
+  - calls: _section, isinstance, prepare_section_hydraulic_inputs
+- **tests.networks.domestic_water.test_section_hydraulic_inputs.test_prepare_section_hydraulic_inputs_elevation_only_mode()** -> `None`
+  - calls: _section, len, prepare_section_hydraulic_inputs
+- **tests.networks.domestic_water.test_section_hydraulic_inputs.test_prepare_section_hydraulic_inputs_missing_diameter_returns_none()** -> `None`
+  - calls: _section, len, prepare_section_hydraulic_inputs
+- **tests.networks.domestic_water.test_section_hydraulic_inputs.test_prepare_section_hydraulic_inputs_clamps_negative_length()** -> `None`
+  - calls: _section, prepare_section_hydraulic_inputs
+
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_section_sizing.py
 
 - **tests.networks.domestic_water.test_section_sizing._appliance_catalog()** -> `ApplianceCatalog`
@@ -1631,4 +1650,6 @@
 - **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_pipe_rules()** -> `None`
   - calls: callable
 - **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_fluid_rules()** -> `None`
+  - calls: callable
+- **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_section_hydraulic_inputs()** -> `None`
   - calls: callable
