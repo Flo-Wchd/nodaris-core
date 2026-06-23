@@ -548,6 +548,17 @@
 - **ndc_core.networks.domestic_water.appliance_propagation._read_cell_appliance_counts(cell)** -> `dict[str, int]`
   - calls: getattr, isinstance, normalize_appliance_counts
 
+## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\appliance_rules.py
+
+- **ndc_core.networks.domestic_water.appliance_rules.appliance_flow_for_profile(appliance, profile)** -> `float`
+  - calls: float, getattr, max
+  - doc: Return the appliance unit design flow for the requested domestic water profile.
+- **ndc_core.networks.domestic_water.appliance_rules.minimum_appliance_internal_diameter_mm(appliance_catalog, appliance_counts, profile)** -> `float`
+  - calls: _optional_positive_float, appliance_catalog.get, appliance_counts.items, appliance_flow_for_profile
+  - doc: Return the maximum appliance minimum internal diameter required by a profile.
+- **ndc_core.networks.domestic_water.appliance_rules._optional_positive_float(value)** -> `float | None`
+  - calls: float
+
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\demand.py
 
 - **ndc_core.networks.domestic_water.demand.DomesticWaterDemandBuilder.cold_water(cls, appliance_catalog)** -> `DomesticWaterDemandBuilder`
@@ -555,7 +566,7 @@
 - **ndc_core.networks.domestic_water.demand.DomesticWaterDemandBuilder.hot_water(cls, appliance_catalog)** -> `DomesticWaterDemandBuilder`
   - calls: cls
 - **ndc_core.networks.domestic_water.demand.DomesticWaterDemandBuilder.compute_from_counts(self, appliance_counts)** -> `Result[DomesticWaterDemand]`
-  - calls: ApplianceDemandItem, DomesticWaterDemand, EngineMessage.info, EngineMessage.warning, Result.success, _flow_for_profile, apply_machine_exclusivity, declared_counts.get, declared_counts.values, effective_counts.values, items.append, messages.append, normalize_appliance_counts, self._simultaneity_factor, self.appliance_catalog.get ...
+  - calls: ApplianceDemandItem, DomesticWaterDemand, EngineMessage.info, EngineMessage.warning, Result.success, appliance_flow_for_profile, apply_machine_exclusivity, declared_counts.get, declared_counts.values, effective_counts.values, items.append, messages.append, normalize_appliance_counts, self._simultaneity_factor, self.appliance_catalog.get ...
 - **ndc_core.networks.domestic_water.demand.DomesticWaterDemandBuilder._simultaneity_factor(self, effective_appliance_count)** -> `float`
   - calls: clamp_simultaneity_factor, collective_dtu_simultaneity_factor
 - **ndc_core.networks.domestic_water.demand.compute_cold_water_demand(appliance_catalog, appliance_counts)** -> `Result[DomesticWaterDemand]`
@@ -564,8 +575,6 @@
 - **ndc_core.networks.domestic_water.demand.compute_hot_water_demand(appliance_catalog, appliance_counts)** -> `Result[DomesticWaterDemand]`
   - calls: DomesticWaterDemandBuilder.hot_water, DomesticWaterDemandBuilder.hot_water(appliance_catalog).compute_from_counts
   - doc: Convenience function for ECS forward demand.
-- **ndc_core.networks.domestic_water.demand._flow_for_profile(appliance, profile)** -> `float`
-  - calls: float, getattr, max
 
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\entity_access.py
 
@@ -775,7 +784,7 @@
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine.hot_water(cls, appliance_catalog, pipe_catalog)** -> `DomesticWaterSectionSizingEngine`
   - calls: cls
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine.size_section_from_counts(self, section, appliance_counts, max_velocity_m_s)** -> `Result[DomesticWaterSectionSizing]`
-  - calls: DomesticWaterDemandBuilder, DomesticWaterDemandBuilder(appliance_catalog=self.appliance_catalog, profile=self.profile).compute_from_counts, DomesticWaterSectionSizing, EngineMessage.warning, Result.failure, Result.partial, Result.success, _minimum_appliance_internal_diameter_mm, apply_section_sizing_state, max, messages.append, messages.extend, normalize_appliance_counts, self._select_or_force_diameter, tuple ...
+  - calls: DomesticWaterDemandBuilder, DomesticWaterDemandBuilder(appliance_catalog=self.appliance_catalog, profile=self.profile).compute_from_counts, DomesticWaterSectionSizing, EngineMessage.warning, Result.failure, Result.partial, Result.success, apply_section_sizing_state, max, messages.append, messages.extend, minimum_appliance_internal_diameter_mm, normalize_appliance_counts, self._select_or_force_diameter, tuple ...
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine._select_or_force_diameter(self, section, demand, raw_counts, effective_counts, min_required_diameter_mm, max_velocity_m_s, messages)** -> `DomesticWaterSectionSizing`
   - calls: clean_optional_code, positive_optional_float, self._size_automatically, self._size_with_forced_internal_diameter, self._size_with_forced_pipe
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine._size_automatically(self, section, demand, raw_counts, effective_counts, min_required_diameter_mm, max_velocity_m_s, messages)** -> `DomesticWaterSectionSizing`
@@ -793,10 +802,6 @@
 - **ndc_core.networks.domestic_water.section_sizing.velocity_limit_for_context(usage_context)** -> `float`
   - calls: isinstance, str, value.strip, value.strip().lower
   - doc: Return default velocity limit for domestic water.
-- **ndc_core.networks.domestic_water.section_sizing._minimum_appliance_internal_diameter_mm(appliance_catalog, appliance_counts, profile)** -> `float`
-  - calls: _flow_for_profile, appliance_catalog.get, appliance_counts.items, float
-- **ndc_core.networks.domestic_water.section_sizing._flow_for_profile(appliance, profile)** -> `float`
-  - calls: float, getattr, max
 
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\section_state.py
 
@@ -1220,6 +1225,21 @@
 - **tests.networks.domestic_water.test_appliance_propagation.test_cycle_is_reported_without_exception()** -> `None`
   - calls: Cell, Network, _node, _section, any, network.add_cell, network.add_node, network.add_section, network.attach_cell_to_node, propagate_cold_water_appliances
 
+## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_appliance_rules.py
+
+- **tests.networks.domestic_water.test_appliance_rules._catalog()** -> `ApplianceCatalog`
+  - calls: Appliance, ApplianceCatalog
+- **tests.networks.domestic_water.test_appliance_rules.test_appliance_flow_for_profile()** -> `None`
+  - calls: Appliance, appliance_flow_for_profile
+- **tests.networks.domestic_water.test_appliance_rules.test_appliance_flow_for_profile_clamps_negative_value()** -> `None`
+  - calls: Appliance, appliance_flow_for_profile
+- **tests.networks.domestic_water.test_appliance_rules.test_minimum_appliance_internal_diameter_mm_uses_only_profile_flow()** -> `None`
+  - calls: _catalog, minimum_appliance_internal_diameter_mm
+- **tests.networks.domestic_water.test_appliance_rules.test_minimum_appliance_internal_diameter_mm_ignores_cold_only_for_hot_water()** -> `None`
+  - calls: _catalog, minimum_appliance_internal_diameter_mm
+- **tests.networks.domestic_water.test_appliance_rules.test_minimum_appliance_internal_diameter_mm_ignores_unknown_and_zero_counts()** -> `None`
+  - calls: _catalog, minimum_appliance_internal_diameter_mm
+
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_demand.py
 
 - **tests.networks.domestic_water.test_demand._catalog()** -> `ApplianceCatalog`
@@ -1500,4 +1520,6 @@
 - **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_numeric_tools()** -> `None`
   - calls: callable
 - **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_section_state_tools()** -> `None`
+  - calls: callable
+- **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_appliance_rules_tools()** -> `None`
   - calls: callable

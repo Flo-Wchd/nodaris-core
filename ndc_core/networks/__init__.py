@@ -57,6 +57,8 @@ from ndc_core.networks.domestic_water import (
     safe_pressure_pa,
     apply_section_pressure_loss_state,
     apply_section_sizing_state,
+    appliance_flow_for_profile,
+    minimum_appliance_internal_diameter_mm,
 )
 from ndc_core.networks.hot_water import (
     HotWaterNetworkEngine,
@@ -124,4 +126,6 @@ __all__ = [
     "safe_pressure_pa",
     "apply_section_pressure_loss_state",
     "apply_section_sizing_state",
+    "appliance_flow_for_profile",
+    "minimum_appliance_internal_diameter_mm",
 ]

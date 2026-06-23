@@ -100,6 +100,10 @@ from ndc_core.networks.domestic_water.section_state import (
     apply_section_pressure_loss_state,
     apply_section_sizing_state,
 )
+from ndc_core.networks.domestic_water.appliance_rules import (
+    appliance_flow_for_profile,
+    minimum_appliance_internal_diameter_mm,
+)
 
 __all__ = [
     "ApplianceDemandItem",
@@ -174,4 +178,6 @@ __all__ = [
     "safe_pressure_pa",
     "apply_section_pressure_loss_state",
     "apply_section_sizing_state",
+    "appliance_flow_for_profile",
+    "minimum_appliance_internal_diameter_mm",
 ]

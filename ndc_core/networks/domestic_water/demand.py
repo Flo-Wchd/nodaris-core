@@ -6,7 +6,6 @@ from dataclasses import dataclass
 from ndc_core.catalogs.appliance_catalog import ApplianceCatalog
 from ndc_core.common.messages import EngineMessage
 from ndc_core.common.result import Result
-from ndc_core.domain.appliances import Appliance
 from ndc_core.networks.domestic_water.profiles import (
     COLD_WATER_PROFILE,
     HOT_WATER_PROFILE,
@@ -24,6 +23,9 @@ from ndc_core.networks.domestic_water.types import (
 from ndc_core.networks.domestic_water.appliance_counts import (
     apply_machine_exclusivity,
     normalize_appliance_counts,
+)
+from ndc_core.networks.domestic_water.appliance_rules import (
+    appliance_flow_for_profile,
 )
 
 
@@ -89,7 +91,7 @@ class DomesticWaterDemandBuilder:
                 )
                 continue
 
-            unit_flow_l_s = _flow_for_profile(appliance, self.profile)
+            unit_flow_l_s = appliance_flow_for_profile(appliance, self.profile)
             if unit_flow_l_s <= 0.0:
                 messages.append(
                     EngineMessage.info(
@@ -166,15 +168,3 @@ def compute_hot_water_demand(
     return DomesticWaterDemandBuilder.hot_water(appliance_catalog).compute_from_counts(
         appliance_counts
     )
-
-
-def _flow_for_profile(
-    appliance: Appliance,
-    profile: DomesticWaterProfile,
-) -> float:
-    value = getattr(appliance, profile.flow_attribute_name, 0.0)
-
-    try:
-        return max(0.0, float(value))
-    except (TypeError, ValueError):
-        return 0.0

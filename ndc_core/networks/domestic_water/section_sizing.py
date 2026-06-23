@@ -8,7 +8,6 @@ from ndc_core.catalogs.appliance_catalog import ApplianceCatalog
 from ndc_core.catalogs.pipe_catalog import PipeCatalog
 from ndc_core.common.messages import EngineMessage
 from ndc_core.common.result import Result
-from ndc_core.domain.appliances import Appliance
 from ndc_core.domain.networks.section import Section
 from ndc_core.domain.networks.types import SectionUsageContext
 from ndc_core.domain.pipes import PipeSize
@@ -28,6 +27,7 @@ from ndc_core.networks.domestic_water.appliance_counts import normalize_applianc
 from ndc_core.networks.domestic_water.entity_access import clean_optional_code
 from ndc_core.networks.domestic_water.numeric import positive_optional_float
 from ndc_core.networks.domestic_water.section_state import apply_section_sizing_state
+from ndc_core.networks.domestic_water.appliance_rules import minimum_appliance_internal_diameter_mm
 
 
 class SectionSizingMode(StrEnum):
@@ -138,7 +138,7 @@ class DomesticWaterSectionSizingEngine:
         }
 
         min_required_diameter = max(
-            _minimum_appliance_internal_diameter_mm(
+            minimum_appliance_internal_diameter_mm(
                 appliance_catalog=self.appliance_catalog,
                 appliance_counts=raw_counts,
                 profile=self.profile,
@@ -548,48 +548,3 @@ def velocity_limit_for_context(
         return 1.5
 
     return 2.0
-
-
-def _minimum_appliance_internal_diameter_mm(
-    *,
-    appliance_catalog: ApplianceCatalog,
-    appliance_counts: Mapping[str, int],
-    profile: DomesticWaterProfile,
-) -> float:
-    minimum = 0.0
-
-    for code, count in appliance_counts.items():
-        if count <= 0:
-            continue
-
-        appliance = appliance_catalog.get(code)
-        if appliance is None:
-            continue
-
-        if _flow_for_profile(appliance, profile) <= 0.0:
-            continue
-
-        if appliance.min_internal_diameter_mm is None:
-            continue
-
-        try:
-            diameter = float(appliance.min_internal_diameter_mm)
-        except (TypeError, ValueError):
-            continue
-
-        if diameter > minimum:
-            minimum = diameter
-
-    return minimum
-
-
-def _flow_for_profile(
-    appliance: Appliance,
-    profile: DomesticWaterProfile,
-) -> float:
-    value = getattr(appliance, profile.flow_attribute_name, 0.0)
-
-    try:
-        return max(0.0, float(value))
-    except (TypeError, ValueError):
-        return 0.0

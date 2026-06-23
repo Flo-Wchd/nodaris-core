@@ -58,6 +58,8 @@ from ndc_core.networks import (
     safe_pressure_pa,
     apply_section_pressure_loss_state,
     apply_section_sizing_state,
+    appliance_flow_for_profile,
+    minimum_appliance_internal_diameter_mm,
 )
 from ndc_core.networks.cold_water import (
     ColdWaterNetworkEngine as ColdWaterNetworkEngineFromPackage,
@@ -164,3 +166,8 @@ def test_networks_public_api_exports_domestic_water_numeric_tools() -> None:
 def test_networks_public_api_exports_domestic_water_section_state_tools() -> None:
     assert callable(apply_section_sizing_state)
     assert callable(apply_section_pressure_loss_state)
+
+
+def test_networks_public_api_exports_domestic_water_appliance_rules_tools() -> None:
+    assert callable(appliance_flow_for_profile)
+    assert callable(minimum_appliance_internal_diameter_mm)
