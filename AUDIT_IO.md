@@ -1674,3 +1674,7 @@
   - calls: callable
 - **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_pressure_loss_result_tools()** -> `None`
   - calls: callable
+- **tests.networks.test_public_api.test_networks_public_api_all_is_unique_and_resolvable()** -> `None`
+  - calls: hasattr, len, set
+- **tests.networks.test_public_api.test_domestic_water_public_api_all_is_unique_and_resolvable()** -> `None`
+  - calls: hasattr, len, set

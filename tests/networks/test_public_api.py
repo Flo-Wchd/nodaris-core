@@ -1,3 +1,6 @@
+import ndc_core.networks as networks_api
+import ndc_core.networks.domestic_water as domestic_water_api
+
 from ndc_core.networks import (
     ColdWaterNetworkEngine,
     DomesticWaterAppliancePropagationEngine,
@@ -216,3 +219,17 @@ def test_networks_public_api_exports_domestic_water_section_hydraulic_inputs() -
 
 def test_networks_public_api_exports_domestic_water_pressure_loss_result_tools() -> None:
     assert callable(build_section_pressure_loss_result)
+
+
+def test_networks_public_api_all_is_unique_and_resolvable() -> None:
+    assert len(networks_api.__all__) == len(set(networks_api.__all__))
+
+    for exported_name in networks_api.__all__:
+        assert hasattr(networks_api, exported_name)
+
+
+def test_domestic_water_public_api_all_is_unique_and_resolvable() -> None:
+    assert len(domestic_water_api.__all__) == len(set(domestic_water_api.__all__))
+
+    for exported_name in domestic_water_api.__all__:
+        assert hasattr(domestic_water_api, exported_name)
