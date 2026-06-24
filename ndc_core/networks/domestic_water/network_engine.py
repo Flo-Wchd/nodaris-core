@@ -1,8 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import dataclass, field
-from enum import StrEnum
+from dataclasses import dataclass
 from typing import Any
 
 from ndc_core.catalogs.appliance_catalog import ApplianceCatalog
@@ -14,11 +13,15 @@ from ndc_core.common.result import Result
 from ndc_core.domain.networks.network import Network
 from ndc_core.hydraulics.conversions import pressure_bar_to_pa
 from ndc_core.networks.domestic_water.appliance_propagation import (
-    DomesticWaterAppliancePropagationResult,
     propagate_domestic_water_appliances,
 )
 from ndc_core.networks.domestic_water.message_binding import (
     bind_domestic_water_messages_to_entities,
+)
+from ndc_core.networks.domestic_water.network_compute_result import (
+    DomesticWaterNetworkComputeResult,
+    DomesticWaterNetworkStep,
+    DomesticWaterSectionComputeResult,
 )
 from ndc_core.networks.domestic_water.pressure_loss import (
     DomesticWaterPressureLossResult,
@@ -42,89 +45,6 @@ from ndc_core.networks.domestic_water.side_matching import (
 from ndc_core.networks.domestic_water.entity_access import (
     read_section_downstream_appliance_counts,
 )
-
-class DomesticWaterNetworkStep(StrEnum):
-    """Network compute step names."""
-
-    TOPOLOGY_VALIDATION = "topology_validation"
-    SIZING = "sizing"
-    PRESSURE_LOSS = "pressure_loss"
-    PRESSURE_PROPAGATION = "pressure_propagation"
-    PRESSURE_SUMMARY = "pressure_summary"
-
-
-@dataclass(frozen=True, slots=True)
-class DomesticWaterSectionComputeResult:
-    """Consolidated compute result for one section."""
-
-    section_id: str
-    sizing: DomesticWaterSectionSizing | None = None
-    pressure_loss: DomesticWaterPressureLossResult | None = None
-    messages: tuple[EngineMessage, ...] = field(default_factory=tuple)
-
-    @property
-    def sizing_ok(self) -> bool:
-        return self.sizing is not None and not self.sizing.has_errors
-
-    @property
-    def pressure_loss_ok(self) -> bool:
-        return self.pressure_loss is not None and not self.pressure_loss.has_errors
-
-    @property
-    def has_pressure_loss(self) -> bool:
-        return self.pressure_loss is not None
-
-    @property
-    def has_warnings(self) -> bool:
-        return any(message.is_warning for message in self.messages)
-
-    @property
-    def has_errors(self) -> bool:
-        return any(message.is_error for message in self.messages)
-
-
-@dataclass(frozen=True, slots=True)
-class DomesticWaterNetworkComputeResult:
-    """Consolidated network compute result."""
-
-    side: DomesticWaterSide
-    section_results: dict[str, DomesticWaterSectionComputeResult]
-    appliance_propagation: DomesticWaterAppliancePropagationResult | None = None
-    pressure_propagation: DomesticWaterPressurePropagationResult | None = None
-    pressure_summary: DomesticWaterPressureSummary | None = None
-    messages: tuple[EngineMessage, ...] = field(default_factory=tuple)
-
-    @property
-    def section_count(self) -> int:
-        return len(self.section_results)
-
-    @property
-    def sized_section_count(self) -> int:
-        return sum(1 for result in self.section_results.values() if result.sizing_ok)
-
-    @property
-    def pressure_loss_section_count(self) -> int:
-        return sum(
-            1
-            for result in self.section_results.values()
-            if result.pressure_loss_ok
-        )
-
-    @property
-    def has_pressure_propagation(self) -> bool:
-        return self.pressure_propagation is not None
-
-    @property
-    def has_pressure_summary(self) -> bool:
-        return self.pressure_summary is not None
-
-    @property
-    def has_warnings(self) -> bool:
-        return any(message.is_warning for message in self.messages)
-
-    @property
-    def has_errors(self) -> bool:
-        return any(message.is_error for message in self.messages)
 
 
 @dataclass(frozen=True, slots=True)
