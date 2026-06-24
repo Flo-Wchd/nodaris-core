@@ -92,6 +92,10 @@ from ndc_core.networks.domestic_water.pressure_network_result import (
     PressurePropagationStatus as PressurePropagationStatusFromModule,
     TerminalPressureStatus as TerminalPressureStatusFromModule,
 )
+from ndc_core.networks.domestic_water.section_sizing_result import (
+    DomesticWaterSectionSizing as SectionSizingFromModule,
+    SectionSizingMode as SectionSizingModeFromModule,
+)
 
 
 def test_networks_public_api_exports_facades() -> None:
@@ -124,6 +128,8 @@ def test_networks_public_api_exports_section_sizing_types() -> None:
     assert DomesticWaterSectionSizing is not None
     assert DomesticWaterSectionSizingEngine is not None
     assert SectionSizingMode.AUTOMATIC.value == "automatic"
+    assert DomesticWaterSectionSizing is SectionSizingFromModule
+    assert SectionSizingMode is SectionSizingModeFromModule
 
 
 def test_networks_public_api_exports_pressure_loss_types() -> None:

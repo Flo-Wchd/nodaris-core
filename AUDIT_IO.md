@@ -801,11 +801,6 @@
 
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\section_sizing.py
 
-- **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizing.sized(self)** -> `bool`
-- **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizing.has_warnings(self)** -> `bool`
-  - calls: any
-- **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizing.has_errors(self)** -> `bool`
-  - calls: any
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine.cold_water(cls, appliance_catalog, pipe_catalog)** -> `DomesticWaterSectionSizingEngine`
   - calls: cls
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine.hot_water(cls, appliance_catalog, pipe_catalog)** -> `DomesticWaterSectionSizingEngine`
@@ -829,6 +824,14 @@
 - **ndc_core.networks.domestic_water.section_sizing.velocity_limit_for_context(usage_context)** -> `float`
   - calls: isinstance, str, value.strip, value.strip().lower
   - doc: Return default velocity limit for domestic water.
+
+## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\section_sizing_result.py
+
+- **ndc_core.networks.domestic_water.section_sizing_result.DomesticWaterSectionSizing.sized(self)** -> `bool`
+- **ndc_core.networks.domestic_water.section_sizing_result.DomesticWaterSectionSizing.has_warnings(self)** -> `bool`
+  - calls: any
+- **ndc_core.networks.domestic_water.section_sizing_result.DomesticWaterSectionSizing.has_errors(self)** -> `bool`
+  - calls: any
 
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\section_state.py
 
@@ -1562,6 +1565,15 @@
   - calls: _appliance_catalog, _pipe_catalog, _section, any, size_cold_water_section_from_counts
 - **tests.networks.domestic_water.test_section_sizing.test_zero_hot_water_demand_returns_partial_without_exception()** -> `None`
   - calls: _appliance_catalog, _pipe_catalog, _section, any, size_hot_water_section_from_counts
+
+## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_section_sizing_result.py
+
+- **tests.networks.domestic_water.test_section_sizing_result.test_section_sizing_result_exports_are_kept_from_section_sizing()** -> `None`
+- **tests.networks.domestic_water.test_section_sizing_result.test_section_sizing_mode_values()** -> `None`
+- **tests.networks.domestic_water.test_section_sizing_result.test_section_sizing_result_helpers_for_sized_section()** -> `None`
+  - calls: DomesticWaterSectionSizing, EngineMessage.warning, SimpleNamespace
+- **tests.networks.domestic_water.test_section_sizing_result.test_section_sizing_result_helpers_for_error()** -> `None`
+  - calls: DomesticWaterSectionSizing, EngineMessage.error, SimpleNamespace
 
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_section_state.py
 

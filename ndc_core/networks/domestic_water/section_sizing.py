@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from enum import StrEnum
+from dataclasses import dataclass
 from typing import Mapping
 
 from ndc_core.catalogs.appliance_catalog import ApplianceCatalog
@@ -10,7 +9,6 @@ from ndc_core.common.messages import EngineMessage
 from ndc_core.common.result import Result
 from ndc_core.domain.networks.section import Section
 from ndc_core.domain.networks.types import SectionUsageContext
-from ndc_core.domain.pipes import PipeSize
 from ndc_core.hydraulics.pipe_sizing import select_pipe_size_by_velocity
 from ndc_core.hydraulics.velocity import velocity_from_l_s_and_mm
 from ndc_core.networks.domestic_water.demand import DomesticWaterDemandBuilder
@@ -19,54 +17,16 @@ from ndc_core.networks.domestic_water.profiles import (
     HOT_WATER_PROFILE,
     DomesticWaterProfile,
 )
-from ndc_core.networks.domestic_water.types import (
-    DomesticWaterDemand,
-    DomesticWaterSide,
-)
+from ndc_core.networks.domestic_water.types import DomesticWaterDemand
 from ndc_core.networks.domestic_water.appliance_counts import normalize_appliance_counts
 from ndc_core.networks.domestic_water.entity_access import clean_optional_code
 from ndc_core.networks.domestic_water.numeric import positive_optional_float
 from ndc_core.networks.domestic_water.section_state import apply_section_sizing_state
 from ndc_core.networks.domestic_water.appliance_rules import minimum_appliance_internal_diameter_mm
-
-
-class SectionSizingMode(StrEnum):
-    """Section diameter selection mode."""
-
-    AUTOMATIC = "automatic"
-    FORCED_PIPE = "forced_pipe"
-    FORCED_INTERNAL_DIAMETER = "forced_internal_diameter"
-
-
-@dataclass(frozen=True, slots=True)
-class DomesticWaterSectionSizing:
-    """Sizing result for one domestic water section."""
-
-    section_id: str
-    side: DomesticWaterSide
-    mode: SectionSizingMode
-    demand: DomesticWaterDemand
-    selected_pipe_size: PipeSize | None
-    selected_pipe_size_code: str | None
-    theoretical_internal_diameter_mm: float | None
-    min_required_internal_diameter_mm: float | None
-    used_internal_diameter_mm: float | None
-    velocity_m_s: float | None
-    max_velocity_m_s: float
-    velocity_ok: bool | None
-    messages: tuple[EngineMessage, ...] = field(default_factory=tuple)
-
-    @property
-    def sized(self) -> bool:
-        return self.used_internal_diameter_mm is not None
-
-    @property
-    def has_warnings(self) -> bool:
-        return any(message.is_warning for message in self.messages)
-
-    @property
-    def has_errors(self) -> bool:
-        return any(message.is_error for message in self.messages)
+from ndc_core.networks.domestic_water.section_sizing_result import (
+    DomesticWaterSectionSizing,
+    SectionSizingMode,
+)
 
 
 @dataclass(frozen=True, slots=True)

@@ -101,12 +101,14 @@ from ndc_core.networks.domestic_water.section_hydraulic_inputs import (
     prepare_section_hydraulic_inputs,
 )
 from ndc_core.networks.domestic_water.section_sizing import (
-    DomesticWaterSectionSizing,
     DomesticWaterSectionSizingEngine,
-    SectionSizingMode,
     size_cold_water_section_from_counts,
     size_hot_water_section_from_counts,
     velocity_limit_for_context,
+)
+from ndc_core.networks.domestic_water.section_sizing_result import (
+    DomesticWaterSectionSizing,
+    SectionSizingMode,
 )
 from ndc_core.networks.domestic_water.section_state import (
     apply_section_pressure_loss_state,
