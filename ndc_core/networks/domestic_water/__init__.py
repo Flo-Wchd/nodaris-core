@@ -79,15 +79,17 @@ from ndc_core.networks.domestic_water.pressure_loss_types import (
 )
 from ndc_core.networks.domestic_water.pressure_network import (
     DomesticWaterPressureNetworkEngine,
+    propagate_cold_water_pressures,
+    propagate_hot_water_pressures,
+    summarize_cold_water_worst_terminal_pressure,
+    summarize_hot_water_worst_terminal_pressure,
+)
+from ndc_core.networks.domestic_water.pressure_network_result import (
     DomesticWaterPressurePropagationResult,
     DomesticWaterPressureSummary,
     NodePressureState,
     PressurePropagationStatus,
     TerminalPressureStatus,
-    propagate_cold_water_pressures,
-    propagate_hot_water_pressures,
-    summarize_cold_water_worst_terminal_pressure,
-    summarize_hot_water_worst_terminal_pressure,
 )
 from ndc_core.networks.domestic_water.profiles import (
     COLD_WATER_PROFILE,

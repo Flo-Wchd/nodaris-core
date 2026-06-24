@@ -85,6 +85,13 @@ from ndc_core.networks.cold_water import (
 from ndc_core.networks.hot_water import (
     HotWaterNetworkEngine as HotWaterNetworkEngineFromPackage,
 )
+from ndc_core.networks.domestic_water.pressure_network_result import (
+    DomesticWaterPressurePropagationResult as PressurePropagationResultFromModule,
+    DomesticWaterPressureSummary as PressureSummaryFromModule,
+    NodePressureState as NodePressureStateFromModule,
+    PressurePropagationStatus as PressurePropagationStatusFromModule,
+    TerminalPressureStatus as TerminalPressureStatusFromModule,
+)
 
 
 def test_networks_public_api_exports_facades() -> None:
@@ -132,6 +139,11 @@ def test_networks_public_api_exports_pressure_network_types() -> None:
     assert NodePressureState is not None
     assert TerminalPressureStatus is not None
     assert PressurePropagationStatus.SUCCESS.value == "success"
+    assert DomesticWaterPressurePropagationResult is PressurePropagationResultFromModule
+    assert DomesticWaterPressureSummary is PressureSummaryFromModule
+    assert NodePressureState is NodePressureStateFromModule
+    assert TerminalPressureStatus is TerminalPressureStatusFromModule
+    assert PressurePropagationStatus is PressurePropagationStatusFromModule
 
 
 def test_networks_public_api_exports_appliance_propagation_types() -> None:
