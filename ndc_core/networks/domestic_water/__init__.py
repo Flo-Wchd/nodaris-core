@@ -27,9 +27,12 @@ from ndc_core.networks.domestic_water.network_engine import (
 )
 from ndc_core.networks.domestic_water.pressure_loss import (
     DomesticWaterPressureLossEngine,
-    DomesticWaterPressureLossResult,
     compute_cold_water_section_pressure_loss,
     compute_hot_water_section_pressure_loss,
+)
+from ndc_core.networks.domestic_water.pressure_loss_result import (
+    DomesticWaterPressureLossResult,
+    build_section_pressure_loss_result,
 )
 from ndc_core.networks.domestic_water.pressure_loss_types import (
     DomesticWaterPressureLossMode,
@@ -218,4 +221,5 @@ __all__ = [
     "resolve_domestic_water_fluid",
     "DomesticWaterSectionHydraulicInputs",
     "prepare_section_hydraulic_inputs",
+    "build_section_pressure_loss_result",
 ]

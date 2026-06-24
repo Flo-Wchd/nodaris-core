@@ -73,6 +73,7 @@ from ndc_core.networks.domestic_water import (
     resolve_domestic_water_fluid,
     DomesticWaterSectionHydraulicInputs,
     prepare_section_hydraulic_inputs,
+    build_section_pressure_loss_result,
 )
 from ndc_core.networks.hot_water import (
     HotWaterNetworkEngine,
@@ -156,4 +157,5 @@ __all__ = [
     "resolve_domestic_water_fluid",
     "DomesticWaterSectionHydraulicInputs",
     "prepare_section_hydraulic_inputs",
+    "build_section_pressure_loss_result",
 ]

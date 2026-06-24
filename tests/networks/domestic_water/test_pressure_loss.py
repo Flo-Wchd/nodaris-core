@@ -9,9 +9,11 @@ from ndc_core.domain.networks.types import SectionUsageContext
 from ndc_core.domain.pipes import PipeMaterial, PipeSize
 from ndc_core.domain.singular_losses import SingularLoss, SingularLossMethod
 from ndc_core.networks.domestic_water.pressure_loss import (
-    DomesticWaterPressureLossMode,
     compute_cold_water_section_pressure_loss,
     compute_hot_water_section_pressure_loss,
+)
+from ndc_core.networks.domestic_water.pressure_loss_types import (
+    DomesticWaterPressureLossMode,
 )
 
 

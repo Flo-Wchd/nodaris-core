@@ -729,23 +729,29 @@
 
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\pressure_loss.py
 
-- **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossResult.reynolds(self)** -> `float | None`
-- **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossResult.linear_pressure_loss_pa(self)** -> `float`
-- **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossResult.singular_pressure_loss_pa(self)** -> `float`
-- **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossResult.elevation_pressure_change_pa(self)** -> `float`
-- **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossResult.total_pressure_change_pa(self)** -> `float`
-- **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossResult.has_warnings(self)** -> `bool`
-  - calls: any
-- **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossResult.has_errors(self)** -> `bool`
-  - calls: any
 - **ndc_core.networks.domestic_water.pressure_loss.DomesticWaterPressureLossEngine.compute_section_pressure_loss(self, section, water_temperature_c, singular_zeta_values)** -> `Result[DomesticWaterPressureLossResult]`
-  - calls: DomesticWaterPressureLossResult, Result.failure, Result.success, apply_section_pressure_loss_state, collect_section_singular_zeta_values, prepare_section_hydraulic_inputs, relative_roughness_for_section, resolve_domestic_water_fluid, total_pressure_loss, tuple
+  - calls: Result.failure, build_section_pressure_loss_result, collect_section_singular_zeta_values, prepare_section_hydraulic_inputs, relative_roughness_for_section, resolve_domestic_water_fluid, total_pressure_loss, tuple
 - **ndc_core.networks.domestic_water.pressure_loss.compute_cold_water_section_pressure_loss(section, fluid_catalog, pipe_catalog, singular_loss_catalog, water_temperature_c, singular_zeta_values)** -> `Result[DomesticWaterPressureLossResult]`
   - calls: DomesticWaterPressureLossEngine, DomesticWaterPressureLossEngine(fluid_catalog=fluid_catalog, pipe_catalog=pipe_catalog, singular_loss_catalog=singular_loss_catalog, side=DomesticWaterSide.COLD_WATER).compute_section_pressure_loss
   - doc: Convenience function for EFS section pressure loss.
 - **ndc_core.networks.domestic_water.pressure_loss.compute_hot_water_section_pressure_loss(section, fluid_catalog, pipe_catalog, singular_loss_catalog, water_temperature_c, singular_zeta_values)** -> `Result[DomesticWaterPressureLossResult]`
   - calls: DomesticWaterPressureLossEngine, DomesticWaterPressureLossEngine(fluid_catalog=fluid_catalog, pipe_catalog=pipe_catalog, singular_loss_catalog=singular_loss_catalog, side=DomesticWaterSide.HOT_WATER).compute_section_pressure_loss
   - doc: Convenience function for ECS forward section pressure loss.
+
+## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\pressure_loss_result.py
+
+- **ndc_core.networks.domestic_water.pressure_loss_result.DomesticWaterPressureLossResult.reynolds(self)** -> `float | None`
+- **ndc_core.networks.domestic_water.pressure_loss_result.DomesticWaterPressureLossResult.linear_pressure_loss_pa(self)** -> `float`
+- **ndc_core.networks.domestic_water.pressure_loss_result.DomesticWaterPressureLossResult.singular_pressure_loss_pa(self)** -> `float`
+- **ndc_core.networks.domestic_water.pressure_loss_result.DomesticWaterPressureLossResult.elevation_pressure_change_pa(self)** -> `float`
+- **ndc_core.networks.domestic_water.pressure_loss_result.DomesticWaterPressureLossResult.total_pressure_change_pa(self)** -> `float`
+- **ndc_core.networks.domestic_water.pressure_loss_result.DomesticWaterPressureLossResult.has_warnings(self)** -> `bool`
+  - calls: any
+- **ndc_core.networks.domestic_water.pressure_loss_result.DomesticWaterPressureLossResult.has_errors(self)** -> `bool`
+  - calls: any
+- **ndc_core.networks.domestic_water.pressure_loss_result.build_section_pressure_loss_result(section, side, fluid, inputs, breakdown, relative_roughness_value, messages)** -> `Result[DomesticWaterPressureLossResult]`
+  - calls: DomesticWaterPressureLossResult, Result.failure, Result.success, apply_section_pressure_loss_state, tuple
+  - doc: Build, write and wrap a domestic water section pressure-loss result.
 
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\pressure_network.py
 
@@ -1461,6 +1467,19 @@
 - **tests.networks.domestic_water.test_pressure_loss.test_unknown_singular_loss_creates_warning_without_failure()** -> `None`
   - calls: _CatalogLoss, _fluid_catalog, _pipe_catalog, _section, _singular_loss_catalog, any, compute_cold_water_section_pressure_loss, section.singular_losses.append
 
+## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_pressure_loss_result.py
+
+- **tests.networks.domestic_water.test_pressure_loss_result._fluid()** -> `Fluid`
+  - calls: Fluid
+- **tests.networks.domestic_water.test_pressure_loss_result._inputs()** -> `DomesticWaterSectionHydraulicInputs`
+  - calls: DomesticWaterSectionHydraulicInputs
+- **tests.networks.domestic_water.test_pressure_loss_result._breakdown()** -> `PressureLossBreakdown`
+  - calls: PressureLossBreakdown
+- **tests.networks.domestic_water.test_pressure_loss_result.test_build_section_pressure_loss_result_success_writes_section_state()** -> `None`
+  - calls: _Section, _breakdown, _fluid, _inputs, build_section_pressure_loss_result, isinstance
+- **tests.networks.domestic_water.test_pressure_loss_result.test_build_section_pressure_loss_result_failure_when_messages_contain_error()** -> `None`
+  - calls: EngineMessage.error, _Section, _breakdown, _fluid, _inputs, build_section_pressure_loss_result
+
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_pressure_network.py
 
 - **tests.networks.domestic_water.test_pressure_network.test_propagate_pressures_on_simple_network()** -> `None`
@@ -1652,4 +1671,6 @@
 - **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_fluid_rules()** -> `None`
   - calls: callable
 - **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_section_hydraulic_inputs()** -> `None`
+  - calls: callable
+- **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_pressure_loss_result_tools()** -> `None`
   - calls: callable
