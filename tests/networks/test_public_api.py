@@ -78,6 +78,7 @@ from ndc_core.networks import (
     DomesticWaterSectionHydraulicInputs,
     prepare_section_hydraulic_inputs,
     build_section_pressure_loss_result,
+    select_section_diameter,
 )
 from ndc_core.networks.cold_water import (
     ColdWaterNetworkEngine as ColdWaterNetworkEngineFromPackage,
@@ -95,6 +96,9 @@ from ndc_core.networks.domestic_water.pressure_network_result import (
 from ndc_core.networks.domestic_water.section_sizing_result import (
     DomesticWaterSectionSizing as SectionSizingFromModule,
     SectionSizingMode as SectionSizingModeFromModule,
+)
+from ndc_core.networks.domestic_water.section_diameter_selection import (
+    select_section_diameter as select_section_diameter_from_module,
 )
 
 
@@ -130,6 +134,8 @@ def test_networks_public_api_exports_section_sizing_types() -> None:
     assert SectionSizingMode.AUTOMATIC.value == "automatic"
     assert DomesticWaterSectionSizing is SectionSizingFromModule
     assert SectionSizingMode is SectionSizingModeFromModule
+    assert callable(select_section_diameter)
+    assert select_section_diameter is select_section_diameter_from_module
 
 
 def test_networks_public_api_exports_pressure_loss_types() -> None:

@@ -77,6 +77,7 @@ from ndc_core.networks.domestic_water import (
     write_section_downstream_appliance_counts,
     zeta_from_catalog_singular_loss,
     zeta_from_section_singular_loss_item,
+    select_section_diameter,
 )
 from ndc_core.networks.hot_water import (
     HotWaterNetworkEngine,
@@ -128,6 +129,7 @@ _DOMESTIC_WATER_SIZING_EXPORTS = [
     "DomesticWaterSectionSizing",
     "DomesticWaterSectionSizingEngine",
     "SectionSizingMode",
+    "select_section_diameter",
 ]
 
 _DOMESTIC_WATER_APPLIANCE_EXPORTS = [

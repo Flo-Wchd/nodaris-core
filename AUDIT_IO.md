@@ -793,6 +793,26 @@
 
 - **ndc_core.networks.domestic_water.profiles.DomesticWaterProfile.flow_attribute_name(self)** -> `str`
 
+## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\section_diameter_selection.py
+
+- **ndc_core.networks.domestic_water.section_diameter_selection.select_section_diameter(section, demand, pipe_catalog, side, min_required_diameter_mm, max_velocity_m_s, messages)** -> `DomesticWaterSectionSizing`
+  - calls: _size_automatically, _size_with_forced_internal_diameter, _size_with_forced_pipe, clean_optional_code, positive_optional_float
+  - doc: Select or apply the section internal diameter.
+- **ndc_core.networks.domestic_water.section_diameter_selection._size_automatically(section, demand, pipe_catalog, side, min_required_diameter_mm, max_velocity_m_s, messages)** -> `DomesticWaterSectionSizing`
+  - calls: DomesticWaterSectionSizing, EngineMessage.error, _pipe_sizes_for_section, messages.append, select_pipe_size_by_velocity, tuple
+- **ndc_core.networks.domestic_water.section_diameter_selection._size_with_forced_pipe(section, demand, pipe_catalog, side, forced_pipe_code, min_required_diameter_mm, max_velocity_m_s, messages)** -> `DomesticWaterSectionSizing`
+  - calls: DomesticWaterSectionSizing, EngineMessage.error, _append_forced_pipe_warnings, _theoretical_internal_diameter_mm, messages.append, pipe_catalog.get_size, pipe_catalog.sizes_by_code.values, tuple, velocity_from_l_s_and_mm
+- **ndc_core.networks.domestic_water.section_diameter_selection._size_with_forced_internal_diameter(section, demand, pipe_catalog, side, forced_diameter_mm, min_required_diameter_mm, max_velocity_m_s, messages)** -> `DomesticWaterSectionSizing`
+  - calls: DomesticWaterSectionSizing, _append_forced_internal_diameter_warnings, _theoretical_internal_diameter_mm, pipe_catalog.sizes_by_code.values, tuple, velocity_from_l_s_and_mm
+- **ndc_core.networks.domestic_water.section_diameter_selection._pipe_sizes_for_section(pipe_catalog, section)** -> `Sequence[PipeSize]`
+  - calls: list, pipe_catalog.list_sizes_for_material, pipe_catalog.sizes_by_code.values, section.fluid_code.lower
+- **ndc_core.networks.domestic_water.section_diameter_selection._theoretical_internal_diameter_mm(demand, pipe_sizes, min_required_diameter_mm, max_velocity_m_s)** -> `float | None`
+  - calls: select_pipe_size_by_velocity
+- **ndc_core.networks.domestic_water.section_diameter_selection._append_forced_pipe_warnings(section, forced_pipe_code, used_diameter_mm, velocity_m_s, velocity_ok, min_required_diameter_mm, max_velocity_m_s, messages)** -> `None`
+  - calls: EngineMessage.warning, messages.append
+- **ndc_core.networks.domestic_water.section_diameter_selection._append_forced_internal_diameter_warnings(section, forced_diameter_mm, velocity_m_s, velocity_ok, min_required_diameter_mm, max_velocity_m_s, messages)** -> `None`
+  - calls: EngineMessage.warning, messages.append
+
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\section_hydraulic_inputs.py
 
 - **ndc_core.networks.domestic_water.section_hydraulic_inputs.prepare_section_hydraulic_inputs(section, messages)** -> `DomesticWaterSectionHydraulicInputs | None`
@@ -806,15 +826,7 @@
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine.hot_water(cls, appliance_catalog, pipe_catalog)** -> `DomesticWaterSectionSizingEngine`
   - calls: cls
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine.size_section_from_counts(self, section, appliance_counts, max_velocity_m_s)** -> `Result[DomesticWaterSectionSizing]`
-  - calls: DomesticWaterDemandBuilder, DomesticWaterDemandBuilder(appliance_catalog=self.appliance_catalog, profile=self.profile).compute_from_counts, DomesticWaterSectionSizing, EngineMessage.warning, Result.failure, Result.partial, Result.success, apply_section_sizing_state, max, messages.append, messages.extend, minimum_appliance_internal_diameter_mm, normalize_appliance_counts, self._select_or_force_diameter, tuple ...
-- **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine._select_or_force_diameter(self, section, demand, raw_counts, effective_counts, min_required_diameter_mm, max_velocity_m_s, messages)** -> `DomesticWaterSectionSizing`
-  - calls: clean_optional_code, positive_optional_float, self._size_automatically, self._size_with_forced_internal_diameter, self._size_with_forced_pipe
-- **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine._size_automatically(self, section, demand, raw_counts, effective_counts, min_required_diameter_mm, max_velocity_m_s, messages)** -> `DomesticWaterSectionSizing`
-  - calls: DomesticWaterSectionSizing, EngineMessage.error, list, messages.append, section.fluid_code.lower, select_pipe_size_by_velocity, self.pipe_catalog.list_sizes_for_material, self.pipe_catalog.sizes_by_code.values, tuple
-- **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine._size_with_forced_pipe(self, section, demand, forced_pipe_code, min_required_diameter_mm, max_velocity_m_s, messages)** -> `DomesticWaterSectionSizing`
-  - calls: DomesticWaterSectionSizing, EngineMessage.error, EngineMessage.warning, messages.append, select_pipe_size_by_velocity, self.pipe_catalog.get_size, self.pipe_catalog.sizes_by_code.values, tuple, velocity_from_l_s_and_mm
-- **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine._size_with_forced_internal_diameter(self, section, demand, forced_diameter_mm, min_required_diameter_mm, max_velocity_m_s, messages)** -> `DomesticWaterSectionSizing`
-  - calls: DomesticWaterSectionSizing, EngineMessage.warning, messages.append, select_pipe_size_by_velocity, self.pipe_catalog.sizes_by_code.values, tuple, velocity_from_l_s_and_mm
+  - calls: DomesticWaterDemandBuilder, DomesticWaterDemandBuilder(appliance_catalog=self.appliance_catalog, profile=self.profile).compute_from_counts, DomesticWaterSectionSizing, EngineMessage.warning, Result.failure, Result.partial, Result.success, apply_section_sizing_state, max, messages.append, messages.extend, minimum_appliance_internal_diameter_mm, normalize_appliance_counts, select_section_diameter, tuple ...
 - **ndc_core.networks.domestic_water.section_sizing.size_cold_water_section_from_counts(section, appliance_counts, appliance_catalog, pipe_catalog, max_velocity_m_s)** -> `Result[DomesticWaterSectionSizing]`
   - calls: DomesticWaterSectionSizingEngine.cold_water, DomesticWaterSectionSizingEngine.cold_water(appliance_catalog=appliance_catalog, pipe_catalog=pipe_catalog).size_section_from_counts
   - doc: Convenience function for EFS section sizing.
@@ -1528,6 +1540,25 @@
 - **tests.networks.domestic_water.test_pressure_network_result.test_pressure_summary_helpers()** -> `None`
   - calls: DomesticWaterPressurePropagationResult, DomesticWaterPressureSummary, NodePressureState, TerminalPressureStatus
 
+## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_section_diameter_selection.py
+
+- **tests.networks.domestic_water.test_section_diameter_selection._pipe_catalog()** -> `PipeCatalog`
+  - calls: PipeCatalog, PipeMaterial, PipeSize
+- **tests.networks.domestic_water.test_section_diameter_selection._section(**kwargs)** -> `Section`
+  - calls: Section, values.update
+- **tests.networks.domestic_water.test_section_diameter_selection._demand(flow_l_s)** -> `DomesticWaterDemand`
+  - calls: ApplianceDemandItem, DomesticWaterDemand
+- **tests.networks.domestic_water.test_section_diameter_selection.test_select_section_diameter_automatic()** -> `None`
+  - calls: _demand, _pipe_catalog, _section, select_section_diameter
+- **tests.networks.domestic_water.test_section_diameter_selection.test_select_section_diameter_forced_pipe()** -> `None`
+  - calls: _demand, _pipe_catalog, _section, select_section_diameter
+- **tests.networks.domestic_water.test_section_diameter_selection.test_select_section_diameter_unknown_forced_pipe_adds_error()** -> `None`
+  - calls: _demand, _pipe_catalog, _section, any, select_section_diameter
+- **tests.networks.domestic_water.test_section_diameter_selection.test_select_section_diameter_forced_internal_diameter()** -> `None`
+  - calls: _demand, _pipe_catalog, _section, select_section_diameter
+- **tests.networks.domestic_water.test_section_diameter_selection.test_select_section_diameter_forced_internal_diameter_below_minimum()** -> `None`
+  - calls: _demand, _pipe_catalog, _section, any, select_section_diameter
+
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_section_hydraulic_inputs.py
 
 - **tests.networks.domestic_water.test_section_hydraulic_inputs._section()** -> `Section`
@@ -1686,6 +1717,7 @@
 - **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_engine_types()** -> `None`
 - **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_domain_types()** -> `None`
 - **tests.networks.test_public_api.test_networks_public_api_exports_section_sizing_types()** -> `None`
+  - calls: callable
 - **tests.networks.test_public_api.test_networks_public_api_exports_pressure_loss_types()** -> `None`
 - **tests.networks.test_public_api.test_networks_public_api_exports_pressure_network_types()** -> `None`
 - **tests.networks.test_public_api.test_networks_public_api_exports_appliance_propagation_types()** -> `None`

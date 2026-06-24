@@ -9,23 +9,21 @@ from ndc_core.common.messages import EngineMessage
 from ndc_core.common.result import Result
 from ndc_core.domain.networks.section import Section
 from ndc_core.domain.networks.types import SectionUsageContext
-from ndc_core.hydraulics.pipe_sizing import select_pipe_size_by_velocity
-from ndc_core.hydraulics.velocity import velocity_from_l_s_and_mm
 from ndc_core.networks.domestic_water.demand import DomesticWaterDemandBuilder
 from ndc_core.networks.domestic_water.profiles import (
     COLD_WATER_PROFILE,
     HOT_WATER_PROFILE,
     DomesticWaterProfile,
 )
-from ndc_core.networks.domestic_water.types import DomesticWaterDemand
 from ndc_core.networks.domestic_water.appliance_counts import normalize_appliance_counts
-from ndc_core.networks.domestic_water.entity_access import clean_optional_code
-from ndc_core.networks.domestic_water.numeric import positive_optional_float
 from ndc_core.networks.domestic_water.section_state import apply_section_sizing_state
 from ndc_core.networks.domestic_water.appliance_rules import minimum_appliance_internal_diameter_mm
 from ndc_core.networks.domestic_water.section_sizing_result import (
     DomesticWaterSectionSizing,
     SectionSizingMode,
+)
+from ndc_core.networks.domestic_water.section_diameter_selection import (
+    select_section_diameter,
 )
 
 
@@ -139,11 +137,11 @@ class DomesticWaterSectionSizingEngine:
             )
             return Result.partial(value=sizing, messages=messages)
 
-        sizing = self._select_or_force_diameter(
+        sizing = select_section_diameter(
             section=section,
             demand=demand,
-            raw_counts=raw_counts,
-            effective_counts=effective_counts,
+            pipe_catalog=self.pipe_catalog,
+            side=self.profile.side,
             min_required_diameter_mm=min_required_diameter,
             max_velocity_m_s=velocity_limit,
             messages=messages,
@@ -160,286 +158,6 @@ class DomesticWaterSectionSizingEngine:
             return Result.failure(value=sizing, messages=messages)
 
         return Result.success(value=sizing, messages=messages)
-
-    def _select_or_force_diameter(
-        self,
-        section: Section,
-        demand: DomesticWaterDemand,
-        raw_counts: dict[str, int],
-        effective_counts: dict[str, int],
-        min_required_diameter_mm: float,
-        max_velocity_m_s: float,
-        messages: list[EngineMessage],
-    ) -> DomesticWaterSectionSizing:
-        forced_pipe_code = clean_optional_code(section.forced_pipe_size_code)
-        forced_diameter = positive_optional_float(
-            section.forced_internal_diameter_mm
-        )
-
-        if forced_pipe_code:
-            return self._size_with_forced_pipe(
-                section=section,
-                demand=demand,
-                forced_pipe_code=forced_pipe_code,
-                min_required_diameter_mm=min_required_diameter_mm,
-                max_velocity_m_s=max_velocity_m_s,
-                messages=messages,
-            )
-
-        if forced_diameter is not None:
-            return self._size_with_forced_internal_diameter(
-                section=section,
-                demand=demand,
-                forced_diameter_mm=forced_diameter,
-                min_required_diameter_mm=min_required_diameter_mm,
-                max_velocity_m_s=max_velocity_m_s,
-                messages=messages,
-            )
-
-        return self._size_automatically(
-            section=section,
-            demand=demand,
-            raw_counts=raw_counts,
-            effective_counts=effective_counts,
-            min_required_diameter_mm=min_required_diameter_mm,
-            max_velocity_m_s=max_velocity_m_s,
-            messages=messages,
-        )
-
-    def _size_automatically(
-        self,
-        section: Section,
-        demand: DomesticWaterDemand,
-        raw_counts: dict[str, int],
-        effective_counts: dict[str, int],
-        min_required_diameter_mm: float,
-        max_velocity_m_s: float,
-        messages: list[EngineMessage],
-    ) -> DomesticWaterSectionSizing:
-        del raw_counts, effective_counts
-
-        pipe_sizes = self.pipe_catalog.list_sizes_for_material(
-            section.fluid_code
-        )
-        if not pipe_sizes:
-            pipe_sizes = self.pipe_catalog.list_sizes_for_material(
-                section.fluid_code.lower()
-            )
-        if not pipe_sizes:
-            pipe_sizes = list(self.pipe_catalog.sizes_by_code.values())
-
-        hydraulic_result = select_pipe_size_by_velocity(
-            design_flow_l_s=demand.design_flow_l_s,
-            pipe_sizes=pipe_sizes,
-            max_velocity_m_s=max_velocity_m_s,
-            min_internal_diameter_mm=(
-                min_required_diameter_mm or None
-            ),
-        )
-
-        selected = hydraulic_result.selected_pipe_size
-
-        if selected is None:
-            messages.append(
-                EngineMessage.error(
-                    code="DOMESTIC_WATER_NO_PIPE_SIZE_FOUND",
-                    text="No usable pipe size was found for section sizing.",
-                    context={"section_id": section.id},
-                )
-            )
-
-        return DomesticWaterSectionSizing(
-            section_id=section.id,
-            side=self.profile.side,
-            mode=SectionSizingMode.AUTOMATIC,
-            demand=demand,
-            selected_pipe_size=selected,
-            selected_pipe_size_code=selected.code if selected else None,
-            theoretical_internal_diameter_mm=(
-                hydraulic_result.theoretical_internal_diameter_mm
-            ),
-            min_required_internal_diameter_mm=(
-                min_required_diameter_mm or None
-            ),
-            used_internal_diameter_mm=(
-                selected.internal_diameter_mm if selected else None
-            ),
-            velocity_m_s=hydraulic_result.real_velocity_m_s,
-            max_velocity_m_s=max_velocity_m_s,
-            velocity_ok=hydraulic_result.velocity_ok,
-            messages=tuple(messages),
-        )
-
-    def _size_with_forced_pipe(
-        self,
-        section: Section,
-        demand: DomesticWaterDemand,
-        forced_pipe_code: str,
-        min_required_diameter_mm: float,
-        max_velocity_m_s: float,
-        messages: list[EngineMessage],
-    ) -> DomesticWaterSectionSizing:
-        selected = self.pipe_catalog.get_size(forced_pipe_code)
-
-        if selected is None:
-            messages.append(
-                EngineMessage.error(
-                    code="DOMESTIC_WATER_FORCED_PIPE_UNKNOWN",
-                    text="Forced pipe size code is not defined in the pipe catalog.",
-                    context={
-                        "section_id": section.id,
-                        "forced_pipe_size_code": forced_pipe_code,
-                    },
-                )
-            )
-            used_diameter = None
-            velocity = None
-            velocity_ok = None
-        else:
-            used_diameter = selected.internal_diameter_mm
-            velocity = velocity_from_l_s_and_mm(
-                demand.design_flow_l_s,
-                used_diameter,
-            )
-            velocity_ok = velocity <= max_velocity_m_s if velocity > 0.0 else None
-
-            if (
-                min_required_diameter_mm > 0.0
-                and used_diameter < min_required_diameter_mm
-            ):
-                messages.append(
-                    EngineMessage.warning(
-                        code="DOMESTIC_WATER_FORCED_PIPE_BELOW_MIN_DIAMETER",
-                        text=(
-                            "Forced pipe internal diameter is below appliance "
-                            "minimum diameter."
-                        ),
-                        context={
-                            "section_id": section.id,
-                            "forced_pipe_size_code": forced_pipe_code,
-                            "used_internal_diameter_mm": used_diameter,
-                            "min_required_internal_diameter_mm": (
-                                min_required_diameter_mm
-                            ),
-                        },
-                    )
-                )
-
-            if velocity_ok is False:
-                messages.append(
-                    EngineMessage.warning(
-                        code="DOMESTIC_WATER_FORCED_PIPE_VELOCITY_EXCEEDED",
-                        text="Forced pipe velocity exceeds the maximum velocity.",
-                        context={
-                            "section_id": section.id,
-                            "velocity_m_s": velocity,
-                            "max_velocity_m_s": max_velocity_m_s,
-                        },
-                    )
-                )
-
-        theoretical = select_pipe_size_by_velocity(
-            design_flow_l_s=demand.design_flow_l_s,
-            pipe_sizes=self.pipe_catalog.sizes_by_code.values(),
-            max_velocity_m_s=max_velocity_m_s,
-            min_internal_diameter_mm=(
-                min_required_diameter_mm or None
-            ),
-        ).theoretical_internal_diameter_mm
-
-        return DomesticWaterSectionSizing(
-            section_id=section.id,
-            side=self.profile.side,
-            mode=SectionSizingMode.FORCED_PIPE,
-            demand=demand,
-            selected_pipe_size=selected,
-            selected_pipe_size_code=selected.code if selected else None,
-            theoretical_internal_diameter_mm=theoretical,
-            min_required_internal_diameter_mm=(
-                min_required_diameter_mm or None
-            ),
-            used_internal_diameter_mm=used_diameter,
-            velocity_m_s=velocity,
-            max_velocity_m_s=max_velocity_m_s,
-            velocity_ok=velocity_ok,
-            messages=tuple(messages),
-        )
-
-    def _size_with_forced_internal_diameter(
-        self,
-        section: Section,
-        demand: DomesticWaterDemand,
-        forced_diameter_mm: float,
-        min_required_diameter_mm: float,
-        max_velocity_m_s: float,
-        messages: list[EngineMessage],
-    ) -> DomesticWaterSectionSizing:
-        velocity = velocity_from_l_s_and_mm(
-            demand.design_flow_l_s,
-            forced_diameter_mm,
-        )
-        velocity_ok = velocity <= max_velocity_m_s if velocity > 0.0 else None
-
-        if (
-            min_required_diameter_mm > 0.0
-            and forced_diameter_mm < min_required_diameter_mm
-        ):
-            messages.append(
-                EngineMessage.warning(
-                    code="DOMESTIC_WATER_FORCED_DIAMETER_BELOW_MIN_DIAMETER",
-                    text=(
-                        "Forced internal diameter is below appliance minimum "
-                        "diameter."
-                    ),
-                    context={
-                        "section_id": section.id,
-                        "forced_internal_diameter_mm": forced_diameter_mm,
-                        "min_required_internal_diameter_mm": (
-                            min_required_diameter_mm
-                        ),
-                    },
-                )
-            )
-
-        if velocity_ok is False:
-            messages.append(
-                EngineMessage.warning(
-                    code="DOMESTIC_WATER_FORCED_DIAMETER_VELOCITY_EXCEEDED",
-                    text="Forced internal diameter velocity exceeds the limit.",
-                    context={
-                        "section_id": section.id,
-                        "velocity_m_s": velocity,
-                        "max_velocity_m_s": max_velocity_m_s,
-                    },
-                )
-            )
-
-        theoretical = select_pipe_size_by_velocity(
-            design_flow_l_s=demand.design_flow_l_s,
-            pipe_sizes=self.pipe_catalog.sizes_by_code.values(),
-            max_velocity_m_s=max_velocity_m_s,
-            min_internal_diameter_mm=(
-                min_required_diameter_mm or None
-            ),
-        ).theoretical_internal_diameter_mm
-
-        return DomesticWaterSectionSizing(
-            section_id=section.id,
-            side=self.profile.side,
-            mode=SectionSizingMode.FORCED_INTERNAL_DIAMETER,
-            demand=demand,
-            selected_pipe_size=None,
-            selected_pipe_size_code=None,
-            theoretical_internal_diameter_mm=theoretical,
-            min_required_internal_diameter_mm=(
-                min_required_diameter_mm or None
-            ),
-            used_internal_diameter_mm=forced_diameter_mm,
-            velocity_m_s=velocity,
-            max_velocity_m_s=max_velocity_m_s,
-            velocity_ok=velocity_ok,
-            messages=tuple(messages),
-        )
 
 
 def size_cold_water_section_from_counts(

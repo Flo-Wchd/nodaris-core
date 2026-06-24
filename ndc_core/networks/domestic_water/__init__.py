@@ -100,6 +100,9 @@ from ndc_core.networks.domestic_water.section_hydraulic_inputs import (
     DomesticWaterSectionHydraulicInputs,
     prepare_section_hydraulic_inputs,
 )
+from ndc_core.networks.domestic_water.section_diameter_selection import (
+    select_section_diameter,
+)
 from ndc_core.networks.domestic_water.section_sizing import (
     DomesticWaterSectionSizingEngine,
     size_cold_water_section_from_counts,
@@ -138,6 +141,7 @@ from ndc_core.networks.domestic_water.types import (
     DomesticWaterMethod,
     DomesticWaterSide,
 )
+
 
 _DOMAIN_EXPORTS = [
     "ApplianceDemandItem",
@@ -206,6 +210,7 @@ _SECTION_SIZING_EXPORTS = [
     "DomesticWaterSectionSizing",
     "DomesticWaterSectionSizingEngine",
     "SectionSizingMode",
+    "select_section_diameter",
     "size_cold_water_section_from_counts",
     "size_hot_water_section_from_counts",
     "velocity_limit_for_context",
