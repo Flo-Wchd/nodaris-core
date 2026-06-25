@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from ndc_core.networks.domestic_water.pressure_network import (
     DomesticWaterPressureNetworkEngine,
     PressurePropagationStatus,
+    PressureSummaryStatus,
     propagate_cold_water_pressures,
     summarize_cold_water_worst_terminal_pressure,
 )
@@ -238,6 +239,14 @@ def test_worst_terminal_summary() -> None:
 
     worst = result.value.worst_terminal
 
+    assert result.value.status is PressureSummaryStatus.INSUFFICIENT_PRESSURE
+    assert result.value.has_insufficient_pressure
+    assert not result.value.is_ok
+    assert result.value.terminal_count == 1
+    assert result.value.critical_node_id == "C"
+    assert result.value.worst_pressure_bar == 2.49
+    assert round(result.value.pressure_margin_bar or 0.0, 2) == -0.11
+
     assert worst.node_id == "C"
     assert worst.pressure_bar == 2.49
     assert round(worst.delta_to_min_bar, 2) == -0.11
@@ -270,3 +279,82 @@ def test_hot_water_sections_are_ignored_by_cold_water_engine() -> None:
     assert result.ok
     assert result.value is not None
     assert set(result.value.node_pressures) == {"A"}
+
+
+def test_worst_terminal_summary_ok_status() -> None:
+    nodes = {
+        "A": _Node(id="A", downstream_section_ids=["S1"]),
+        "B": _Node(id="B", downstream_section_ids=[]),
+    }
+    sections = {
+        "S1": _Section(
+            id="S1",
+            upstream_node_id="A",
+            downstream_node_id="B",
+            total_pressure_loss_pa=0.25 * 100_000.0,
+        ),
+    }
+
+    result = summarize_cold_water_worst_terminal_pressure(
+        nodes=nodes,
+        sections=sections,
+        source_node_id="A",
+        source_pressure_bar=3.0,
+        min_required_pressure_bar=2.5,
+    )
+
+    assert result.ok
+    assert result.value is not None
+    assert result.value.status is PressureSummaryStatus.OK
+    assert result.value.is_ok
+    assert not result.value.has_insufficient_pressure
+    assert result.value.terminal_count == 1
+    assert result.value.critical_node_id == "B"
+    assert result.value.worst_pressure_bar == 2.75
+    assert result.value.pressure_margin_bar == 0.25
+
+
+def test_worst_terminal_summary_no_terminal_status() -> None:
+    nodes = {
+        "A": _Node(id="A", downstream_section_ids=["S1"]),
+        "B": _Node(id="B", downstream_section_ids=["S2"]),
+        "C": _Node(id="C", downstream_section_ids=["S3"]),
+    }
+    sections = {
+        "S1": _Section(
+            id="S1",
+            upstream_node_id="A",
+            downstream_node_id="B",
+            total_pressure_loss_pa=10.0,
+        ),
+        "S2": _Section(
+            id="S2",
+            upstream_node_id="B",
+            downstream_node_id="C",
+            total_pressure_loss_pa=10.0,
+        ),
+        "S3": _Section(
+            id="S3",
+            upstream_node_id="C",
+            downstream_node_id="A",
+            total_pressure_loss_pa=10.0,
+        ),
+    }
+
+    result = summarize_cold_water_worst_terminal_pressure(
+        nodes=nodes,
+        sections=sections,
+        source_node_id="A",
+        source_pressure_bar=3.0,
+        min_required_pressure_bar=1.0,
+    )
+
+    assert result.ok
+    assert result.value is not None
+    assert result.value.status is PressureSummaryStatus.NO_TERMINAL_REACHED
+    assert not result.value.has_worst_terminal
+    assert result.value.terminal_count == 0
+    assert result.value.critical_node_id is None
+    assert result.value.worst_pressure_bar is None
+    assert result.value.pressure_margin_bar is None
+    assert result.value.has_warnings

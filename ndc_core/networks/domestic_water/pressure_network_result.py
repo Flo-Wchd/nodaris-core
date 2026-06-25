@@ -15,6 +15,15 @@ class PressurePropagationStatus(StrEnum):
     NO_TERMINAL_REACHED = "no_terminal_reached"
 
 
+class PressureSummaryStatus(StrEnum):
+    """Worst terminal pressure summary status."""
+
+    OK = "ok"
+    INSUFFICIENT_PRESSURE = "insufficient_pressure"
+    NO_TERMINAL_REACHED = "no_terminal_reached"
+    SOURCE_NOT_FOUND = "source_not_found"
+
+
 @dataclass(frozen=True, slots=True)
 class NodePressureState:
     """Computed pressure state for one node."""
@@ -77,10 +86,39 @@ class DomesticWaterPressureSummary:
     terminal_statuses: dict[str, TerminalPressureStatus]
     propagation: DomesticWaterPressurePropagationResult
     messages: tuple[EngineMessage, ...] = field(default_factory=tuple)
+    status: PressureSummaryStatus = PressureSummaryStatus.OK
 
     @property
     def has_worst_terminal(self) -> bool:
         return self.worst_terminal is not None
+
+    @property
+    def terminal_count(self) -> int:
+        return len(self.terminal_statuses)
+
+    @property
+    def has_terminal_pressure_checks(self) -> bool:
+        return bool(self.terminal_statuses)
+
+    @property
+    def critical_node_id(self) -> str | None:
+        return self.worst_terminal.node_id if self.worst_terminal else None
+
+    @property
+    def worst_pressure_bar(self) -> float | None:
+        return self.worst_terminal.pressure_bar if self.worst_terminal else None
+
+    @property
+    def pressure_margin_bar(self) -> float | None:
+        return self.worst_terminal.delta_to_min_bar if self.worst_terminal else None
+
+    @property
+    def has_insufficient_pressure(self) -> bool:
+        return self.status is PressureSummaryStatus.INSUFFICIENT_PRESSURE
+
+    @property
+    def is_ok(self) -> bool:
+        return self.status is PressureSummaryStatus.OK
 
     @property
     def has_warnings(self) -> bool:

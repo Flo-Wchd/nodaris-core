@@ -22,8 +22,12 @@ from ndc_core.networks.domestic_water.pressure_network_result import (
     NodePressureState,
     PressurePropagationStatus,
     TerminalPressureStatus,
+    PressureSummaryStatus,
 )
 from ndc_core.networks.domestic_water.types import DomesticWaterSide
+from ndc_core.networks.domestic_water.pressure_network import (
+    PressureSummaryStatus as EnginePressureSummaryStatus,
+)
 
 
 def test_pressure_network_result_exports_are_kept_from_pressure_network() -> None:
@@ -32,6 +36,7 @@ def test_pressure_network_result_exports_are_kept_from_pressure_network() -> Non
     assert EngineNodePressureState is NodePressureState
     assert EnginePressurePropagationStatus is PressurePropagationStatus
     assert EngineTerminalPressureStatus is TerminalPressureStatus
+    assert EnginePressureSummaryStatus is PressureSummaryStatus
 
 
 def test_pressure_propagation_status_values() -> None:
@@ -132,3 +137,54 @@ def test_pressure_summary_helpers() -> None:
     assert summary.has_worst_terminal
     assert not summary.has_warnings
     assert not summary.has_errors
+    assert summary.status is PressureSummaryStatus.OK
+    assert summary.is_ok
+    assert not summary.has_insufficient_pressure
+    assert summary.terminal_count == 1
+    assert summary.has_terminal_pressure_checks
+    assert summary.critical_node_id == "B"
+    assert summary.worst_pressure_bar == 2.5
+    assert summary.pressure_margin_bar == -0.1
+
+
+def test_pressure_summary_insufficient_pressure_helpers() -> None:
+    propagation = DomesticWaterPressurePropagationResult(
+        source_node_id="A",
+        source_pressure_pa=300_000.0,
+        source_pressure_bar=3.0,
+        side=DomesticWaterSide.COLD_WATER,
+        node_pressures={
+            "B": NodePressureState(
+                node_id="B",
+                pressure_pa=250_000.0,
+                pressure_bar=2.5,
+                is_terminal=True,
+            ),
+        },
+    )
+    terminal = TerminalPressureStatus(
+        node_id="B",
+        pressure_pa=250_000.0,
+        pressure_bar=2.5,
+        min_required_pressure_bar=2.6,
+        delta_to_min_bar=-0.1,
+        is_below_min=True,
+    )
+
+    summary = DomesticWaterPressureSummary(
+        source_node_id="A",
+        source_pressure_bar=3.0,
+        min_required_pressure_bar=2.6,
+        side=DomesticWaterSide.COLD_WATER,
+        worst_terminal=terminal,
+        terminal_statuses={"B": terminal},
+        propagation=propagation,
+        status=PressureSummaryStatus.INSUFFICIENT_PRESSURE,
+    )
+
+    assert not summary.is_ok
+    assert summary.has_insufficient_pressure
+    assert summary.terminal_count == 1
+    assert summary.critical_node_id == "B"
+    assert summary.worst_pressure_bar == 2.5
+    assert summary.pressure_margin_bar == -0.1

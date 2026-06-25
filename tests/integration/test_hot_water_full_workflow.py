@@ -9,6 +9,9 @@ from tests.helpers.catalog_builders import (
     domestic_water_singular_loss_catalog,
 )
 from tests.helpers.network_builders import domestic_water_branching_network
+from ndc_core.networks.domestic_water.pressure_network_result import (
+    PressureSummaryStatus,
+)
 
 
 def test_hot_water_full_workflow_on_branching_network() -> None:
@@ -54,6 +57,14 @@ def test_hot_water_full_workflow_on_branching_network() -> None:
     assert compute.pressure_summary is not None
     assert compute.pressure_summary.has_worst_terminal
     assert compute.pressure_summary.worst_terminal is not None
+    assert compute.pressure_summary.status is PressureSummaryStatus.OK
+    assert compute.pressure_summary.is_ok
+    assert compute.pressure_summary.terminal_count == 2
+    assert compute.pressure_summary.critical_node_id in {
+        "N_ECS_A",
+        "N_ECS_B",
+    }
+    assert compute.pressure_summary.pressure_margin_bar is not None
     assert compute.pressure_summary.worst_terminal.node_id in {
         "N_ECS_A",
         "N_ECS_B",

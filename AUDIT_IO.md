@@ -784,6 +784,15 @@
 - **ndc_core.networks.domestic_water.pressure_network_result.DomesticWaterPressurePropagationResult.has_errors(self)** -> `bool`
   - calls: any
 - **ndc_core.networks.domestic_water.pressure_network_result.DomesticWaterPressureSummary.has_worst_terminal(self)** -> `bool`
+- **ndc_core.networks.domestic_water.pressure_network_result.DomesticWaterPressureSummary.terminal_count(self)** -> `int`
+  - calls: len
+- **ndc_core.networks.domestic_water.pressure_network_result.DomesticWaterPressureSummary.has_terminal_pressure_checks(self)** -> `bool`
+  - calls: bool
+- **ndc_core.networks.domestic_water.pressure_network_result.DomesticWaterPressureSummary.critical_node_id(self)** -> `str | None`
+- **ndc_core.networks.domestic_water.pressure_network_result.DomesticWaterPressureSummary.worst_pressure_bar(self)** -> `float | None`
+- **ndc_core.networks.domestic_water.pressure_network_result.DomesticWaterPressureSummary.pressure_margin_bar(self)** -> `float | None`
+- **ndc_core.networks.domestic_water.pressure_network_result.DomesticWaterPressureSummary.has_insufficient_pressure(self)** -> `bool`
+- **ndc_core.networks.domestic_water.pressure_network_result.DomesticWaterPressureSummary.is_ok(self)** -> `bool`
 - **ndc_core.networks.domestic_water.pressure_network_result.DomesticWaterPressureSummary.has_warnings(self)** -> `bool`
   - calls: any
 - **ndc_core.networks.domestic_water.pressure_network_result.DomesticWaterPressureSummary.has_errors(self)** -> `bool`
@@ -1577,6 +1586,10 @@
   - calls: _Node, _Section, round, set, summarize_cold_water_worst_terminal_pressure
 - **tests.networks.domestic_water.test_pressure_network.test_hot_water_sections_are_ignored_by_cold_water_engine()** -> `None`
   - calls: _Node, _Section, propagate_cold_water_pressures, set
+- **tests.networks.domestic_water.test_pressure_network.test_worst_terminal_summary_ok_status()** -> `None`
+  - calls: _Node, _Section, summarize_cold_water_worst_terminal_pressure
+- **tests.networks.domestic_water.test_pressure_network.test_worst_terminal_summary_no_terminal_status()** -> `None`
+  - calls: _Node, _Section, summarize_cold_water_worst_terminal_pressure
 
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_pressure_network_result.py
 
@@ -1587,6 +1600,8 @@
 - **tests.networks.domestic_water.test_pressure_network_result.test_pressure_propagation_result_error_helper()** -> `None`
   - calls: DomesticWaterPressurePropagationResult, EngineMessage.error
 - **tests.networks.domestic_water.test_pressure_network_result.test_pressure_summary_helpers()** -> `None`
+  - calls: DomesticWaterPressurePropagationResult, DomesticWaterPressureSummary, NodePressureState, TerminalPressureStatus
+- **tests.networks.domestic_water.test_pressure_network_result.test_pressure_summary_insufficient_pressure_helpers()** -> `None`
   - calls: DomesticWaterPressurePropagationResult, DomesticWaterPressureSummary, NodePressureState, TerminalPressureStatus
 
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_section_diameter_selection.py

@@ -29,6 +29,7 @@ from ndc_core.networks.domestic_water.pressure_network_result import (
     DomesticWaterPressureSummary,
     NodePressureState,
     PressurePropagationStatus,
+    PressureSummaryStatus,
     TerminalPressureStatus,
 )
 
@@ -259,6 +260,7 @@ class DomesticWaterPressureNetworkEngine:
                     status=PressurePropagationStatus.SOURCE_NOT_FOUND,
                 ),
                 messages=tuple(messages),
+                status=PressureSummaryStatus.SOURCE_NOT_FOUND,
             )
             return Result.failure(value=summary, messages=messages)
 
@@ -296,12 +298,19 @@ class DomesticWaterPressureNetworkEngine:
                 terminal_statuses={},
                 propagation=propagation_result.value,
                 messages=tuple(messages),
+                status=PressureSummaryStatus.NO_TERMINAL_REACHED,
             )
             return Result.partial(value=summary, messages=messages)
 
         worst_terminal = min(
             terminal_statuses.values(),
             key=lambda terminal: terminal.delta_to_min_bar,
+        )
+
+        summary_status = (
+            PressureSummaryStatus.INSUFFICIENT_PRESSURE
+            if worst_terminal.is_below_min
+            else PressureSummaryStatus.OK
         )
 
         summary = DomesticWaterPressureSummary(
@@ -313,6 +322,7 @@ class DomesticWaterPressureNetworkEngine:
             terminal_statuses=terminal_statuses,
             propagation=propagation_result.value,
             messages=tuple(messages),
+            status=summary_status,
         )
 
         return Result.success(value=summary, messages=messages)
