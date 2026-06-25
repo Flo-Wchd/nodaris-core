@@ -106,6 +106,9 @@ from ndc_core.networks.domestic_water.section_no_flow_sizing import (
 from ndc_core.networks.domestic_water.section_sizing_context import (
     build_section_sizing_context,
 )
+from ndc_core.networks.domestic_water.section_sizing_finalization import (
+    finalize_section_sizing_result,
+)
 
 
 def test_networks_public_api_exports_facades() -> None:
@@ -281,3 +284,12 @@ def test_section_sizing_context_helper_stays_internal() -> None:
 
 def test_networks_public_api_does_not_export_section_sizing_context_helper() -> None:
     assert "build_section_sizing_context" not in networks_api.__all__
+
+
+def test_section_sizing_finalization_helper_stays_internal() -> None:
+    assert finalize_section_sizing_result is not None
+    assert "finalize_section_sizing_result" not in domestic_water_api.__all__
+
+
+def test_networks_public_api_does_not_export_section_sizing_finalization_helper() -> None:
+    assert "finalize_section_sizing_result" not in networks_api.__all__

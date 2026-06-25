@@ -832,7 +832,7 @@
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine.hot_water(cls, appliance_catalog, pipe_catalog)** -> `DomesticWaterSectionSizingEngine`
   - calls: cls
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine.size_section_from_counts(self, section, appliance_counts, max_velocity_m_s)** -> `Result[DomesticWaterSectionSizing]`
-  - calls: Result.failure, Result.partial, Result.success, apply_section_sizing_state, build_no_flow_section_sizing, build_section_sizing_context, select_section_diameter
+  - calls: Result.failure, build_no_flow_section_sizing, build_section_sizing_context, finalize_section_sizing_result, select_section_diameter
 - **ndc_core.networks.domestic_water.section_sizing.size_cold_water_section_from_counts(section, appliance_counts, appliance_catalog, pipe_catalog, max_velocity_m_s)** -> `Result[DomesticWaterSectionSizing]`
   - calls: DomesticWaterSectionSizingEngine.cold_water, DomesticWaterSectionSizingEngine.cold_water(appliance_catalog=appliance_catalog, pipe_catalog=pipe_catalog).size_section_from_counts
   - doc: Convenience function for EFS section sizing.
@@ -848,6 +848,12 @@
 - **ndc_core.networks.domestic_water.section_sizing_context.velocity_limit_for_context(usage_context)** -> `float`
   - calls: isinstance, str, value.strip, value.strip().lower
   - doc: Return default velocity limit for domestic water.
+
+## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\section_sizing_finalization.py
+
+- **ndc_core.networks.domestic_water.section_sizing_finalization.finalize_section_sizing_result(section, context, sizing)** -> `Result[DomesticWaterSectionSizing]`
+  - calls: Result.failure, Result.partial, Result.success, apply_section_sizing_state
+  - doc: Apply sizing outputs to the section and wrap the engine result.
 
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\section_sizing_result.py
 
@@ -1637,6 +1643,23 @@
 - **tests.networks.domestic_water.test_section_sizing_context.test_velocity_limit_for_context_is_kept_compatible_from_section_sizing()** -> `None`
   - calls: velocity_limit_for_context
 
+## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_section_sizing_finalization.py
+
+- **tests.networks.domestic_water.test_section_sizing_finalization._section(**kwargs)** -> `Section`
+  - calls: Section, values.update
+- **tests.networks.domestic_water.test_section_sizing_finalization._demand(flow_l_s)** -> `DomesticWaterDemand`
+  - calls: ApplianceDemandItem, DomesticWaterDemand
+- **tests.networks.domestic_water.test_section_sizing_finalization._context(messages)** -> `DomesticWaterSectionSizingContext`
+  - calls: DomesticWaterSectionSizingContext, _demand
+- **tests.networks.domestic_water.test_section_sizing_finalization._sizing(messages, used_internal_diameter_mm)** -> `DomesticWaterSectionSizing`
+  - calls: DomesticWaterSectionSizing, _demand
+- **tests.networks.domestic_water.test_section_sizing_finalization.test_finalize_section_sizing_result_writes_section_state()** -> `None`
+  - calls: _context, _section, _sizing, finalize_section_sizing_result
+- **tests.networks.domestic_water.test_section_sizing_finalization.test_finalize_section_sizing_result_returns_partial_on_warning()** -> `None`
+  - calls: EngineMessage.warning, _context, _section, _sizing, finalize_section_sizing_result
+- **tests.networks.domestic_water.test_section_sizing_finalization.test_finalize_section_sizing_result_returns_failure_on_error()** -> `None`
+  - calls: EngineMessage.error, _context, _section, _sizing, finalize_section_sizing_result
+
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_section_sizing_result.py
 
 - **tests.networks.domestic_water.test_section_sizing_result.test_section_sizing_result_exports_are_kept_from_section_sizing()** -> `None`
@@ -1794,3 +1817,5 @@
 - **tests.networks.test_public_api.test_networks_public_api_does_not_export_no_flow_helper()** -> `None`
 - **tests.networks.test_public_api.test_section_sizing_context_helper_stays_internal()** -> `None`
 - **tests.networks.test_public_api.test_networks_public_api_does_not_export_section_sizing_context_helper()** -> `None`
+- **tests.networks.test_public_api.test_section_sizing_finalization_helper_stays_internal()** -> `None`
+- **tests.networks.test_public_api.test_networks_public_api_does_not_export_section_sizing_finalization_helper()** -> `None`

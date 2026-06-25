@@ -26,8 +26,8 @@ from ndc_core.networks.domestic_water.section_sizing_result import (
     DomesticWaterSectionSizing,
     SectionSizingMode,
 )
-from ndc_core.networks.domestic_water.section_state import (
-    apply_section_sizing_state,
+from ndc_core.networks.domestic_water.section_sizing_finalization import (
+    finalize_section_sizing_result,
 )
 
 
@@ -97,13 +97,11 @@ class DomesticWaterSectionSizingEngine:
                 max_velocity_m_s=context.max_velocity_m_s,
                 messages=context.messages,
             )
-            apply_section_sizing_state(
+            return finalize_section_sizing_result(
                 section=section,
+                context=context,
                 sizing=sizing,
-                raw_counts=context.raw_appliance_counts,
-                effective_counts=context.effective_appliance_counts,
             )
-            return Result.partial(value=sizing, messages=context.messages)
 
         sizing = select_section_diameter(
             section=section,
@@ -115,17 +113,11 @@ class DomesticWaterSectionSizingEngine:
             messages=context.messages,
         )
 
-        apply_section_sizing_state(
+        return finalize_section_sizing_result(
             section=section,
+            context=context,
             sizing=sizing,
-            raw_counts=context.raw_appliance_counts,
-            effective_counts=context.effective_appliance_counts,
         )
-
-        if sizing.has_errors:
-            return Result.failure(value=sizing, messages=context.messages)
-
-        return Result.success(value=sizing, messages=context.messages)
 
 
 def size_cold_water_section_from_counts(
