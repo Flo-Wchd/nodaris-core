@@ -224,11 +224,11 @@ class DomesticWaterPressureNetworkEngine:
         return Result.success(value=result, messages=messages)
 
     def summarize_worst_terminal_pressure(
-            self,
-            *,
-            source_node_id: str,
-            source_pressure_bar: float,
-            min_required_pressure_bar: float = 1.0,
+        self,
+        *,
+        source_node_id: str,
+        source_pressure_bar: float,
+        min_required_pressure_bar: float = 1.0,
     ) -> Result[DomesticWaterPressureSummary]:
         messages: list[EngineMessage] = []
 

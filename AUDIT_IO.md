@@ -681,7 +681,7 @@
   - calls: DomesticWaterNetworkComputeResult, Result.failure, Result.partial, Result.success, any, messages.extend, propagate_domestic_water_appliances, section_matches_domestic_water_side, self._bind_messages_to_entities, self._compute_one_section, self._validate_topology, self.sections.items, str, tuple
   - doc: Compute sizing and pressure losses for all sections matching the engine side.
 - **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine.compute_all(self, source_node_id, source_pressure_bar, min_required_pressure_bar, max_velocity_m_s, water_temperature_c)** -> `Result[DomesticWaterNetworkComputeResult]`
-  - calls: DomesticWaterNetworkComputeResult, DomesticWaterPressureNetworkEngine, Result.failure, Result.partial, Result.success, messages.extend, pressure_bar_to_pa, pressure_engine.propagate_pressures, pressure_engine.summarize_worst_terminal_pressure, self._bind_messages_to_entities, self.compute_sections, tuple
+  - calls: DomesticWaterNetworkComputeResult, DomesticWaterPressureNetworkEngine, DomesticWaterPressurePropagationResult, Result.failure, Result.partial, Result.success, build_pressure_summary_from_propagation, messages.append, messages.extend, pressure_bar_to_pa, pressure_engine.propagate_pressures, safe_non_negative_float, self._bind_messages_to_entities, self.compute_sections, str ...
   - doc: Compute sections, then optionally propagate pressure and summarize terminals.
 - **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine._validate_topology(self)** -> `tuple[EngineMessage, ...]`
   - calls: EngineMessage, context.setdefault, dict, messages.append, self.network.validate_topology, tuple
@@ -1488,6 +1488,10 @@
   - calls: _Node, _appliance_catalog, _fluid_catalog, _pipe_catalog, _section, any, compute_cold_water_network
 - **tests.networks.domestic_water.test_network_engine.test_hot_water_engine_ignores_cold_water_sections()** -> `None`
   - calls: DomesticWaterNetworkEngine.hot_water, _Node, _appliance_catalog, _fluid_catalog, _pipe_catalog, _section, engine.compute_sections
+- **tests.networks.domestic_water.test_network_engine.test_compute_all_reuses_single_pressure_propagation_for_summary(monkeypatch)** -> `None`
+  - calls: _Node, _section
+- **tests.networks.domestic_water.test_network_engine.fake_propagate_pressures(self, source_node_id, source_pressure_pa)** -> `Result[DomesticWaterPressurePropagationResult]`
+  - calls: DomesticWaterPressurePropagationResult, NodePressureState, Result.success
 
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_network_engine_appliance_propagation.py
 

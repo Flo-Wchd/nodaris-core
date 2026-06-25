@@ -14,6 +14,14 @@ from ndc_core.networks.domestic_water.network_engine import (
     DomesticWaterNetworkEngine,
     compute_cold_water_network,
 )
+from ndc_core.common.result import Result
+from ndc_core.networks.domestic_water.pressure_network import (
+    DomesticWaterPressureNetworkEngine,
+)
+from ndc_core.networks.domestic_water.pressure_network_result import (
+    DomesticWaterPressurePropagationResult,
+    NodePressureState,
+)
 
 
 @dataclass
@@ -216,6 +224,10 @@ def test_compute_all_sizes_losses_and_propagates_pressure() -> None:
     assert network_result.pressure_summary.worst_terminal is not None
     assert network_result.pressure_summary.worst_terminal.node_id == "N1"
 
+    assert network_result.pressure_summary.propagation is (
+        network_result.pressure_propagation
+    )
+
 
 def test_compute_all_without_source_only_computes_sections() -> None:
     nodes = {
@@ -310,3 +322,80 @@ def test_hot_water_engine_ignores_cold_water_sections() -> None:
     assert result.value is not None
     assert result.value.section_count == 0
     assert sections["S1"].selected_internal_diameter_mm is None
+
+
+def test_compute_all_reuses_single_pressure_propagation_for_summary(
+    monkeypatch,
+) -> None:
+    nodes = {
+        "N0": _Node(id="N0", downstream_section_ids=["S1"]),
+        "N1": _Node(id="N1", downstream_section_ids=[]),
+    }
+    sections = {
+        "S1": _section(
+            "S1",
+            "N1",
+            counts={"L": 1, "D": 1},
+            elevation_change_m=0.0,
+        ),
+    }
+
+    call_count = {"propagate": 0}
+
+    def fake_propagate_pressures(
+        self: DomesticWaterPressureNetworkEngine,
+        *,
+        source_node_id: str,
+        source_pressure_pa: float,
+    ) -> Result[DomesticWaterPressurePropagationResult]:
+        call_count["propagate"] += 1
+
+        return Result.success(
+            value=DomesticWaterPressurePropagationResult(
+                source_node_id=source_node_id,
+                source_pressure_pa=source_pressure_pa,
+                source_pressure_bar=source_pressure_pa / 100_000.0,
+                side=self.side,
+                node_pressures={
+                    source_node_id: NodePressureState(
+                        node_id=source_node_id,
+                        pressure_pa=source_pressure_pa,
+                        pressure_bar=source_pressure_pa / 100_000.0,
+                    ),
+                    "N1": NodePressureState(
+                        node_id="N1",
+                        pressure_pa=250_000.0,
+                        pressure_bar=2.5,
+                        is_terminal=True,
+                    ),
+                },
+            ),
+            messages=[],
+        )
+
+    monkeypatch.setattr(
+        DomesticWaterPressureNetworkEngine,
+        "propagate_pressures",
+        fake_propagate_pressures,
+    )
+
+    result = compute_cold_water_network(
+        nodes=nodes,
+        sections=sections,
+        appliance_catalog=_appliance_catalog(),
+        pipe_catalog=_pipe_catalog(),
+        fluid_catalog=_fluid_catalog(),
+        source_node_id="N0",
+        source_pressure_bar=3.0,
+        min_required_pressure_bar=1.0,
+    )
+
+    assert result.ok
+    assert result.value is not None
+    assert call_count["propagate"] == 1
+
+    assert result.value.pressure_propagation is not None
+    assert result.value.pressure_summary is not None
+    assert result.value.pressure_summary.propagation is result.value.pressure_propagation
+    assert result.value.pressure_summary.worst_terminal is not None
+    assert result.value.pressure_summary.worst_terminal.node_id == "N1"

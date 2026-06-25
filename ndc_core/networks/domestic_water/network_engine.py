@@ -32,6 +32,7 @@ from ndc_core.networks.domestic_water.pressure_network import (
     DomesticWaterPressureNetworkEngine,
     DomesticWaterPressurePropagationResult,
     DomesticWaterPressureSummary,
+    PressurePropagationStatus,
 )
 from ndc_core.networks.domestic_water.section_sizing import (
     DomesticWaterSectionSizing,
@@ -45,7 +46,12 @@ from ndc_core.networks.domestic_water.side_matching import (
 from ndc_core.networks.domestic_water.entity_access import (
     read_section_downstream_appliance_counts,
 )
-
+from ndc_core.networks.domestic_water.numeric import (
+    safe_non_negative_float,
+)
+from ndc_core.networks.domestic_water.pressure_summary import (
+    build_pressure_summary_from_propagation,
+)
 
 @dataclass(frozen=True, slots=True)
 class DomesticWaterNetworkEngine:
@@ -281,6 +287,13 @@ class DomesticWaterNetworkEngine:
         pressure_summary: DomesticWaterPressureSummary | None = None
 
         if source_node_id is not None and source_pressure_bar is not None:
+            source_id = str(source_node_id or "").strip()
+            source_pressure_bar_f = safe_non_negative_float(source_pressure_bar)
+            min_required_bar_f = safe_non_negative_float(
+                min_required_pressure_bar,
+                default=1.0,
+            )
+
             pressure_engine = DomesticWaterPressureNetworkEngine(
                 nodes=self.nodes,
                 sections=self.sections,
@@ -288,19 +301,37 @@ class DomesticWaterNetworkEngine:
             )
 
             propagation_result = pressure_engine.propagate_pressures(
-                source_node_id=source_node_id,
-                source_pressure_pa=pressure_bar_to_pa(source_pressure_bar),
+                source_node_id=source_id,
+                source_pressure_pa=pressure_bar_to_pa(source_pressure_bar_f),
             )
             messages.extend(propagation_result.messages)
+
             pressure_propagation = propagation_result.value
 
-            summary_result = pressure_engine.summarize_worst_terminal_pressure(
-                source_node_id=source_node_id,
-                source_pressure_bar=source_pressure_bar,
-                min_required_pressure_bar=min_required_pressure_bar,
+            if pressure_propagation is None:
+                pressure_propagation = DomesticWaterPressurePropagationResult(
+                    source_node_id=source_id,
+                    source_pressure_pa=0.0,
+                    source_pressure_bar=0.0,
+                    side=self.side,
+                    node_pressures={},
+                    messages=tuple(propagation_result.messages),
+                    status=PressurePropagationStatus.SOURCE_NOT_FOUND,
+                )
+
+            summary_result = build_pressure_summary_from_propagation(
+                propagation=pressure_propagation,
+                source_pressure_bar=source_pressure_bar_f,
+                min_required_pressure_bar=min_required_bar_f,
+                side=self.side,
+                messages=propagation_result.messages,
             )
-            messages.extend(summary_result.messages)
+
             pressure_summary = summary_result.value
+
+            for message in summary_result.messages:
+                if message not in propagation_result.messages:
+                    messages.append(message)
 
         result = DomesticWaterNetworkComputeResult(
             side=self.side,

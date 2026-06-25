@@ -57,6 +57,7 @@ def test_cold_water_full_workflow_on_branching_network() -> None:
     assert compute.pressure_summary is not None
     assert compute.pressure_summary.has_worst_terminal
     assert compute.pressure_summary.worst_terminal is not None
+    assert compute.pressure_summary.propagation is compute.pressure_propagation
     assert compute.pressure_summary.status is PressureSummaryStatus.OK
     assert compute.pressure_summary.is_ok
     assert compute.pressure_summary.terminal_count == 2
