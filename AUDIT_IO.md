@@ -1162,6 +1162,23 @@
 - **tests.domain.test_singular_losses.test_singular_loss_method_helpers()** -> `None`
   - calls: SingularLoss
 
+## C:\dev\PythonProject_v4\tests\helpers\catalog_builders.py
+
+- **tests.helpers.catalog_builders.domestic_water_appliance_catalog()** -> `ApplianceCatalog`
+  - calls: Appliance, ApplianceCatalog
+- **tests.helpers.catalog_builders.domestic_water_pipe_catalog()** -> `PipeCatalog`
+  - calls: PipeCatalog, PipeMaterial, PipeSize
+- **tests.helpers.catalog_builders.domestic_water_fluid_catalog()** -> `FluidCatalog`
+  - calls: Fluid, FluidCatalog
+- **tests.helpers.catalog_builders.domestic_water_singular_loss_catalog()** -> `SingularLossCatalog`
+  - calls: SingularLoss, SingularLossCatalog
+
+## C:\dev\PythonProject_v4\tests\helpers\network_builders.py
+
+- **tests.helpers.network_builders.domestic_water_branching_network()** -> `Network`
+  - calls: Cell, Network, Node, Section, SingularLoss, network.add_cell, network.add_node, network.add_section, network.attach_cell_to_node, section.add_singular_loss
+  - doc: Mixed EFS/ECS reference network.
+
 ## C:\dev\PythonProject_v4\tests\hydraulics\test_conversions.py
 
 - **tests.hydraulics.test_conversions.test_flow_conversions()** -> `None`
@@ -1229,6 +1246,13 @@
 - **tests.hydraulics.test_velocity.test_theoretical_diameter_mm_for_velocity()** -> `None`
   - calls: theoretical_diameter_mm_for_velocity
 
+## C:\dev\PythonProject_v4\tests\integration\test_cold_water_full_workflow.py
+
+- **tests.integration.test_cold_water_full_workflow.test_cold_water_full_workflow_on_branching_network()** -> `None`
+  - calls: ColdWaterNetworkEngine.from_network, ColdWaterNetworkEngine.from_network(network=network, appliance_catalog=domestic_water_appliance_catalog(), pipe_catalog=domestic_water_pipe_catalog(), fluid_catalog=domestic_water_fluid_catalog(), singular_loss_catalog=domestic_water_singular_loss_catalog()).compute_all, domestic_water_appliance_catalog, domestic_water_branching_network, domestic_water_fluid_catalog, domestic_water_pipe_catalog, domestic_water_singular_loss_catalog, network.get_section, set
+- **tests.integration.test_cold_water_full_workflow.test_cold_water_functional_entry_point_full_workflow()** -> `None`
+  - calls: compute_cold_water_network_from_network, domestic_water_appliance_catalog, domestic_water_branching_network, domestic_water_fluid_catalog, domestic_water_pipe_catalog, domestic_water_singular_loss_catalog
+
 ## C:\dev\PythonProject_v4\tests\integration\test_domestic_water_mixed_network.py
 
 - **tests.integration.test_domestic_water_mixed_network._appliance_catalog()** -> `ApplianceCatalog`
@@ -1248,6 +1272,13 @@
   - calls: _appliance_catalog, _fluid_catalog, _mixed_network, _pipe_catalog, cold_network.get_section, compute_cold_water_network_from_network, compute_hot_water_network_from_network, hot_network.get_section, set
 - **tests.integration.test_domestic_water_mixed_network.test_running_cold_then_hot_on_same_mixed_network_computes_both_without_cross_sizing()** -> `None`
   - calls: ColdWaterNetworkEngine.from_network, ColdWaterNetworkEngine.from_network(network=network, appliance_catalog=_appliance_catalog(), pipe_catalog=_pipe_catalog(), fluid_catalog=_fluid_catalog()).compute_all, HotWaterNetworkEngine.from_network, HotWaterNetworkEngine.from_network(network=network, appliance_catalog=_appliance_catalog(), pipe_catalog=_pipe_catalog(), fluid_catalog=_fluid_catalog()).compute_all, _appliance_catalog, _fluid_catalog, _mixed_network, _pipe_catalog, network.get_section, set
+
+## C:\dev\PythonProject_v4\tests\integration\test_hot_water_full_workflow.py
+
+- **tests.integration.test_hot_water_full_workflow.test_hot_water_full_workflow_on_branching_network()** -> `None`
+  - calls: HotWaterNetworkEngine.from_network, HotWaterNetworkEngine.from_network(network=network, appliance_catalog=domestic_water_appliance_catalog(), pipe_catalog=domestic_water_pipe_catalog(), fluid_catalog=domestic_water_fluid_catalog(), singular_loss_catalog=domestic_water_singular_loss_catalog()).compute_all, domestic_water_appliance_catalog, domestic_water_branching_network, domestic_water_fluid_catalog, domestic_water_pipe_catalog, domestic_water_singular_loss_catalog, network.get_section, set
+- **tests.integration.test_hot_water_full_workflow.test_hot_water_functional_entry_point_full_workflow()** -> `None`
+  - calls: compute_hot_water_network_from_network, domestic_water_appliance_catalog, domestic_water_branching_network, domestic_water_fluid_catalog, domestic_water_pipe_catalog, domestic_water_singular_loss_catalog
 
 ## C:\dev\PythonProject_v4\tests\networks\cold_water\test_engine.py
 
