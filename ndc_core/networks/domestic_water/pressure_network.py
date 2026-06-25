@@ -29,8 +29,11 @@ from ndc_core.networks.domestic_water.pressure_network_result import (
     DomesticWaterPressureSummary,
     NodePressureState,
     PressurePropagationStatus,
-    PressureSummaryStatus,
-    TerminalPressureStatus,
+    PressureSummaryStatus as PressureSummaryStatus,
+    TerminalPressureStatus as TerminalPressureStatus,
+)
+from ndc_core.networks.domestic_water.pressure_summary import (
+    build_pressure_summary_from_propagation,
 )
 
 
@@ -221,14 +224,15 @@ class DomesticWaterPressureNetworkEngine:
         return Result.success(value=result, messages=messages)
 
     def summarize_worst_terminal_pressure(
-        self,
-        *,
-        source_node_id: str,
-        source_pressure_bar: float,
-        min_required_pressure_bar: float = 1.0,
+            self,
+            *,
+            source_node_id: str,
+            source_pressure_bar: float,
+            min_required_pressure_bar: float = 1.0,
     ) -> Result[DomesticWaterPressureSummary]:
         messages: list[EngineMessage] = []
 
+        source_id = str(source_node_id or "").strip()
         source_pressure_bar_f = safe_non_negative_float(source_pressure_bar)
         min_required_bar_f = safe_non_negative_float(
             min_required_pressure_bar,
@@ -236,96 +240,31 @@ class DomesticWaterPressureNetworkEngine:
         )
 
         propagation_result = self.propagate_pressures(
-            source_node_id=source_node_id,
+            source_node_id=source_id,
             source_pressure_pa=pressure_bar_to_pa(source_pressure_bar_f),
         )
 
         messages.extend(propagation_result.messages)
 
-        if propagation_result.value is None:
-            summary = DomesticWaterPressureSummary(
-                source_node_id=str(source_node_id or "").strip(),
-                source_pressure_bar=source_pressure_bar_f,
-                min_required_pressure_bar=min_required_bar_f,
+        propagation = propagation_result.value
+        if propagation is None:
+            propagation = DomesticWaterPressurePropagationResult(
+                source_node_id=source_id,
+                source_pressure_pa=0.0,
+                source_pressure_bar=0.0,
                 side=self.side,
-                worst_terminal=None,
-                terminal_statuses={},
-                propagation=DomesticWaterPressurePropagationResult(
-                    source_node_id=str(source_node_id or "").strip(),
-                    source_pressure_pa=0.0,
-                    source_pressure_bar=0.0,
-                    side=self.side,
-                    node_pressures={},
-                    messages=tuple(messages),
-                    status=PressurePropagationStatus.SOURCE_NOT_FOUND,
-                ),
+                node_pressures={},
                 messages=tuple(messages),
-                status=PressureSummaryStatus.SOURCE_NOT_FOUND,
-            )
-            return Result.failure(value=summary, messages=messages)
-
-        terminal_statuses: dict[str, TerminalPressureStatus] = {}
-
-        for node_id, state in propagation_result.value.node_pressures.items():
-            if not state.is_terminal:
-                continue
-
-            delta_to_min = state.pressure_bar - min_required_bar_f
-
-            terminal_statuses[node_id] = TerminalPressureStatus(
-                node_id=node_id,
-                pressure_pa=state.pressure_pa,
-                pressure_bar=state.pressure_bar,
-                min_required_pressure_bar=min_required_bar_f,
-                delta_to_min_bar=delta_to_min,
-                is_below_min=delta_to_min < 0.0,
+                status=PressurePropagationStatus.SOURCE_NOT_FOUND,
             )
 
-        if not terminal_statuses:
-            messages.append(
-                EngineMessage.warning(
-                    code="DOMESTIC_WATER_PRESSURE_NO_TERMINAL_REACHED",
-                    text="No terminal node was reached during pressure propagation.",
-                    context={"source_node_id": str(source_node_id or "").strip()},
-                )
-            )
-            summary = DomesticWaterPressureSummary(
-                source_node_id=propagation_result.value.source_node_id,
-                source_pressure_bar=source_pressure_bar_f,
-                min_required_pressure_bar=min_required_bar_f,
-                side=self.side,
-                worst_terminal=None,
-                terminal_statuses={},
-                propagation=propagation_result.value,
-                messages=tuple(messages),
-                status=PressureSummaryStatus.NO_TERMINAL_REACHED,
-            )
-            return Result.partial(value=summary, messages=messages)
-
-        worst_terminal = min(
-            terminal_statuses.values(),
-            key=lambda terminal: terminal.delta_to_min_bar,
-        )
-
-        summary_status = (
-            PressureSummaryStatus.INSUFFICIENT_PRESSURE
-            if worst_terminal.is_below_min
-            else PressureSummaryStatus.OK
-        )
-
-        summary = DomesticWaterPressureSummary(
-            source_node_id=propagation_result.value.source_node_id,
+        return build_pressure_summary_from_propagation(
+            propagation=propagation,
             source_pressure_bar=source_pressure_bar_f,
             min_required_pressure_bar=min_required_bar_f,
             side=self.side,
-            worst_terminal=worst_terminal,
-            terminal_statuses=terminal_statuses,
-            propagation=propagation_result.value,
-            messages=tuple(messages),
-            status=summary_status,
+            messages=messages,
         )
-
-        return Result.success(value=summary, messages=messages)
 
 
 def propagate_cold_water_pressures(

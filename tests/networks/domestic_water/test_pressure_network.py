@@ -358,3 +358,20 @@ def test_worst_terminal_summary_no_terminal_status() -> None:
     assert result.value.worst_pressure_bar is None
     assert result.value.pressure_margin_bar is None
     assert result.value.has_warnings
+
+
+def test_worst_terminal_summary_source_not_found_status() -> None:
+    result = summarize_cold_water_worst_terminal_pressure(
+        nodes={},
+        sections={},
+        source_node_id="UNKNOWN",
+        source_pressure_bar=3.0,
+        min_required_pressure_bar=1.0,
+    )
+
+    assert result.failed
+    assert result.value is not None
+    assert result.value.status is PressureSummaryStatus.SOURCE_NOT_FOUND
+    assert not result.value.has_worst_terminal
+    assert result.value.terminal_count == 0
+    assert result.value.propagation.status is PressurePropagationStatus.SOURCE_NOT_FOUND

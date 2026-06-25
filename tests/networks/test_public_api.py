@@ -109,6 +109,9 @@ from ndc_core.networks.domestic_water.section_sizing_context import (
 from ndc_core.networks.domestic_water.section_sizing_finalization import (
     finalize_section_sizing_result,
 )
+from ndc_core.networks.domestic_water.pressure_summary import (
+    build_pressure_summary_from_propagation,
+)
 
 
 def test_networks_public_api_exports_facades() -> None:
@@ -293,3 +296,12 @@ def test_section_sizing_finalization_helper_stays_internal() -> None:
 
 def test_networks_public_api_does_not_export_section_sizing_finalization_helper() -> None:
     assert "finalize_section_sizing_result" not in networks_api.__all__
+
+
+def test_pressure_summary_builder_stays_internal() -> None:
+    assert build_pressure_summary_from_propagation is not None
+    assert "build_pressure_summary_from_propagation" not in domestic_water_api.__all__
+
+
+def test_networks_public_api_does_not_export_pressure_summary_builder() -> None:
+    assert "build_pressure_summary_from_propagation" not in networks_api.__all__
