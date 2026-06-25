@@ -144,6 +144,11 @@ from ndc_core.networks.domestic_water.types import (
     DomesticWaterMethod,
     DomesticWaterSide,
 )
+from ndc_core.networks.domestic_water.network_diagnostic import (
+    DomesticWaterNetworkDiagnostic,
+    DomesticWaterNetworkDiagnosticStatus,
+    build_domestic_water_network_diagnostic,
+)
 
 
 _DOMAIN_EXPORTS = [
@@ -183,6 +188,12 @@ _NETWORK_ENGINE_EXPORTS = [
     "compute_cold_water_network_from_domain",
     "compute_hot_water_network",
     "compute_hot_water_network_from_domain",
+]
+
+_NETWORK_DIAGNOSTIC_EXPORTS = [
+    "DomesticWaterNetworkDiagnostic",
+    "DomesticWaterNetworkDiagnosticStatus",
+    "build_domestic_water_network_diagnostic",
 ]
 
 _PRESSURE_LOSS_EXPORTS = [
@@ -277,6 +288,7 @@ __all__ = [
     *_DEMAND_EXPORTS,
     *_APPLIANCE_PROPAGATION_EXPORTS,
     *_NETWORK_ENGINE_EXPORTS,
+    *_NETWORK_DIAGNOSTIC_EXPORTS,
     *_PRESSURE_LOSS_EXPORTS,
     *_PRESSURE_NETWORK_EXPORTS,
     *_SECTION_SIZING_EXPORTS,

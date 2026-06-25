@@ -12,6 +12,10 @@ from tests.helpers.catalog_builders import (
     domestic_water_singular_loss_catalog,
 )
 from tests.helpers.network_builders import domestic_water_branching_network
+from ndc_core.networks.domestic_water.network_diagnostic import (
+    DomesticWaterNetworkDiagnosticStatus,
+    build_domestic_water_network_diagnostic,
+)
 
 
 def test_cold_water_pressure_diagnostic_ok_on_reference_network() -> None:
@@ -92,6 +96,27 @@ def test_cold_water_pressure_diagnostic_detects_insufficient_pressure() -> None:
     assert worst_terminal.min_required_pressure_bar == 1.0
     assert worst_terminal.delta_to_min_bar == compute.pressure_summary.pressure_margin_bar
 
+    diagnostic = build_domestic_water_network_diagnostic(compute)
+
+    assert (
+        diagnostic.status
+        is DomesticWaterNetworkDiagnosticStatus.INSUFFICIENT_PRESSURE
+    )
+    assert diagnostic.has_insufficient_pressure
+    assert diagnostic.side is DomesticWaterSide.COLD_WATER
+    assert diagnostic.section_count == 3
+    assert diagnostic.sized_section_count == 3
+    assert diagnostic.pressure_loss_section_count == 3
+    assert diagnostic.pressure_status is PressureSummaryStatus.INSUFFICIENT_PRESSURE
+    assert diagnostic.critical_node_id in {
+        "N_EFS_A",
+        "N_EFS_B",
+    }
+    assert diagnostic.worst_pressure_bar is not None
+    assert diagnostic.worst_pressure_bar < 1.0
+    assert diagnostic.pressure_margin_bar is not None
+    assert diagnostic.pressure_margin_bar < 0.0
+
 
 def test_hot_water_pressure_diagnostic_detects_insufficient_pressure() -> None:
     network = domestic_water_branching_network()
@@ -135,6 +160,27 @@ def test_hot_water_pressure_diagnostic_detects_insufficient_pressure() -> None:
     assert worst_terminal.is_below_min
     assert worst_terminal.min_required_pressure_bar == 1.0
     assert worst_terminal.delta_to_min_bar == compute.pressure_summary.pressure_margin_bar
+
+    diagnostic = build_domestic_water_network_diagnostic(compute)
+
+    assert (
+        diagnostic.status
+        is DomesticWaterNetworkDiagnosticStatus.INSUFFICIENT_PRESSURE
+    )
+    assert diagnostic.has_insufficient_pressure
+    assert diagnostic.side is DomesticWaterSide.HOT_WATER
+    assert diagnostic.section_count == 3
+    assert diagnostic.sized_section_count == 3
+    assert diagnostic.pressure_loss_section_count == 3
+    assert diagnostic.pressure_status is PressureSummaryStatus.INSUFFICIENT_PRESSURE
+    assert diagnostic.critical_node_id in {
+        "N_ECS_A",
+        "N_ECS_B",
+    }
+    assert diagnostic.worst_pressure_bar is not None
+    assert diagnostic.worst_pressure_bar < 1.0
+    assert diagnostic.pressure_margin_bar is not None
+    assert diagnostic.pressure_margin_bar < 0.0
 
 
 def test_pressure_diagnostic_keeps_cold_and_hot_networks_isolated() -> None:
@@ -196,4 +242,31 @@ def test_pressure_diagnostic_keeps_cold_and_hot_networks_isolated() -> None:
         "S_ECS_MAIN",
         "S_ECS_A",
         "S_ECS_B",
+    }
+
+    cold_diagnostic = build_domestic_water_network_diagnostic(cold_result.value)
+    hot_diagnostic = build_domestic_water_network_diagnostic(hot_result.value)
+
+    assert (
+        cold_diagnostic.status
+        is DomesticWaterNetworkDiagnosticStatus.INSUFFICIENT_PRESSURE
+    )
+    assert (
+        hot_diagnostic.status
+        is DomesticWaterNetworkDiagnosticStatus.INSUFFICIENT_PRESSURE
+    )
+
+    assert cold_diagnostic.side is DomesticWaterSide.COLD_WATER
+    assert hot_diagnostic.side is DomesticWaterSide.HOT_WATER
+
+    assert cold_diagnostic.pressure_status is PressureSummaryStatus.INSUFFICIENT_PRESSURE
+    assert hot_diagnostic.pressure_status is PressureSummaryStatus.INSUFFICIENT_PRESSURE
+
+    assert cold_diagnostic.critical_node_id in {
+        "N_EFS_A",
+        "N_EFS_B",
+    }
+    assert hot_diagnostic.critical_node_id in {
+        "N_ECS_A",
+        "N_ECS_B",
     }

@@ -664,6 +664,18 @@
 - **ndc_core.networks.domestic_water.network_compute_result.DomesticWaterNetworkComputeResult.has_errors(self)** -> `bool`
   - calls: any
 
+## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\network_diagnostic.py
+
+- **ndc_core.networks.domestic_water.network_diagnostic.DomesticWaterNetworkDiagnostic.is_ok(self)** -> `bool`
+- **ndc_core.networks.domestic_water.network_diagnostic.DomesticWaterNetworkDiagnostic.has_warnings(self)** -> `bool`
+- **ndc_core.networks.domestic_water.network_diagnostic.DomesticWaterNetworkDiagnostic.has_errors(self)** -> `bool`
+- **ndc_core.networks.domestic_water.network_diagnostic.DomesticWaterNetworkDiagnostic.has_insufficient_pressure(self)** -> `bool`
+- **ndc_core.networks.domestic_water.network_diagnostic.DomesticWaterNetworkDiagnostic.is_computed(self)** -> `bool`
+- **ndc_core.networks.domestic_water.network_diagnostic.build_domestic_water_network_diagnostic(compute_result)** -> `DomesticWaterNetworkDiagnostic`
+  - calls: DomesticWaterNetworkDiagnostic, _resolve_network_diagnostic_status, sum, tuple
+  - doc: Build a consolidated diagnostic from a domestic water compute result.
+- **ndc_core.networks.domestic_water.network_diagnostic._resolve_network_diagnostic_status(error_count, warning_count, pressure_status)** -> `DomesticWaterNetworkDiagnosticStatus`
+
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\network_engine.py
 
 - **ndc_core.networks.domestic_water.network_engine.DomesticWaterNetworkEngine.cold_water(cls, nodes, sections, appliance_catalog, pipe_catalog, fluid_catalog, singular_loss_catalog, network)** -> `DomesticWaterNetworkEngine`
@@ -1295,11 +1307,11 @@
 - **tests.integration.test_domestic_water_pressure_diagnostics.test_cold_water_pressure_diagnostic_ok_on_reference_network()** -> `None`
   - calls: ColdWaterNetworkEngine.from_network, ColdWaterNetworkEngine.from_network(network=network, appliance_catalog=domestic_water_appliance_catalog(), pipe_catalog=domestic_water_pipe_catalog(), fluid_catalog=domestic_water_fluid_catalog(), singular_loss_catalog=domestic_water_singular_loss_catalog()).compute_all, domestic_water_appliance_catalog, domestic_water_branching_network, domestic_water_fluid_catalog, domestic_water_pipe_catalog, domestic_water_singular_loss_catalog
 - **tests.integration.test_domestic_water_pressure_diagnostics.test_cold_water_pressure_diagnostic_detects_insufficient_pressure()** -> `None`
-  - calls: ColdWaterNetworkEngine.from_network, ColdWaterNetworkEngine.from_network(network=network, appliance_catalog=domestic_water_appliance_catalog(), pipe_catalog=domestic_water_pipe_catalog(), fluid_catalog=domestic_water_fluid_catalog(), singular_loss_catalog=domestic_water_singular_loss_catalog()).compute_all, domestic_water_appliance_catalog, domestic_water_branching_network, domestic_water_fluid_catalog, domestic_water_pipe_catalog, domestic_water_singular_loss_catalog
+  - calls: ColdWaterNetworkEngine.from_network, ColdWaterNetworkEngine.from_network(network=network, appliance_catalog=domestic_water_appliance_catalog(), pipe_catalog=domestic_water_pipe_catalog(), fluid_catalog=domestic_water_fluid_catalog(), singular_loss_catalog=domestic_water_singular_loss_catalog()).compute_all, build_domestic_water_network_diagnostic, domestic_water_appliance_catalog, domestic_water_branching_network, domestic_water_fluid_catalog, domestic_water_pipe_catalog, domestic_water_singular_loss_catalog
 - **tests.integration.test_domestic_water_pressure_diagnostics.test_hot_water_pressure_diagnostic_detects_insufficient_pressure()** -> `None`
-  - calls: HotWaterNetworkEngine.from_network, HotWaterNetworkEngine.from_network(network=network, appliance_catalog=domestic_water_appliance_catalog(), pipe_catalog=domestic_water_pipe_catalog(), fluid_catalog=domestic_water_fluid_catalog(), singular_loss_catalog=domestic_water_singular_loss_catalog()).compute_all, domestic_water_appliance_catalog, domestic_water_branching_network, domestic_water_fluid_catalog, domestic_water_pipe_catalog, domestic_water_singular_loss_catalog
+  - calls: HotWaterNetworkEngine.from_network, HotWaterNetworkEngine.from_network(network=network, appliance_catalog=domestic_water_appliance_catalog(), pipe_catalog=domestic_water_pipe_catalog(), fluid_catalog=domestic_water_fluid_catalog(), singular_loss_catalog=domestic_water_singular_loss_catalog()).compute_all, build_domestic_water_network_diagnostic, domestic_water_appliance_catalog, domestic_water_branching_network, domestic_water_fluid_catalog, domestic_water_pipe_catalog, domestic_water_singular_loss_catalog
 - **tests.integration.test_domestic_water_pressure_diagnostics.test_pressure_diagnostic_keeps_cold_and_hot_networks_isolated()** -> `None`
-  - calls: ColdWaterNetworkEngine.from_network, ColdWaterNetworkEngine.from_network(network=network, appliance_catalog=domestic_water_appliance_catalog(), pipe_catalog=domestic_water_pipe_catalog(), fluid_catalog=domestic_water_fluid_catalog(), singular_loss_catalog=domestic_water_singular_loss_catalog()).compute_all, HotWaterNetworkEngine.from_network, HotWaterNetworkEngine.from_network(network=network, appliance_catalog=domestic_water_appliance_catalog(), pipe_catalog=domestic_water_pipe_catalog(), fluid_catalog=domestic_water_fluid_catalog(), singular_loss_catalog=domestic_water_singular_loss_catalog()).compute_all, domestic_water_appliance_catalog, domestic_water_branching_network, domestic_water_fluid_catalog, domestic_water_pipe_catalog, domestic_water_singular_loss_catalog, set
+  - calls: ColdWaterNetworkEngine.from_network, ColdWaterNetworkEngine.from_network(network=network, appliance_catalog=domestic_water_appliance_catalog(), pipe_catalog=domestic_water_pipe_catalog(), fluid_catalog=domestic_water_fluid_catalog(), singular_loss_catalog=domestic_water_singular_loss_catalog()).compute_all, HotWaterNetworkEngine.from_network, HotWaterNetworkEngine.from_network(network=network, appliance_catalog=domestic_water_appliance_catalog(), pipe_catalog=domestic_water_pipe_catalog(), fluid_catalog=domestic_water_fluid_catalog(), singular_loss_catalog=domestic_water_singular_loss_catalog()).compute_all, build_domestic_water_network_diagnostic, domestic_water_appliance_catalog, domestic_water_branching_network, domestic_water_fluid_catalog, domestic_water_pipe_catalog, domestic_water_singular_loss_catalog, set
 
 ## C:\dev\PythonProject_v4\tests\integration\test_hot_water_full_workflow.py
 
@@ -1478,6 +1490,22 @@
   - calls: DomesticWaterSectionComputeResult, EngineMessage.error, SimpleNamespace
 - **tests.networks.domestic_water.test_network_compute_result.test_network_compute_result_count_helpers()** -> `None`
   - calls: DomesticWaterNetworkComputeResult, DomesticWaterSectionComputeResult, SimpleNamespace
+
+## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_network_diagnostic.py
+
+- **tests.networks.domestic_water.test_network_diagnostic.test_network_diagnostic_not_computed()** -> `None`
+  - calls: build_domestic_water_network_diagnostic
+- **tests.networks.domestic_water.test_network_diagnostic.test_network_diagnostic_ok_without_pressure_summary()** -> `None`
+  - calls: DomesticWaterNetworkComputeResult, DomesticWaterSectionComputeResult, build_domestic_water_network_diagnostic
+- **tests.networks.domestic_water.test_network_diagnostic.test_network_diagnostic_warning_status()** -> `None`
+  - calls: DomesticWaterNetworkComputeResult, EngineMessage.warning, build_domestic_water_network_diagnostic
+- **tests.networks.domestic_water.test_network_diagnostic.test_network_diagnostic_error_status_has_priority()** -> `None`
+  - calls: DomesticWaterNetworkComputeResult, EngineMessage.error, _pressure_summary, build_domestic_water_network_diagnostic
+- **tests.networks.domestic_water.test_network_diagnostic.test_network_diagnostic_insufficient_pressure_status()** -> `None`
+  - calls: DomesticWaterNetworkComputeResult, _pressure_summary, build_domestic_water_network_diagnostic
+- **tests.networks.domestic_water.test_network_diagnostic.test_network_diagnostic_status_values()** -> `None`
+- **tests.networks.domestic_water.test_network_diagnostic._pressure_summary(status, critical_node_id, worst_pressure_bar, pressure_margin_bar)** -> `DomesticWaterPressureSummary`
+  - calls: DomesticWaterPressurePropagationResult, DomesticWaterPressureSummary, NodePressureState, TerminalPressureStatus
 
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_network_engine.py
 
@@ -1864,6 +1892,8 @@
 - **tests.networks.test_public_api.test_networks_public_api_exports_facades()** -> `None`
   - calls: callable
 - **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_engine_types()** -> `None`
+- **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_diagnostic_types()** -> `None`
+  - calls: callable
 - **tests.networks.test_public_api.test_networks_public_api_exports_domestic_water_domain_types()** -> `None`
 - **tests.networks.test_public_api.test_networks_public_api_exports_section_sizing_types()** -> `None`
   - calls: callable

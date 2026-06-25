@@ -79,6 +79,9 @@ from ndc_core.networks import (
     prepare_section_hydraulic_inputs,
     build_section_pressure_loss_result,
     select_section_diameter,
+    DomesticWaterNetworkDiagnostic,
+    DomesticWaterNetworkDiagnosticStatus,
+    build_domestic_water_network_diagnostic,
 )
 from ndc_core.networks.cold_water import (
     ColdWaterNetworkEngine as ColdWaterNetworkEngineFromPackage,
@@ -130,6 +133,12 @@ def test_networks_public_api_exports_domestic_water_engine_types() -> None:
     assert DomesticWaterNetworkComputeResult is not None
     assert DomesticWaterSectionComputeResult is not None
     assert DomesticWaterNetworkStep.SIZING.value == "sizing"
+
+
+def test_networks_public_api_exports_domestic_water_diagnostic_types() -> None:
+    assert DomesticWaterNetworkDiagnostic is not None
+    assert DomesticWaterNetworkDiagnosticStatus.OK.value == "ok"
+    assert callable(build_domestic_water_network_diagnostic)
 
 
 def test_networks_public_api_exports_domestic_water_domain_types() -> None:

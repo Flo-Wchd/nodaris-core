@@ -81,6 +81,9 @@ from ndc_core.networks.domestic_water import (
     zeta_from_catalog_singular_loss,
     zeta_from_section_singular_loss_item,
     select_section_diameter,
+    DomesticWaterNetworkDiagnostic,
+    DomesticWaterNetworkDiagnosticStatus,
+    build_domestic_water_network_diagnostic,
 )
 from ndc_core.networks.hot_water import (
     HotWaterNetworkEngine,
@@ -108,9 +111,12 @@ _DOMESTIC_WATER_DOMAIN_EXPORTS = [
 
 _DOMESTIC_WATER_ENGINE_EXPORTS = [
     "DomesticWaterNetworkComputeResult",
+    "DomesticWaterNetworkDiagnostic",
+    "DomesticWaterNetworkDiagnosticStatus",
     "DomesticWaterNetworkEngine",
     "DomesticWaterNetworkStep",
     "DomesticWaterSectionComputeResult",
+    "build_domestic_water_network_diagnostic",
 ]
 
 _DOMESTIC_WATER_PRESSURE_EXPORTS = [
