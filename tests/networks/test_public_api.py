@@ -103,6 +103,9 @@ from ndc_core.networks.domestic_water.section_diameter_selection import (
 from ndc_core.networks.domestic_water.section_no_flow_sizing import (
     build_no_flow_section_sizing,
 )
+from ndc_core.networks.domestic_water.section_sizing_context import (
+    build_section_sizing_context,
+)
 
 
 def test_networks_public_api_exports_facades() -> None:
@@ -269,3 +272,12 @@ def test_no_flow_section_sizing_helper_stays_internal() -> None:
 
 def test_networks_public_api_does_not_export_no_flow_helper() -> None:
     assert "build_no_flow_section_sizing" not in networks_api.__all__
+
+
+def test_section_sizing_context_helper_stays_internal() -> None:
+    assert build_section_sizing_context is not None
+    assert "build_section_sizing_context" not in domestic_water_api.__all__
+
+
+def test_networks_public_api_does_not_export_section_sizing_context_helper() -> None:
+    assert "build_section_sizing_context" not in networks_api.__all__

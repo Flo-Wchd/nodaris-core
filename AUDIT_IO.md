@@ -832,14 +832,20 @@
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine.hot_water(cls, appliance_catalog, pipe_catalog)** -> `DomesticWaterSectionSizingEngine`
   - calls: cls
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine.size_section_from_counts(self, section, appliance_counts, max_velocity_m_s)** -> `Result[DomesticWaterSectionSizing]`
-  - calls: DomesticWaterDemandBuilder, DomesticWaterDemandBuilder(appliance_catalog=self.appliance_catalog, profile=self.profile).compute_from_counts, Result.failure, Result.partial, Result.success, apply_section_sizing_state, build_no_flow_section_sizing, max, messages.extend, minimum_appliance_internal_diameter_mm, normalize_appliance_counts, select_section_diameter, velocity_limit_for_context
+  - calls: Result.failure, Result.partial, Result.success, apply_section_sizing_state, build_no_flow_section_sizing, build_section_sizing_context, select_section_diameter
 - **ndc_core.networks.domestic_water.section_sizing.size_cold_water_section_from_counts(section, appliance_counts, appliance_catalog, pipe_catalog, max_velocity_m_s)** -> `Result[DomesticWaterSectionSizing]`
   - calls: DomesticWaterSectionSizingEngine.cold_water, DomesticWaterSectionSizingEngine.cold_water(appliance_catalog=appliance_catalog, pipe_catalog=pipe_catalog).size_section_from_counts
   - doc: Convenience function for EFS section sizing.
 - **ndc_core.networks.domestic_water.section_sizing.size_hot_water_section_from_counts(section, appliance_counts, appliance_catalog, pipe_catalog, max_velocity_m_s)** -> `Result[DomesticWaterSectionSizing]`
   - calls: DomesticWaterSectionSizingEngine.hot_water, DomesticWaterSectionSizingEngine.hot_water(appliance_catalog=appliance_catalog, pipe_catalog=pipe_catalog).size_section_from_counts
   - doc: Convenience function for ECS forward section sizing.
-- **ndc_core.networks.domestic_water.section_sizing.velocity_limit_for_context(usage_context)** -> `float`
+
+## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\section_sizing_context.py
+
+- **ndc_core.networks.domestic_water.section_sizing_context.build_section_sizing_context(section, appliance_counts, appliance_catalog, profile, max_velocity_m_s)** -> `Result[DomesticWaterSectionSizingContext]`
+  - calls: DomesticWaterDemandBuilder, DomesticWaterDemandBuilder(appliance_catalog=appliance_catalog, profile=profile).compute_from_counts, DomesticWaterSectionSizingContext, Result.failure, Result.success, max, messages.extend, minimum_appliance_internal_diameter_mm, normalize_appliance_counts, velocity_limit_for_context
+  - doc: Prepare demand, counts and sizing limits for one section.
+- **ndc_core.networks.domestic_water.section_sizing_context.velocity_limit_for_context(usage_context)** -> `float`
   - calls: isinstance, str, value.strip, value.strip().lower
   - doc: Return default velocity limit for domestic water.
 
@@ -1614,6 +1620,23 @@
 - **tests.networks.domestic_water.test_section_sizing.test_zero_hot_water_demand_returns_partial_without_exception()** -> `None`
   - calls: _appliance_catalog, _pipe_catalog, _section, any, size_hot_water_section_from_counts
 
+## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_section_sizing_context.py
+
+- **tests.networks.domestic_water.test_section_sizing_context._appliance_catalog()** -> `ApplianceCatalog`
+  - calls: Appliance, ApplianceCatalog
+- **tests.networks.domestic_water.test_section_sizing_context._section(**kwargs)** -> `Section`
+  - calls: Section, values.update
+- **tests.networks.domestic_water.test_section_sizing_context.test_build_section_sizing_context_for_cold_water()** -> `None`
+  - calls: _appliance_catalog, _section, build_section_sizing_context, isinstance, list
+- **tests.networks.domestic_water.test_section_sizing_context.test_build_section_sizing_context_respects_machine_exclusivity()** -> `None`
+  - calls: _appliance_catalog, _section, build_section_sizing_context
+- **tests.networks.domestic_water.test_section_sizing_context.test_build_section_sizing_context_keeps_zero_hot_water_demand()** -> `None`
+  - calls: _appliance_catalog, _section, build_section_sizing_context
+- **tests.networks.domestic_water.test_section_sizing_context.test_build_section_sizing_context_accepts_manual_velocity_limit()** -> `None`
+  - calls: _appliance_catalog, _section, build_section_sizing_context
+- **tests.networks.domestic_water.test_section_sizing_context.test_velocity_limit_for_context_is_kept_compatible_from_section_sizing()** -> `None`
+  - calls: velocity_limit_for_context
+
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_section_sizing_result.py
 
 - **tests.networks.domestic_water.test_section_sizing_result.test_section_sizing_result_exports_are_kept_from_section_sizing()** -> `None`
@@ -1769,3 +1792,5 @@
   - calls: hasattr, len, set
 - **tests.networks.test_public_api.test_no_flow_section_sizing_helper_stays_internal()** -> `None`
 - **tests.networks.test_public_api.test_networks_public_api_does_not_export_no_flow_helper()** -> `None`
+- **tests.networks.test_public_api.test_section_sizing_context_helper_stays_internal()** -> `None`
+- **tests.networks.test_public_api.test_networks_public_api_does_not_export_section_sizing_context_helper()** -> `None`
