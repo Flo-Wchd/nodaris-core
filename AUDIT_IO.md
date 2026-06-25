@@ -819,6 +819,12 @@
   - calls: DomesticWaterSectionHydraulicInputs, EngineMessage.error, EngineMessage.info, diameter_mm_to_m, max, messages.append, safe_float, safe_positive_float, velocity_from_l_s_and_mm
   - doc: Prepare safe hydraulic inputs from a Section-like object.
 
+## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\section_no_flow_sizing.py
+
+- **ndc_core.networks.domestic_water.section_no_flow_sizing.build_no_flow_section_sizing(section, demand, side, min_required_diameter_mm, max_velocity_m_s, messages)** -> `DomesticWaterSectionSizing`
+  - calls: DomesticWaterSectionSizing, EngineMessage.warning, messages.append, tuple
+  - doc: Build a managed sizing result for a section with zero design flow.
+
 ## C:\dev\PythonProject_v4\ndc_core\networks\domestic_water\section_sizing.py
 
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine.cold_water(cls, appliance_catalog, pipe_catalog)** -> `DomesticWaterSectionSizingEngine`
@@ -826,7 +832,7 @@
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine.hot_water(cls, appliance_catalog, pipe_catalog)** -> `DomesticWaterSectionSizingEngine`
   - calls: cls
 - **ndc_core.networks.domestic_water.section_sizing.DomesticWaterSectionSizingEngine.size_section_from_counts(self, section, appliance_counts, max_velocity_m_s)** -> `Result[DomesticWaterSectionSizing]`
-  - calls: DomesticWaterDemandBuilder, DomesticWaterDemandBuilder(appliance_catalog=self.appliance_catalog, profile=self.profile).compute_from_counts, DomesticWaterSectionSizing, EngineMessage.warning, Result.failure, Result.partial, Result.success, apply_section_sizing_state, max, messages.append, messages.extend, minimum_appliance_internal_diameter_mm, normalize_appliance_counts, select_section_diameter, tuple ...
+  - calls: DomesticWaterDemandBuilder, DomesticWaterDemandBuilder(appliance_catalog=self.appliance_catalog, profile=self.profile).compute_from_counts, Result.failure, Result.partial, Result.success, apply_section_sizing_state, build_no_flow_section_sizing, max, messages.extend, minimum_appliance_internal_diameter_mm, normalize_appliance_counts, select_section_diameter, velocity_limit_for_context
 - **ndc_core.networks.domestic_water.section_sizing.size_cold_water_section_from_counts(section, appliance_counts, appliance_catalog, pipe_catalog, max_velocity_m_s)** -> `Result[DomesticWaterSectionSizing]`
   - calls: DomesticWaterSectionSizingEngine.cold_water, DomesticWaterSectionSizingEngine.cold_water(appliance_catalog=appliance_catalog, pipe_catalog=pipe_catalog).size_section_from_counts
   - doc: Convenience function for EFS section sizing.
@@ -1571,6 +1577,17 @@
   - calls: _section, len, prepare_section_hydraulic_inputs
 - **tests.networks.domestic_water.test_section_hydraulic_inputs.test_prepare_section_hydraulic_inputs_clamps_negative_length()** -> `None`
   - calls: _section, prepare_section_hydraulic_inputs
+
+## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_section_no_flow_sizing.py
+
+- **tests.networks.domestic_water.test_section_no_flow_sizing._section(**kwargs)** -> `Section`
+  - calls: Section, values.update
+- **tests.networks.domestic_water.test_section_no_flow_sizing._zero_flow_demand()** -> `DomesticWaterDemand`
+  - calls: ApplianceDemandItem, DomesticWaterDemand
+- **tests.networks.domestic_water.test_section_no_flow_sizing.test_build_no_flow_section_sizing()** -> `None`
+  - calls: _section, _zero_flow_demand, any, build_no_flow_section_sizing, list
+- **tests.networks.domestic_water.test_section_no_flow_sizing.test_build_no_flow_section_sizing_keeps_min_required_diameter()** -> `None`
+  - calls: _section, _zero_flow_demand, build_no_flow_section_sizing
 
 ## C:\dev\PythonProject_v4\tests\networks\domestic_water\test_section_sizing.py
 

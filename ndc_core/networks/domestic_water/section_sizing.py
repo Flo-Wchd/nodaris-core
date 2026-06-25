@@ -25,6 +25,9 @@ from ndc_core.networks.domestic_water.section_sizing_result import (
 from ndc_core.networks.domestic_water.section_diameter_selection import (
     select_section_diameter,
 )
+from ndc_core.networks.domestic_water.section_no_flow_sizing import (
+    build_no_flow_section_sizing,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -105,29 +108,13 @@ class DomesticWaterSectionSizingEngine:
         )
 
         if demand.design_flow_l_s <= 0.0:
-            messages.append(
-                EngineMessage.warning(
-                    code="DOMESTIC_WATER_SECTION_NO_FLOW",
-                    text="Section demand is zero; diameter sizing was not performed.",
-                    context={"section_id": section.id},
-                )
-            )
-            sizing = DomesticWaterSectionSizing(
-                section_id=section.id,
-                side=self.profile.side,
-                mode=SectionSizingMode.AUTOMATIC,
+            sizing = build_no_flow_section_sizing(
+                section=section,
                 demand=demand,
-                selected_pipe_size=None,
-                selected_pipe_size_code=None,
-                theoretical_internal_diameter_mm=None,
-                min_required_internal_diameter_mm=(
-                    min_required_diameter or None
-                ),
-                used_internal_diameter_mm=None,
-                velocity_m_s=None,
+                side=self.profile.side,
+                min_required_diameter_mm=min_required_diameter,
                 max_velocity_m_s=velocity_limit,
-                velocity_ok=None,
-                messages=tuple(messages),
+                messages=messages,
             )
             apply_section_sizing_state(
                 section=section,
@@ -136,7 +123,6 @@ class DomesticWaterSectionSizingEngine:
                 effective_counts=effective_counts,
             )
             return Result.partial(value=sizing, messages=messages)
-
         sizing = select_section_diameter(
             section=section,
             demand=demand,
@@ -226,3 +212,12 @@ def velocity_limit_for_context(
         return 1.5
 
     return 2.0
+
+__all__ = [
+    "DomesticWaterSectionSizing",
+    "DomesticWaterSectionSizingEngine",
+    "SectionSizingMode",
+    "size_cold_water_section_from_counts",
+    "size_hot_water_section_from_counts",
+    "velocity_limit_for_context",
+]
