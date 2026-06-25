@@ -100,6 +100,9 @@ from ndc_core.networks.domestic_water.section_sizing_result import (
 from ndc_core.networks.domestic_water.section_diameter_selection import (
     select_section_diameter as select_section_diameter_from_module,
 )
+from ndc_core.networks.domestic_water.section_no_flow_sizing import (
+    build_no_flow_section_sizing,
+)
 
 
 def test_networks_public_api_exports_facades() -> None:
@@ -257,3 +260,12 @@ def test_domestic_water_public_api_all_is_unique_and_resolvable() -> None:
 
     for exported_name in domestic_water_api.__all__:
         assert hasattr(domestic_water_api, exported_name)
+
+
+def test_no_flow_section_sizing_helper_stays_internal() -> None:
+    assert build_no_flow_section_sizing is not None
+    assert "build_no_flow_section_sizing" not in domestic_water_api.__all__
+
+
+def test_networks_public_api_does_not_export_no_flow_helper() -> None:
+    assert "build_no_flow_section_sizing" not in networks_api.__all__

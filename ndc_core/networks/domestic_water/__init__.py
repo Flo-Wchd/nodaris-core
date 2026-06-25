@@ -1,5 +1,8 @@
 # ruff: noqa: F401
-# Public barrel module: imported symbols are intentionnaly re-exported via __all__
+"""Public domestic water network API.
+
+Imported symbols are intentionnally re-exported through __all__.
+"""
 
 from ndc_core.networks.domestic_water.appliance_counts import (
     apply_machine_exclusivity,

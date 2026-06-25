@@ -1,5 +1,8 @@
 # ruff: noqa: F401
-# Public barrel module: imported symbols are intentionnaly re-exported via __all__
+"""Public network API.
+
+Imported symbols are intentionnally re-exported through __all__.
+"""
 
 from ndc_core.networks.cold_water import (
     ColdWaterNetworkEngine,

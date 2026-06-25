@@ -1767,3 +1767,5 @@
   - calls: hasattr, len, set
 - **tests.networks.test_public_api.test_domestic_water_public_api_all_is_unique_and_resolvable()** -> `None`
   - calls: hasattr, len, set
+- **tests.networks.test_public_api.test_no_flow_section_sizing_helper_stays_internal()** -> `None`
+- **tests.networks.test_public_api.test_networks_public_api_does_not_export_no_flow_helper()** -> `None`
